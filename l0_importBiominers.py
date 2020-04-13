@@ -101,3 +101,41 @@ def postprocess_table(country, df_single):
   print(f"no postprocessing for country {country_name}")
   return df_single
 
+
+
+import pandas as pd
+from notion.client import NotionClient
+
+class L0ImportBiominers:
+
+  def get_notion_token(self, notion_fn):
+    token_v2=open(notion_fn,"r").read().strip()
+    self.client = NotionClient(token_v2=token_v2)
+
+  def fetch_tables(self):
+    # get all
+    df_global = []
+    for country_name in notion_map.keys():
+      print(country_name)
+      df_single = get_table(self.client, country_name)
+      print("%s .. %s"%(country_name, df_single.shape))
+
+      df_single = postprocess_table(country_name, df_single)
+      # df_single = df_single[["Date","total_cumul"]]
+
+      df_single["country_t11"] = country_name
+      df_global.append(df_single)
+
+    # merge
+    df_global = pd.concat(df_global, axis=0)
+    df_global = df_global.loc[pd.notnull(df_global.total_cumul),]
+    df_global = df_global.sort_values(["country_t11", "Date"], ascending=True)
+    self.df_global = df_global
+
+  def to_csv(self, fn_biominers):
+    # save
+    # fn_biominers = "multiple-biominers-gitrepo.csv"
+    df_save = self.df_global[["country_t11", "Date", "total_cumul"]]
+    df_save.to_csv(fn_biominers, index=False)
+
+
