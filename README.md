@@ -16,7 +16,7 @@ For the python scripts
 ```
 pip3 install pew
 pew new biominers_covid19
-pip3 install notion pandas
+pip3 install notion pandas Click
 ```
 
 For the R scripts
