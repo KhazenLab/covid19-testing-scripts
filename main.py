@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
 
-from .l0_importBiominers import L0ImportBiominers
-from .l1_importOthers import L1ImportOthers
+from lib.l0_importBiominers import L0ImportBiominers
+from lib.l1_importOthers import L1ImportOthers
 
 
 import click
@@ -27,7 +27,7 @@ def l0_importBiominers(notion_fn, fn_biominers):
 
     # notion_fn="notion-shadiakiki1986-token_v2.txt"
     # fn_biominers = "multiple-biominers-gitrepo.csv"
-    factory = L0ImportBiominers(self, notion_fn, fn_biominers)
+    factory = L0ImportBiominers()
     factory.get_notion_token(notion_fn)
     factory.fetch_tables()
     factory.to_csv(fn_biominers)
@@ -36,16 +36,15 @@ def l0_importBiominers(notion_fn, fn_biominers):
 @cli.command()
 @click.argument('dir_gdrive')
 def l1_importOthers(dir_gdrive):
-    """
-    Original notebook at
-        t11b-shadi-collect biominers and non-biominers sources.ipynb
-        https://colab.research.google.com/drive/1yN-HGiOJzMDXnaimHZ96yUBT7bU38A94
+  """
+  Original notebook at
+      t11b-shadi-collect biominers and non-biominers sources.ipynb
+      https://colab.research.google.com/drive/1yN-HGiOJzMDXnaimHZ96yUBT7bU38A94
 
-    Read data from other non-biominer sources
-    """
+  Read data from other non-biominer sources
+  """
 
-  dir_gdrive = "/content/covid19-testing"
-	factory = L1ImportOthers(dir_gdrive)
+  factory = L1ImportOthers(dir_gdrive)
 
   factory.get_owid_roser()
   factory.get_owid_ortiz()

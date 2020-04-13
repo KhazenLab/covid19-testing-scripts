@@ -318,7 +318,7 @@ class L1ImportOthers:
     # fn_agg = "multiple-aggregated_owid_wiki_worldometers_biominers-v20200406c.csv"
     fn_agg = "multiple-aggregated_owid_wiki_worldometers_biominers-gitrepo.csv"
     
-    df_save = df_merged[["Location","Date","total_cumul.all","total_cumul.source"]]
+    df_save = self.df_merged[["Location","Date","total_cumul.all","total_cumul.source"]]
     df_save = df_save[pd.notnull(df_save["total_cumul.all"])]
     df_save = df_save.sort_values(["Location","Date"], ascending=True)
     
@@ -333,7 +333,7 @@ class L1ImportOthers:
     fn_agg = "multiple-aggregated_owid_wiki_worldometers_biominers-gitrepo-sidebyside.csv"
     
     # df_save = df_merged[["Location","Date","total_cumul.all","total_cumul.source"]]
-    df_save = df_merged
+    df_save = self.df_merged
     df_save = df_save[pd.notnull(df_save["total_cumul.all"])]
     df_save = df_save.sort_values(["Location","Date"], ascending=True)
     

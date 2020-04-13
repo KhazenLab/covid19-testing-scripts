@@ -54,47 +54,47 @@ def get_table(client, country_name):
     return df_all
 
 
-def postprocess_table(country, df_single):
+def postprocess_table(country_name, df_single):
   # Update 2020-04-09: in general, do not replace NA with 0 with fillna(0)
 
-  if country=="Argentina":
+  if country_name=="Argentina":
     # df_single["total_cumul"] = df_single[["neg cumul labs", "neg cumul epid", "confirmed cumulative"]].fillna(0).apply(sum, axis=1)
     # Update 2020-04-09: do not use neg cumul epid
     df_single["total_cumul"] = df_single[["neg cumul labs", "confirmed cumulative"]].apply(sum, axis=1)
     return df_single
   
-  if country=="Armenia":
+  if country_name=="Armenia":
     df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     return df_single
 
-  if country=="Bolivia":
+  if country_name=="Bolivia":
     df_single["total_cumul"] = df_single[["cumulative negative", "cumulative confirmed"]].apply(sum, axis=1)
     return df_single
 
   # Update 2020-04-10: turns out they have a total cumulative tests field
-  #if country=="Bosnia and Herzegovina":
+  #if country_name=="Bosnia and Herzegovina":
   #  df_single["total_cumul"] = df_single[["cumulative negative", "cumulative confirmed"]].apply(sum, axis=1)
   #  return df_single
 
-  if country=="Colombia":
+  if country_name=="Colombia":
     df_single["total_cumul"] = df_single[["confirmed cumul", "negative cumul"]].apply(sum, axis=1)
     return df_single
 
-  if country=="Costa Rica":
+  if country_name=="Costa Rica":
     df_single["total_cumul"] = df_single[["confirmed cumul", "negative cumul"]].apply(sum, axis=1)
     return df_single
 
-  #if country=="Croatia":
+  #if country_name=="Croatia":
   #  # Croatia has a total_cumul column, but for some dates that are missing it, we can calculate it from confirmed + negative
   #  df_single["total_cumul"] = df_single[["confirmed cumul", "negative cumul"]].fillna(0).apply(sum, axis=1)
   #  return df_single
 
   # Update 2020-04-09: just use the total_cumul field directly
-  #if country=="Estonia":
+  #if country_name=="Estonia":
   #  df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
   #  return df_single
 
-  if country=="Philippines":
+  if country_name=="Philippines":
     df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     return df_single
 
