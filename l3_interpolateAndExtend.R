@@ -49,13 +49,13 @@ histData$tests_per_mil=histData$total_cumul.all*1000000/histData$Population;
 histData$ratio_confirmed_total_pct=histData$ConfirmedCases*100/histData$total_cumul.all;
 histData$negative_cases=histData$total_cumul.all-histData$ConfirmedCases;
 histData$tests_per_mil=floor(histData$tests_per_mil)
-write.csv(histData,"../covid19-testing/ArcGIS/t11c_confirmed_totalTests_historical.csv")
+write.csv(histData,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-historical.csv")
 #End Historical
 
 
 #Begin Latest
 latest=histData[which(as.Date(histData$Date)==max(as.Date(histData$Date))),c("CountryProv","Lat","Long","ConfirmedCases","Fatalities","total_cumul.all","Population","tests_per_mil","ratio_confirmed_total_pct","negative_cases")]
-write.csv(latest,"../covid19-testing/ArcGIS/t11c_confirmed_totalTests_latest.csv")
+write.csv(latest,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-latestOnly.csv")
 #End Latest
 
 #Begin Daily Stacked
@@ -124,5 +124,5 @@ long=c(histData$Long,histData$Long);
 
 res= data.frame("CountryProv"=country,"Lat"=lat,"Long"=long,"dailyValue"=daily,"cumulativeValue"=cumulative,"Positive.Negative"=positiveNegative)
 
-write.csv(res,"../covid19-testing/ArcGIS/t11c_confirmedtotalTests_historical_stacked.csv")
+write.csv(res,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-historical-stacked.csv")
 #End Daily Stacked
