@@ -109,7 +109,35 @@ class L2MergeTogether:
                     )
     del conf_train['Location']
 
+    # fix few outliers where total tests < confirmed cases and is negligible
+    # Two steps
+    # 1. create a bi-index since it's not working in pandas
+    # 2. assert that the data is of a certain value (as of the check of this date 2020-04-14)
+    # 2. overwrite (sources are worldometers.info and confirmed cases are not so far from total tests)
+    conf_train["UID"] = conf_train["CountryProv"]+"/"+conf_train.Date.dt.strftime("%Y-%m-%d")
+    conf_train.set_index("UID", inplace=True)
+
+    assert conf_train.loc["Burundi/2020-04-04","total_cumul.all"] == 2
+    conf_train.loc["Burundi/2020-04-04","total_cumul.all"] = 3 # was 2 from worldometers
+    assert conf_train.loc["Moldova/2020-04-04","total_cumul.all"] == 681
+    conf_train.loc["Moldova/2020-04-04","total_cumul.all"] = 752 # was 681 from worldometers
+    #assert ...
+    #conf_train.loc["Senegal/2020-04-04","total_cumul.all"] = 219 # no longer needed after owid/roser data source integration
+    assert conf_train.loc["Sierra Leone/2020-04-04","total_cumul.all"] == 2
+    conf_train.loc["Sierra Leone/2020-04-04","total_cumul.all"] = 4 # was 2 from worldometers
+
+    conf_train.reset_index(inplace=True)
+    del conf_train["UID"]
+
+    # continue with index as usual
     conf_train.set_index(["CountryProv","Date"], inplace=True)
+
+    # check that total tests >= Confirmed cases
+    conf_breach = conf_train[(conf_train["total_cumul.all"] < conf_train["ConfirmedCases"])]
+    if conf_breach.shape[0] > 0:
+      print("Details of exception")
+      print(conf_breach.head())
+      raise Exception("Found breach totals<confirmed for: (only top 5 shown above)")
 
     self.conf_train = conf_train
 
@@ -182,22 +210,6 @@ class L2MergeTogether:
 
     conf_train = conf_train[colOrder]
 
-    # fix few outliers where total tests < confirmed cases and is negligible
-
-    # create a bi-index since it's not working in pandas
-    conf_train["UID"] = conf_train["CountryProv"]+"/"+conf_train.Date.dt.strftime("%Y-%m-%d")
-    conf_train.set_index("UID", inplace=True)
-
-    # overwrite (sources are worldometers.info and confirmed cases are not so far from total tests)
-    conf_train.loc["Burundi/2020-04-04","total_cumul.all"] = 3
-    conf_train.loc["Moldova/2020-04-04","total_cumul.all"] = 752
-    conf_train.loc["Senegal/2020-04-04","total_cumul.all"] = 219
-    conf_train.loc["Sierra Leone/2020-04-04","total_cumul.all"] = 4
-
-    #
-    conf_train.reset_index(inplace=True)
-
-    del conf_train["UID"]
 
     # any outliers where total tests < confirmed cases ?
     # conf_train[  conf_train["total_cumul.all"] < conf_train["ConfirmedCases"]  ].head(n=10)

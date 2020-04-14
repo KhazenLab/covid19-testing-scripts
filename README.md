@@ -58,7 +58,6 @@ Step 3b: merge with confirmed cases
 (TODO add extracting the latestOnly file as well)
 
 ```
-# WIP
 python3 main.py l2-mergetogether \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```

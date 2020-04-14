@@ -3,6 +3,7 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- enh, l2: moved minor over-writing of data up in pipeline and added assertions to avoid over-writing if data changes value/source
 - feat: drop daily owid/roser source and get cumulative one and integrate. This is a major source of data
 
 
