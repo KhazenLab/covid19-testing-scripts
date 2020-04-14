@@ -1,5 +1,0 @@
-# quote "Korea, South" in the csv file (and other country/states containing comas)
-#system('sed --version', intern=T)
-system('sed -i "s/Korea, South/\\"Korea, South\\"/g" /content/covid19-testing/t11c-confirmed+totalTests-historical.csv 2>&1', intern=T)
-system('sed -i "s/Netherlands – Bonaire, Sint Eustatius and Saba/\\"Netherlands – Bonaire, Sint Eustatius and Saba\\"/g" /content/covid19-testing/t11c-confirmed+totalTests-historical.csv 2>&1', intern=T)
-system('sed -i "s/,Bonaire, Sint Eustatius and Saba/,\\"Bonaire, Sint Eustatius and Saba\\"/g" /content/covid19-testing/t11c-confirmed+totalTests-historical.csv 2>&1', intern=T)
