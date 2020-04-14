@@ -1,5 +1,5 @@
 library(zoo)
-histData=read.csv("historical.csv")
+histData=read.csv("../covid19-testing/t11c-confirmed+totalTests-historical.csv")
 histData$CountryProv=as.character(histData$CountryProv)
 gsub('*',histData$CountryProv,'');
 countries=unique(histData$CountryProv)
@@ -32,8 +32,8 @@ for(i in 1:length(countries))
   tempdata_approx <- na.approx(tempdata)
   countryData$total_cumul.all[index(tempdata_approx)]=round(tempdata_approx,0)
   
-  indexNA=which(is.na(countryData$total_cumul.all))
-  countryData$total_cumul.all[indexNA]=countryData$ConfirmedCases;
+  #indexNA=which(is.na(countryData$total_cumul.all))
+  #countryData$total_cumul.all[indexNA]=countryData$ConfirmedCases;
   
   if(!isUpdated)
   {
@@ -49,17 +49,17 @@ histData$tests_per_mil=histData$total_cumul.all*1000000/histData$Population;
 histData$ratio_confirmed_total_pct=histData$ConfirmedCases*100/histData$total_cumul.all;
 histData$negative_cases=histData$total_cumul.all-histData$ConfirmedCases;
 histData$tests_per_mil=floor(histData$tests_per_mil)
-
+write.csv(histData,"../covid19-testing/ArcGIS/t11c_confirmed_totalTests_historical.csv")
 #End Historical
 
 
 #Begin Latest
 latest=histData[which(as.Date(histData$Date)==max(as.Date(histData$Date))),c("CountryProv","Lat","Long","ConfirmedCases","Fatalities","total_cumul.all","Population","tests_per_mil","ratio_confirmed_total_pct","negative_cases")]
-
+write.csv(latest,"../covid19-testing/ArcGIS/t11c_confirmed_totalTests_latest.csv")
 #End Latest
 
 #Begin Daily Stacked
-
+countries=unique(histData$CountryProv)
 dates<-vector();
 dailyConfirmed<-vector()
 for(i in 1:length(countries))
@@ -68,7 +68,7 @@ for(i in 1:length(countries))
   dailyConfirmed<-append(dailyConfirmed,diff(c(0,countryData$ConfirmedCases)))
   
 }
-histData$dailyConfirmed=dailyConfirmed
+
 
 dailyTotal<-vector()
 for(i in 1:length(countries))
@@ -87,7 +87,7 @@ for(i in 1:length(countries))
   }
   dailyTotal<-append(dailyTotal,diff(total))
 }
-histData$dailyTotal=dailyTotal
+
 
 
 dailyNegative<-vector()
@@ -107,7 +107,7 @@ for(i in 1:length(countries))
   }
   dailyNegative<-append(dailyNegative,diff(negative))
 }
-histData$dailyNegative=dailyNegative
+
 
 date= c(histData$Dates,histData$dates)
 
@@ -124,5 +124,5 @@ long=c(histData$Long,histData$Long);
 
 res= data.frame("CountryProv"=country,"Lat"=lat,"Long"=long,"dailyValue"=daily,"cumulativeValue"=cumulative,"Positive.Negative"=positiveNegative)
 
-
+write.csv(res,"../covid19-testing/ArcGIS/t11c_confirmedtotalTests_historical_stacked.csv")
 #End Daily Stacked
