@@ -76,7 +76,8 @@ def l2_mergeTogether(dir_gitrepo):
   factory.merge_country_meta()
   factory.export_count_per_source()
   factory.add_supplementary_stats()
-  factory.to_csv()
+  factory.to_csv_historical()
+  factory.to_csv_latestOnly()
 
 
 if __name__ == '__main__':

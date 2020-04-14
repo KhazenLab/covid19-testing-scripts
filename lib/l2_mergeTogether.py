@@ -229,7 +229,7 @@ class L2MergeTogether:
     self.conf_train = conf_train
 
 
-  def to_csv(self):
+  def to_csv_historical(self):
     save_fn = "t11c-confirmed+totalTests-historical.csv"
     save_fn = join(self.dir_gitrepo, save_fn)
     # Use na="" since arcgis.com doesn't support values for NAs
@@ -237,7 +237,32 @@ class L2MergeTogether:
     self.conf_train.reset_index().to_csv(save_fn, na_rep="", index=False) # , quote=False
 
 
-"""Extract the `latestOnly` version manually by opening the historical in a worksheet editor and creating a pivot table.
+  def to_csv_latestOnly(self):
+    """Extract the `latestOnly` version from the historical.
+    This used to be done manually with a libreoffice pivot table.
+    Now from notebook t11c3
+    """
+    df_hist = self.conf_train.reset_index()
 
-"""
+    # get last date for totals
+    df_last_tot = df_hist.groupby("CountryProv").apply(lambda g: g.Date[pd.notnull(g["total_cumul.all"])].tail(n=1).tolist())
+    df_last_tot = df_last_tot.apply(lambda v: np.NaN if len(v)==0 else v[0])
+    df_last_tot = df_last_tot.reset_index().head().rename(columns={0:"Date"})
+    
+    # repeat for confirmed cases to fill the blanks from totals
+    df_last_conf = df_hist.groupby("CountryProv").apply(lambda g: g.Date[pd.notnull(g["ConfirmedCases"])].tail(n=1).tolist())
+    df_last_conf = df_last_conf.apply(lambda v: np.NaN if len(v)==0 else v[0])
+    df_last_conf = df_last_conf.reset_index().head().rename(columns={0:"Date"})
+    
+    # merge last from totals with last from confirmed and fillna
+    df_last = df_last_tot.merge(df_last_conf, how='outer', on="CountryProv", suffixes=["_tot","_conf"])
+    df_last["Date"] = df_last["Date_tot"].fillna(df_last["Date_conf"])
+    del df_last["Date_tot"]
+    del df_last["Date_conf"]
+    
+    df_last = df_last.merge(df_hist, how='left', on=["CountryProv","Date"])
+    df_last = df_last[["CountryProv","Date","ConfirmedCases","Fatalities","total_cumul.all","Population","tests_per_mil", "ratio_confirmed_total_pct", "negative_cases"]]
 
+    # save to csv
+    save_fn = "t11c-confirmed+totalTests-latestOnly.csv"
+    df_last.to_csv(join(self.dir_gitrepo, save_fn))
