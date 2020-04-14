@@ -19,7 +19,7 @@ Step 1: import notion tables
 ```
 python3 main.py l0-importbiominers \
     ~/Development/bitbucket.org/shadiakiki1986/shadi-configs/notion-shadiakiki1986-token_v2.txt \
-    ~/Development/gitlab.com/biominers/covid19-testing/multiple-biominers-gitrepo.csv 
+    ~/Development/gitlab.com/biominers/covid19-testing-data/multiple-biominers-gitrepo.csv 
 ```
 
 Step 2: import non-biominer tables and merge with biominer
@@ -28,7 +28,7 @@ Step 2: import non-biominer tables and merge with biominer
 
 ```
 python3 main.py l1-importothers \
-  ~/Development/gitlab.com/biominers/covid19-testing/
+  ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
 
 Step 3a: get confirmed cases data from kaggle
@@ -50,7 +50,7 @@ kaggle --version 2>&1
 # download
 rm -rf /tmp/train.csv
 kaggle competitions download -c covid19-global-forecasting-week-4 -f train.csv -p /tmp
-mv /tmp/train.csv ~/Development/gitlab.com/biominers/covid19-testing/kaggle-confirmed.csv
+mv /tmp/train.csv ~/Development/gitlab.com/biominers/covid19-testing-data/kaggle-confirmed.csv
 ```
 
 Step 3b: merge with confirmed cases
@@ -60,7 +60,7 @@ Step 3b: merge with confirmed cases
 ```
 # WIP
 python3 main.py l2-mergetogether \
-  ~/Development/gitlab.com/biominers/covid19-testing/
+  ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
 
 Step 4: interpolate and extrapolate

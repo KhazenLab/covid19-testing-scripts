@@ -1,6 +1,11 @@
 All entries in reverse chronological order.
 
 
+Version 0.2 (?)
+
+- feat: drop daily owid/roser source and get cumulative one and integrate. This is a major source of data
+
+
 Version 0.1 (2020-04-14)
 
 - feat: l2: add to latest more fields such as latest totals date, first totals date, count totals, latest confirmed date
