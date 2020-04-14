@@ -49,13 +49,14 @@ histData$tests_per_mil=histData$total_cumul.all*1000000/histData$Population;
 histData$ratio_confirmed_total_pct=histData$ConfirmedCases*100/histData$total_cumul.all;
 histData$negative_cases=histData$total_cumul.all-histData$ConfirmedCases;
 histData$tests_per_mil=floor(histData$tests_per_mil)
-write.csv(histData,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-historical.csv")
+write.csv(histData,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-historical.csv",na="")
 #End Historical
 
 
 #Begin Latest
 latest=histData[which(as.Date(histData$Date)==max(as.Date(histData$Date))),c("CountryProv","Lat","Long","ConfirmedCases","Fatalities","total_cumul.all","Population","tests_per_mil","ratio_confirmed_total_pct","negative_cases")]
-write.csv(latest,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-latestOnly.csv")
+names(latest)=c("CountryProv","Lat","Long","Max - ConfirmedCases","Max - Fatalities","Max - total_cumul.all","Max - Population","Max - tests_per_mil","Max - ratio_confirmed_total_pct","Max - negative_cases")
+write.csv(latest,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-latestOnly.csv",na="")
 #End Latest
 
 #Begin Daily Stacked
@@ -109,7 +110,7 @@ for(i in 1:length(countries))
 }
 
 
-date= c(histData$Dates,histData$dates)
+date= c(histData$Date,histData$Date)
 
 negativeStr=rep("Negative",times=length(histData$ConfirmedCases))
 positiveStr=rep("Positive",times=length(histData$ConfirmedCases))
@@ -122,7 +123,7 @@ country=c(as.character(histData$CountryProv),as.character(histData$CountryProv))
 lat=c(histData$Lat,histData$Lat);
 long=c(histData$Long,histData$Long);
 
-res= data.frame("CountryProv"=country,"Lat"=lat,"Long"=long,"dailyValue"=daily,"cumulativeValue"=cumulative,"Positive.Negative"=positiveNegative)
-
-write.csv(res,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-historical-stacked.csv")
+res= data.frame("CountryProv"=country,"Date"=date,"Lat"=lat,"Long"=long,"dailyValue"=daily,"cumulativeValue"=cumulative,"Positive.Negative"=positiveNegative)
+names(res)=c("CountryProv","Date","Lat","Long","dailyValue","cumulativeValue","Positive/Negative")
+write.csv(res,"../covid19-testing/ArcGIS/t11c-confirmedtotalTests-historical-stacked.csv",na="")
 #End Daily Stacked
