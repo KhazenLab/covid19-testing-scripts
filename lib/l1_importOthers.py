@@ -47,6 +47,9 @@ class L1ImportOthers:
     df_owid_roser = df_corr
     del df_corr
 
+    # some corrections for merging
+    df_owid_roser.loc[df_owid_roser["Entity2"]=="Czech Republic", "Entity2"] = "Czechia"
+
     self.df_owid_roser = df_owid_roser
 
 

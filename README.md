@@ -14,7 +14,7 @@ pip3 install notion pandas Click
 
 ## Usage
 
-Step 1: import notion tables
+Step 0: import notion tables
 
 ```
 python3 main.py l0-importbiominers \
@@ -22,7 +22,7 @@ python3 main.py l0-importbiominers \
     ~/Development/gitlab.com/biominers/covid19-testing-data/multiple-biominers-gitrepo.csv 
 ```
 
-Step 2: import non-biominer tables and merge with biominer
+Step 1: import non-biominer tables and merge with biominer
 
 (This includes ourworldindata.org, wikipedia, and worldometers)
 
@@ -31,7 +31,7 @@ python3 main.py l1-importothers \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
 
-Step 3a: get confirmed cases data from kaggle
+Step 2a: get confirmed cases data from kaggle
 
 ```
 # Install kaggle CLI
@@ -53,7 +53,7 @@ kaggle competitions download -c covid19-global-forecasting-week-4 -f train.csv -
 mv /tmp/train.csv ~/Development/gitlab.com/biominers/covid19-testing-data/kaggle-confirmed.csv
 ```
 
-Step 3b: merge with confirmed cases
+Step 2b: merge with confirmed cases
 
 (TODO add extracting the latestOnly file as well)
 
@@ -62,8 +62,8 @@ python3 main.py l2-mergetogether \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
 
-Step 4: interpolate and extrapolate
+Step 3: interpolate and extrapolate (R code run by Halim)
 
 ```
-Rscript l4_interpolate.R
+Rscript l3_interpolateAndExtend.R
 ```
