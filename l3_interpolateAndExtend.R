@@ -12,7 +12,7 @@ for(i in 1:length(countries))
   
   indexfin=max(which(!is.na(tests)))
   isUpdated<-F;
-  if(indexfin==length(tests))
+  if(indexfin==length(tests)||indexfin==(length(tests)-1))
   {
     isUpdated<-T;
   }
