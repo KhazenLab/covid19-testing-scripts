@@ -12,10 +12,23 @@ class L1ImportOthers:
 
 
   def get_owid_roser(self):
-    """### ourworldindata.org Roser page"""
+    """
+    Download the data from ourworldindata.org that is referenced at
+    https://ourworldindata.org/coronavirus#the-total-number-of-tests-performed-or-people-tested-so-far
 
-    fn_owid_roser = "multiple-ourworldindata.org page 2 roser - v20200406.csv"
+    Update 2020-04-14:
+    Replace their csv from the ourworldindata.org article (download from plot) with the one from the github repo. It contains more dates/countries
+    """
 
+    #fn_owid_roser = "multiple-ourworldindata.org page 2 roser - v20200406.csv"
+    fn_owid_roser = "multiple-ourworldindata.org page 2 roser - gitub.csv"
+
+    # download file
+    import urllib.request
+    csv_url = "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv"
+    urllib.request.urlretrieve(csv_url, join(self.dir_gdrive, fn_owid_roser))
+
+    # Read
     df_owid_roser = pd.read_csv(join(self.dir_gdrive, fn_owid_roser))
     df_owid_roser.Date = pd.to_datetime(df_owid_roser.Date)
 
@@ -223,8 +236,8 @@ class L1ImportOthers:
     
     # prep
     df_1 = self.df_owid_roser.copy()
-    df_1 = df_1.rename(columns={"Entity2": "Location", "Date": "Date", "Daily change in cumulative total tests": "total_daily.owid_roser"})
-    df_1 = df_1[["Location","Date","total_daily.owid_roser"]]
+    df_1 = df_1.rename(columns={"Entity2": "Location", "Date": "Date", "Cumulative total": "total_cumul.owid_roser"})
+    df_1 = df_1[["Location","Date","total_cumul.owid_roser"]]
     
     df_2 = self.df_owid_ortiz.copy()
     df_2 = df_2.rename(columns={"Country or territory": "Location", "Date": "Date", "Total tests": "total_cumul.owid_ortiz"})
@@ -261,7 +274,7 @@ class L1ImportOthers:
     
     df_agg = self.df_merged.groupby("Location").agg(
                                       {"Date": [np.min,np.max,len],
-                                       "total_daily.owid_roser": lambda x: sum(pd.notnull(x)),
+                                       "total_cumul.owid_roser": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.owid_ortiz": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.wiki": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.worldometers": lambda x: sum(pd.notnull(x)),
@@ -288,20 +301,22 @@ class L1ImportOthers:
     """## Combine into a single dataset"""
     df_merged = self.df_merged
     
-    df_merged["total_cumul.all"] = df_merged["total_cumul.owid_ortiz"].fillna(
+    df_merged["total_cumul.all"] = df_merged["total_cumul.owid_roser"].fillna(
+                                   df_merged["total_cumul.owid_ortiz"].fillna(
                                      df_merged["total_cumul.wiki"].fillna(
                                        df_merged["total_cumul.worldometers"].fillna(
                                            df_merged["total_cumul.biominers"]
                                        )
                                      )
                                     )
+                                    )
     
     df_merged["total_cumul.source"] = df_merged.apply(lambda r:
-                                        "owid/ortiz" if pd.notnull(r["total_cumul.owid_ortiz"])
+                                        "owid/roser" if pd.notnull(r["total_cumul.owid_roser"])
+                                        else "owid/ortiz" if pd.notnull(r["total_cumul.owid_ortiz"])
                                         else "wiki" if pd.notnull(r["total_cumul.wiki"])
                                         else "worldometers" if pd.notnull(r["total_cumul.worldometers"])
                                         else "biominers" if pd.notnull(r["total_cumul.biominers"])
-                                        else "owid/roser (daily)" if pd.notnull(r["total_daily.owid_roser"])
                                         else np.NaN,
                                         axis=1
                                       )
