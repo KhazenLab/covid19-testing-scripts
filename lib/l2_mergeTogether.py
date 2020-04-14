@@ -3,6 +3,7 @@
 from os.path import join
 from os.path import isfile
 import pandas as pd
+import numpy as np
 
 
 #Combine country and province into a single string
@@ -247,12 +248,12 @@ class L2MergeTogether:
     # get last date for totals
     df_last_tot = df_hist.groupby("CountryProv").apply(lambda g: g.Date[pd.notnull(g["total_cumul.all"])].tail(n=1).tolist())
     df_last_tot = df_last_tot.apply(lambda v: np.NaN if len(v)==0 else v[0])
-    df_last_tot = df_last_tot.reset_index().head().rename(columns={0:"Date"})
+    df_last_tot = df_last_tot.reset_index().rename(columns={0:"Date"})
     
     # repeat for confirmed cases to fill the blanks from totals
     df_last_conf = df_hist.groupby("CountryProv").apply(lambda g: g.Date[pd.notnull(g["ConfirmedCases"])].tail(n=1).tolist())
     df_last_conf = df_last_conf.apply(lambda v: np.NaN if len(v)==0 else v[0])
-    df_last_conf = df_last_conf.reset_index().head().rename(columns={0:"Date"})
+    df_last_conf = df_last_conf.reset_index().rename(columns={0:"Date"})
     
     # merge last from totals with last from confirmed and fillna
     df_last = df_last_tot.merge(df_last_conf, how='outer', on="CountryProv", suffixes=["_tot","_conf"])
@@ -261,8 +262,11 @@ class L2MergeTogether:
     del df_last["Date_conf"]
     
     df_last = df_last.merge(df_hist, how='left', on=["CountryProv","Date"])
-    df_last = df_last[["CountryProv","Date","ConfirmedCases","Fatalities","total_cumul.all","Population","tests_per_mil", "ratio_confirmed_total_pct", "negative_cases"]]
+    df_last = df_last[["CountryProv", "Lat", "Long", "Date",
+                       "ConfirmedCases", "Fatalities", "total_cumul.all",
+                       "Population", "tests_per_mil",  "ratio_confirmed_total_pct", "negative_cases"
+                       ]]
 
     # save to csv
     save_fn = "t11c-confirmed+totalTests-latestOnly.csv"
-    df_last.to_csv(join(self.dir_gitrepo, save_fn))
+    df_last.to_csv(join(self.dir_gitrepo, save_fn), index=False)
