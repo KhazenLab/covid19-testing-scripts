@@ -46,6 +46,23 @@ class L2MergeTogether:
     if conf_train[["CountryProv","Date"]].duplicated().sum()>0:
       raise Exception("Found dupes")
 
+    # fix few outliers
+    # Two steps
+    # 1. create a bi-index since it's not working in pandas
+    # 2. assert that the data is of a certain value (as of the check of this date 2020-04-14)
+    # 2. overwrite (sources are worldometers.info and confirmed cases are not so far from total tests)
+    conf_train["UID"] = conf_train["CountryProv"]+"/"+conf_train.Date.dt.strftime("%Y-%m-%d")
+    conf_train.set_index("UID", inplace=True)
+
+    # US/Florida on 04-13: jump by 100k
+    # FIXME: cannot use NaN because that converts the field to double and replaces the full csv
+    assert conf_train.loc["US – Florida/2020-04-12","ConfirmedCases"] ==  19895
+    assert conf_train.loc["US – Florida/2020-04-13","ConfirmedCases"] == 123019
+    conf_train.loc["US – Florida/2020-04-13","ConfirmedCases"] = 23019 # np.NaN
+
+    conf_train.reset_index(inplace=True)
+    del conf_train["UID"]
+
     self.conf_train = conf_train
 
 
