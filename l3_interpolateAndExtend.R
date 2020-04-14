@@ -11,10 +11,10 @@ for(i in 1:length(countries))
   tests=countryData$total_cumul.all;
   
   indexfin=max(which(!is.na(tests)))
-  isUpdated<-F;
+  isUpdated<-T;
   if(indexfin==length(tests)||indexfin==(length(tests)-1))
   {
-    isUpdated<-T;
+    isUpdated<-F;
   }
   
   if(is.finite(indexfin) && (indexfin<length(tests)))
