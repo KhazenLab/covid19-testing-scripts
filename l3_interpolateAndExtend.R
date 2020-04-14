@@ -110,17 +110,17 @@ for(i in 1:length(countries))
 }
 
 
-date= c(histData$Date,histData$Date)
+date= c(as.Date(histData$Date),as.Date(histData$Date))
 
 negativeStr=rep("Negative",times=length(histData$ConfirmedCases))
 positiveStr=rep("Positive",times=length(histData$ConfirmedCases))
 
-positiveNegative=c(positiveStr,negativeStr);
-daily=c(dailyConfirmed,dailyNegative);
-cumulative=c(histData$ConfirmedCases,histData$negative_cases);
+positiveNegative=c(positiveStr,negativeStr)
+daily=c(dailyConfirmed,dailyNegative)
+cumulative=c(histData$ConfirmedCases,histData$negative_cases)
 
 country=c(as.character(histData$CountryProv),as.character(histData$CountryProv))
-lat=c(histData$Lat,histData$Lat);
+lat=c(histData$Lat,histData$Lat)
 long=c(histData$Long,histData$Long);
 
 res= data.frame("CountryProv"=country,"Date"=date,"Lat"=lat,"Long"=long,"dailyValue"=daily,"cumulativeValue"=cumulative,"Positive.Negative"=positiveNegative)
