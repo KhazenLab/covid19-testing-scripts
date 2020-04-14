@@ -14,10 +14,21 @@ notion_map = {
 
     # Halim
     "Argentina": "https://www.notion.so/a09b8d4dd2c44745983ab1916445ed94?v=266d332fc93543069857c1f081ea37a6",
+    "Australia":  "https://www.notion.so/519b9667ab114786be8be3b1a2306c68?v=14f86820859d48be8cbc5a3199392d25",
+    "Azerbaijan": "https://www.notion.so/f587f06c442b45f09c7be0ac3f58f514?v=f73a7b62fe6b4de8ac0a6f818d5a8274",
     "Bangladesh": "https://www.notion.so/35b7ee1e86b643ef8b64417112858405?v=ecbfa792b75947c6bf21501e28bf50cd",
     "Bolivia": "https://www.notion.so/9214e05323bb48f18817ed86125cf2c0?v=f3f10addeaa94d5fafbf8a5dd543ddcc",
-    "Bosnia and Herzegovina": "https://www.notion.so/c4d504fb061d4a2e8d1e9b4eef16f8db?v=082817d19e1746ccbe9f98999752ddb5"
-
+    "Bosnia and Herzegovina": "https://www.notion.so/c4d504fb061d4a2e8d1e9b4eef16f8db?v=082817d19e1746ccbe9f98999752ddb5",
+    "Chile": "https://www.notion.so/5b5ff55b44c84f09ba89d9e0bb5fd834?v=84f03e51051c41579958fc2054ff2c35",
+    "Hungary": "https://www.notion.so/891f5d09165d4815834921adf73a673e?v=210fc8fb1d6a4bc297b1c5ec193ca7e1",
+    "Indonesia": "https://www.notion.so/f9b8def063b14688bea0731ccb5dc046?v=464fba9d406a4d708a4c8274e44804f8",
+    "New Zealand": "https://www.notion.so/66ea1fa7a90c4ff481e5c0eb6573ba67?v=a84dbac7dd2e422d93557007d1c5eaa1",
+    "Northern Macedonia": "https://www.notion.so/7bba8f1ac34e43e19ff42f3d331c406d?v=6e85b5a16122473194ebcb7d1d3080a1",
+    "Serbia": "https://www.notion.so/64ebd94f97d3440ca3431d9dd4850f76?v=05b88d514b6641d9a01da44a31372f7c",
+    "Slovenia": "https://www.notion.so/200f4d913065463a92bdd8e009616af4?v=ed8aecb1b5354c6d905bfe8b5721ff90",
+    "South Africa": "https://www.notion.so/e7be19dda46349188a998c7feb7c861c?v=457a2e1ffc514b4b9ebb59c626711b67",
+    "Uruguay": "https://www.notion.so/d9f406529d9e4b0aa000c5950e05779f?v=67daa5dc0deb40869780016b2fa62e22",
+    "Vietnam": "https://www.notion.so/c20b8220238c4fab8b183b3ee8276603?v=b4382f1d9c4e4d74b7c05b1fcd9183aa",
 }
 
 
@@ -99,6 +110,10 @@ def postprocess_table(country_name, df_single):
     df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     return df_single
 
+  if country_name=="Vietnam":
+    df_single["total_cumul"] = df_single[["total positive", "total negative"]].apply(sum, axis=1)
+    return df_single
+
   print(f"no postprocessing for country {country_name}")
   return df_single
 
@@ -123,6 +138,11 @@ class L0ImportBiominers:
 
       df_single = postprocess_table(country_name, df_single)
       # df_single = df_single[["Date","total_cumul"]]
+
+      # At this point, all tables should have a total_cumul field and a Date field
+      # whether it comes from the notion.so table directly, or from the postprocess_table function
+      assert "Date" in df_single.columns
+      assert "total_cumul" in df_single.columns
 
       df_single["country_t11"] = country_name
       df_global.append(df_single)
