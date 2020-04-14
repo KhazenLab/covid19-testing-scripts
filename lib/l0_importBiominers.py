@@ -72,9 +72,10 @@ def postprocess_table(country_name, df_single):
     return df_single
 
   # Update 2020-04-10: turns out they have a total cumulative tests field
-  #if country_name=="Bosnia and Herzegovina":
-  #  df_single["total_cumul"] = df_single[["cumulative negative", "cumulative confirmed"]].apply(sum, axis=1)
-  #  return df_single
+  # Update 2020-04-14: Halim dropped the total field and is just recording positive and negative
+  if country_name=="Bosnia and Herzegovina":
+    df_single["total_cumul"] = df_single[["negative_cumul", "positive_cumul"]].apply(sum, axis=1)
+    return df_single
 
   if country_name=="Colombia":
     df_single["total_cumul"] = df_single[["confirmed cumul", "negative cumul"]].apply(sum, axis=1)

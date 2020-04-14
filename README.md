@@ -34,22 +34,23 @@ python3 main.py l1-importothers \
 Step 3a: get confirmed cases data from kaggle
 
 ```
-ls /content/kaggle.json
-pip3 install --user --upgrade kaggle==1.5.6 2>&1
-echo 'pip show kaggle'
+# Install kaggle CLI
+# pip3 install --user --upgrade kaggle==1.5.6 2>&1
+pip3 install --user --upgrade kaggle 2>&1
 pip3 show kaggle
-mkdir -p /root/.kaggle/
-cp /content/kaggle.json /root/.kaggle/
-chmod 600 /root/.kaggle/kaggle.json
-# kbin=/root/.local/bin/kaggle
-kbin=/usr/local/bin/kaggle
+
+# configure kaggle key
+mkdir -p ~/.kaggle/
+cp path/to/kaggle.json ~/.kaggle/
+chmod 600 ~/.kaggle/kaggle.json
+
 echo 'kaggle version'
-$kbin --version 2>&1
-echo 'kaggle download'
-rm train.csv test.csv submission.csv
-$kbin competitions download -c covid19-global-forecasting-week-4 2>&1
-rm test.csv submission.csv
-mv train.csv ~/Development/gitlab.com/biominers/covid19-testing/kaggle-confirmed.csv
+kaggle --version 2>&1
+
+# download
+rm -rf /tmp/train.csv
+kaggle competitions download -c covid19-global-forecasting-week-4 -f train.csv -p /tmp
+mv /tmp/train.csv ~/Development/gitlab.com/biominers/covid19-testing/kaggle-confirmed.csv
 ```
 
 Step 3b: merge with confirmed cases
