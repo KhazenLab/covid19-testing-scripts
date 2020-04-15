@@ -55,10 +55,11 @@ class L2MergeTogether:
     conf_train.set_index("UID", inplace=True)
 
     # US/Florida on 04-13: jump by 100k
-    # FIXME: cannot use NaN because that converts the field to double and replaces the full csv
-    assert conf_train.loc["US – Florida/2020-04-12","ConfirmedCases"] ==  19895
-    assert conf_train.loc["US – Florida/2020-04-13","ConfirmedCases"] == 123019
-    conf_train.loc["US – Florida/2020-04-13","ConfirmedCases"] = 23019 # np.NaN
+    # Cannot use NaN because that converts the field to double and replaces the full csv
+    # Update 2020-04-15: this outlier was fixed in kaggle
+    #assert conf_train.loc["US – Florida/2020-04-12","ConfirmedCases"] == 19895
+    #assert conf_train.loc["US – Florida/2020-04-13","ConfirmedCases"] == 21019 # 123019
+    #conf_train.loc["US – Florida/2020-04-13","ConfirmedCases"] = 23019 # np.NaN
 
     conf_train.reset_index(inplace=True)
     del conf_train["UID"]
