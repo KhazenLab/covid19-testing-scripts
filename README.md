@@ -15,7 +15,7 @@ pip3 install notion pandas Click
 It also helps to see CSVs in the terminal with vd:
 
 ```
-pip3 install vd
+pip3 install visidata
 ```
 
 ## Usage
