@@ -148,6 +148,10 @@ class L2MergeTogether:
     assert conf_train.loc["Sierra Leone/2020-04-04","total_cumul.all"] == 2
     conf_train.loc["Sierra Leone/2020-04-04","total_cumul.all"] = 4 # was 2 from worldometers
 
+    # inconsistency between covidtracking.com and kaggle confirmed cases
+    assert conf_train.loc["US – New York/2020-03-12","total_cumul.all"] == 308
+    conf_train.loc["US – New York/2020-03-12","total_cumul.all"] = 328
+
     conf_train.reset_index(inplace=True)
     del conf_train["UID"]
 
