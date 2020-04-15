@@ -4,6 +4,7 @@ from os.path import join
 import pandas as pd
 import numpy as np
 import tempfile
+import urllib.request
 
 
 class L1ImportOthers:
@@ -28,7 +29,6 @@ class L1ImportOthers:
     fn_owid_roser = "multiple-ourworldindata.org page 2 roser - gitub.csv"
 
     # download file
-    import urllib.request
     csv_url = "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv"
     urllib.request.urlretrieve(csv_url, join(self.dir_temp, fn_owid_roser))
 
@@ -89,6 +89,37 @@ class L1ImportOthers:
     del df_owid_ortiz["UID"]
 
     self.df_owid_ortiz = df_owid_ortiz
+
+
+  def get_covidtracking_usa(self):
+    fn_covusa_daily = join(self.dir_temp, "covidtracking.com-states_daily.csv")
+    fn_covusa_info  = join(self.dir_temp, "covidtracking.com-states_info.csv" )
+    url_daily = "https://covidtracking.com/api/states/daily.csv"
+    url_info  = "https://covidtracking.com/api/states/info.csv"
+    urllib.request.urlretrieve(url_daily, fn_covusa_daily)
+    urllib.request.urlretrieve(url_info , fn_covusa_info)
+    
+    df_daily = pd.read_csv(fn_covusa_daily)
+    df_info  = pd.read_csv(fn_covusa_info )
+    
+    df_daily = df_daily.merge(df_info[["state","name"]], how='left', on='state')
+    df_daily.date = pd.to_datetime(df_daily.date, format="%Y%m%d")
+    df_daily = df_daily[["name","date","positive","negative"]]
+    df_daily.sort_values(["name","date"], inplace=True)
+    
+    # some postprocessing
+    df_daily["total_cumul"] = df_daily.positive + df_daily.negative
+    df_daily["name"] = "USA – " + df_daily.name
+
+    # drop na
+    df_daily = df_daily[pd.notnull(df_daily.total_cumul)]
+
+    # save
+    fn_covusa_save = join(self.dir_l1a_others, "covidtracking.com-distilled.csv")
+    df_daily.to_csv(fn_covusa_save, index=False)
+
+    self.df_covusa = df_daily
+ 
 
 
   def get_wikipedia(self):
@@ -214,8 +245,7 @@ class L1ImportOthers:
     del df_worldometers["UID"]
 
     self.df_worldometers = df_worldometers
-
-
+   
 
   def get_biominers(self):
     """### Biominers
@@ -247,14 +277,18 @@ class L1ImportOthers:
     #df_biominers.columns
     
     # prep
-    df_1 = self.df_owid_roser.copy()
-    df_1 = df_1.rename(columns={"Entity2": "Location", "Date": "Date", "Cumulative total": "total_cumul.owid_roser"})
-    df_1 = df_1[["Location","Date","total_cumul.owid_roser"]]
+    df_1a = self.df_owid_roser.copy()
+    df_1a = df_1a.rename(columns={"Entity2": "Location", "Date": "Date", "Cumulative total": "total_cumul.owid_roser"})
+    df_1a = df_1a[["Location","Date","total_cumul.owid_roser"]]
     
-    df_2 = self.df_owid_ortiz.copy()
-    df_2 = df_2.rename(columns={"Country or territory": "Location", "Date": "Date", "Total tests": "total_cumul.owid_ortiz"})
-    df_2 = df_2[["Location","Date","total_cumul.owid_ortiz"]]
+    df_1b = self.df_owid_ortiz.copy()
+    df_1b = df_1b.rename(columns={"Country or territory": "Location", "Date": "Date", "Total tests": "total_cumul.owid_ortiz"})
+    df_1b = df_1b[["Location","Date","total_cumul.owid_ortiz"]]
     
+    df_2 = self.df_covusa.copy()
+    df_2 = df_2.rename(columns={"name": "Location", "date": "Date", "total_cumul": "total_cumul.covusa"})
+    df_2 = df_2[["Location","Date","total_cumul.covusa"]]
+
     df_3 = self.df_wiki.copy()
     # df_3["Location"] = df_3.apply(lambda r: r.Country if pd.isna(r.Region) else r.Country+' – '+r.Region, axis=1)
     df_3["Location"] = df_3.apply(lambda r: r.Country if r.Region=="" else str(r.Country)+' – '+str(r.Region), axis=1)
@@ -270,7 +304,8 @@ class L1ImportOthers:
     df_5 = df_5[["Location","Date","total_cumul.biominers"]]
     
     # merge
-    df_merged = df_1.merge(df_2, on=["Location","Date"], how='outer'
+    df_merged = df_1a.merge(df_1b, on=["Location","Date"], how='outer'
+                   ).merge(df_2, on=["Location","Date"], how='outer'
                    ).merge(df_3, on=["Location","Date"], how='outer'
                    ).merge(df_4, on=["Location","Date"], how='outer'
                    ).merge(df_5, on=["Location","Date"], how='outer'
@@ -288,6 +323,7 @@ class L1ImportOthers:
                                       {"Date": [np.min,np.max,len],
                                        "total_cumul.owid_roser": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.owid_ortiz": lambda x: sum(pd.notnull(x)),
+                                       "total_cumul.covusa": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.wiki": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.worldometers": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.biominers": lambda x: sum(pd.notnull(x)),
@@ -315,6 +351,7 @@ class L1ImportOthers:
     
     df_merged["total_cumul.all"] = df_merged["total_cumul.owid_roser"].fillna(
                                    df_merged["total_cumul.owid_ortiz"].fillna(
+                                   df_merged["total_cumul.covusa"].fillna(
                                      df_merged["total_cumul.wiki"].fillna(
                                        df_merged["total_cumul.worldometers"].fillna(
                                            df_merged["total_cumul.biominers"]
@@ -322,10 +359,12 @@ class L1ImportOthers:
                                      )
                                     )
                                     )
+                                    )
     
     df_merged["total_cumul.source"] = df_merged.apply(lambda r:
                                         "owid/roser" if pd.notnull(r["total_cumul.owid_roser"])
                                         else "owid/ortiz" if pd.notnull(r["total_cumul.owid_ortiz"])
+                                        else "covidtracking.com" if pd.notnull(r["total_cumul.covusa"])
                                         else "wiki" if pd.notnull(r["total_cumul.wiki"])
                                         else "worldometers" if pd.notnull(r["total_cumul.worldometers"])
                                         else "biominers" if pd.notnull(r["total_cumul.biominers"])

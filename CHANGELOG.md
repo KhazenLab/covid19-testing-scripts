@@ -3,6 +3,7 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- feat, l1: add covidtracking.com source
 - enh, l0,l1,l2: use subdirectories + owid/roser simplified columns to subset
 - enh, l0: lebanon add airport and non-airport
 - enh, l0: cast total tests to int

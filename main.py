@@ -49,6 +49,7 @@ def l1_importOthers(dir_gitrepo):
 
   factory.get_owid_roser()
   factory.get_owid_ortiz()
+  factory.get_covidtracking_usa()
   factory.get_wikipedia()
   factory.get_worldometers()
   factory.get_biominers()
