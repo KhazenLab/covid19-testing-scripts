@@ -1,5 +1,5 @@
 library(zoo)
-histData=read.csv("../covid19-testing/t11c-confirmed+totalTests-historical.csv")
+histData=read.csv("../covid19-testing/l2-withConfirmed/t11c-confirmed+totalTests-historical.csv")
 histData$CountryProv=as.character(histData$CountryProv)
 gsub('*',histData$CountryProv,'');
 countries=unique(histData$CountryProv)
