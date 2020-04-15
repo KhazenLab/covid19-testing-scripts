@@ -109,7 +109,9 @@ class L1ImportOthers:
     
     # some postprocessing
     df_daily["total_cumul"] = df_daily.positive + df_daily.negative
-    df_daily["name"] = "USA – " + df_daily.name
+
+    # Use "US" prefix to match with kaggle confirmed cases convention
+    df_daily["name"] = "US – " + df_daily.name
 
     # drop na
     df_daily = df_daily[pd.notnull(df_daily.total_cumul)]
