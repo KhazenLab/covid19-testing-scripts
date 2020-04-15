@@ -84,6 +84,7 @@ class L1ImportOthers:
     df_owid_ortiz.set_index("UID", inplace=True)
     df_owid_ortiz.loc["Japan/2020-03-19","Total tests"] = np.NaN
     df_owid_ortiz.loc["Ukraine/2020-03-20","Total tests"] = np.NaN
+    df_owid_ortiz.loc["Spain/2020-03-18","Total tests"] = np.NaN
 
     df_owid_ortiz.reset_index(inplace=True)
     del df_owid_ortiz["UID"]
@@ -195,6 +196,7 @@ class L1ImportOthers:
     df_wiki.loc["Philippines//2020-03-26",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Philippines//2020-03-28",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Russia//2020-03-20",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Spain//2020-03-18",  "Cumulative Test Nb"] = np.NaN # this was 30k, but it's very out of line wtih the 300k on 03-21, so dropping it
     df_wiki.loc["Taiwan//2020-03-19",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["US/California/2020-03-30",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["US/California/2020-03-31",  "Cumulative Test Nb"] = np.NaN
@@ -241,6 +243,9 @@ class L1ImportOthers:
     df_worldometers.loc["North Macedonia/2020-04-05", "Total Tests"] = np.NaN
     df_worldometers.loc["North Macedonia/2020-04-06", "Total Tests"] = np.NaN
     df_worldometers.loc["Philippines/2020-04-06", "Total Tests"] = np.NaN
+    df_worldometers.loc["Spain/2020-04-04", "Total Tests"] = np.NaN
+    df_worldometers.loc["Spain/2020-04-05", "Total Tests"] = np.NaN
+    df_worldometers.loc["Spain/2020-04-06", "Total Tests"] = np.NaN
 
     # 
     df_worldometers.reset_index(inplace=True)
