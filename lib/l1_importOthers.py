@@ -47,6 +47,9 @@ class L1ImportOthers:
     df_owid_roser = df_corr
     del df_corr
 
+    # some corrections for merging
+    df_owid_roser.loc[df_owid_roser["Entity2"]=="Czech Republic", "Entity2"] = "Czechia"
+
     self.df_owid_roser = df_owid_roser
 
 
@@ -186,6 +189,7 @@ class L1ImportOthers:
     df_worldometers.loc["Argentina/2020-04-05", "Total Tests"] = np.NaN
     df_worldometers.loc["Argentina/2020-04-06", "Total Tests"] = np.NaN
     df_worldometers.loc["Armenia/2020-04-04", "Total Tests"] = np.NaN
+    df_worldometers.loc["Germany/2020-04-06", "Total Tests"] = np.NaN
     df_worldometers.loc["Hong Kong/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["India/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["India/2020-04-06", "Total Tests"] = np.NaN
@@ -320,6 +324,12 @@ class L1ImportOthers:
                                         else np.NaN,
                                         axis=1
                                       )
+
+    # check that there are no dips in the data, eg mixing different sources with one being lagged
+    # FIXME should do something about these
+    country_dipped = df_merged.groupby("Location")["total_cumul.all"].apply(lambda g: g.diff().min())
+    print("Top country dips in total tests:")
+    print(country_dipped.sort_values(ascending=True).head(20))
 
     self.df_merged = df_merged
 

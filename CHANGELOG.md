@@ -3,6 +3,10 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- enh, l0: cast total tests to int
+- bug, l1: skip kaggle germany outlier in confirmed cases
+- bug, l1: fix florida jump of 100k confirmed cases from apr 12 to apr 13
+  - as of 2020-04-15, kaggle fixed this
 - feat, l0: add new tables in notion maintained by halim
 - enh, l2: moved minor over-writing of data up in pipeline and added assertions to avoid over-writing if data changes value/source
 - feat: drop daily owid/roser source and get cumulative one and integrate. This is a major source of data

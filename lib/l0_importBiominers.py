@@ -1,5 +1,5 @@
 notion_map = {
-    # Maintainer = Shadi
+#    # Maintainer = Shadi
     "Armenia": "https://www.notion.so/59b0c69000274ff1b1ee83c0c6cea5a0?v=b6a8a7f3941c47ecae19ffe621482f59",
     "Austria": "https://www.notion.so/6d378966ff5c4e268376627f86f4dc2f?v=0dacaca7b49c4700a49efa550fb5f6c2",
     "Bahrain": "https://www.notion.so/9c9f2c905ae545faacaf13071d2eb033?v=7fe7cb6968bc42818030a583bac34998",
@@ -107,7 +107,7 @@ def postprocess_table(country_name, df_single):
   #  return df_single
 
   if country_name=="Philippines":
-    df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
+    df_single["total_cumul"] = df_single[["confirmed_cumul", "negative_cumul"]].apply(sum, axis=1)
     return df_single
 
   if country_name=="Vietnam":
@@ -150,6 +150,7 @@ class L0ImportBiominers:
     # merge
     df_global = pd.concat(df_global, axis=0)
     df_global = df_global.loc[pd.notnull(df_global.total_cumul),]
+    df_global["total_cumul"] = df_global.total_cumul.astype(int)
     df_global = df_global.sort_values(["country_t11", "Date"], ascending=True)
     self.df_global = df_global
 
