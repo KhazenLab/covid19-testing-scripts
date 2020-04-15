@@ -3,6 +3,7 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- enh, l0: lebanon add airport and non-airport
 - enh, l0: cast total tests to int
 - bug, l1: skip kaggle germany outlier in confirmed cases
 - bug, l1: fix florida jump of 100k confirmed cases from apr 12 to apr 13

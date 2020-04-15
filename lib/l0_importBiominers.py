@@ -106,6 +106,10 @@ def postprocess_table(country_name, df_single):
   #  df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
   #  return df_single
 
+  if country_name=="Lebanon":
+    df_single["total_cumul"] = df_single[["total_cumul_labs", "total_cumul_airport"]].apply(sum, axis=1)
+    return df_single
+
   if country_name=="Philippines":
     df_single["total_cumul"] = df_single[["confirmed_cumul", "negative_cumul"]].apply(sum, axis=1)
     return df_single
