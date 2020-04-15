@@ -19,7 +19,7 @@ Step 0: import notion tables
 ```
 python3 main.py l0-importbiominers \
     ~/Development/bitbucket.org/shadiakiki1986/shadi-configs/notion-shadiakiki1986-token_v2.txt \
-    ~/Development/gitlab.com/biominers/covid19-testing-data/multiple-biominers-gitrepo.csv 
+    ~/Development/gitlab.com/biominers/covid19-testing-data/l0-notion_tables/multiple-biominers-gitrepo.csv 
 ```
 
 Step 1: import non-biominer tables and merge with biominer
@@ -50,7 +50,7 @@ kaggle --version 2>&1
 # download
 rm -rf /tmp/train.csv
 kaggle competitions download -c covid19-global-forecasting-week-4 -f train.csv -p /tmp
-mv /tmp/train.csv ~/Development/gitlab.com/biominers/covid19-testing-data/kaggle-confirmed.csv
+mv /tmp/train.csv ~/Development/gitlab.com/biominers/covid19-testing-data/l1a-non-biominer_data/kaggle-confirmed.csv
 ```
 
 Step 2b: merge with confirmed cases

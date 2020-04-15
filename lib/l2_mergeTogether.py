@@ -17,7 +17,11 @@ class L2MergeTogether:
 
   def __init__(self, dir_gitrepo):
     # dir_gitrepo = "/content/covid19-testing"
-    self.dir_gitrepo = dir_gitrepo
+    self.dir_l0_notion = join(dir_gitrepo, "l0-notion_tables")
+    self.dir_l1a_others = join(dir_gitrepo, "l1a-non-biominer_data")
+    self.dir_l1b_altogether = join(dir_gitrepo, "l1b-altogether")
+    self.dir_l2_withConf = join(dir_gitrepo, "l2-withConfirmed")
+
 
   def read_confirmed_cases(self):
     # Path to local data file
@@ -26,7 +30,7 @@ class L2MergeTogether:
     # conf_fn_filename = "covid19-global-forecasting-week-2.v20200331.raw.RData"
     # conf_fn_filename = "covid19-global-forecasting-week-4.v20200408.raw.RData"
     conf_fn_filename = "kaggle-confirmed.csv"
-    conf_fn_full = join(self.dir_gitrepo, conf_fn_filename)
+    conf_fn_full = join(self.dir_l1a_others, conf_fn_filename)
 
     # code copied from notebook t4e
     if not isfile(conf_fn_full):
@@ -70,7 +74,7 @@ class L2MergeTogether:
   def read_totaltests(self):
     # totaltests_fn = "multiple-aggregated_owid_wiki_worldometers_biominers-v20200406.csv"
     totaltests_fn = "multiple-aggregated_owid_wiki_worldometers_biominers-gitrepo.csv"
-    totaltests_fn = join(self.dir_gitrepo, totaltests_fn)
+    totaltests_fn = join(self.dir_l1b_altogether, totaltests_fn)
 
     if not isfile(totaltests_fn): raise Exception("Failed to find agg file")
 
@@ -165,7 +169,7 @@ class L2MergeTogether:
     eg population, long/lat
     """
     countrymeta_fn = "t11c-country_metadata.csv"
-    countrymeta_fn = "%s/%s" % (self.dir_gitrepo, countrymeta_fn)
+    countrymeta_fn = "%s/%s" % (self.dir_l0_notion, countrymeta_fn)
     df_pop = pd.read_csv(countrymeta_fn)
 
     dim_0a = self.conf_train.shape[0]
@@ -194,7 +198,7 @@ class L2MergeTogether:
 
     # save
     from os.path import join
-    df_counts.to_csv(join(self.dir_gitrepo, "count_sources.csv"), index=True)
+    df_counts.to_csv(join(self.dir_l2_withConf, "count_sources.csv"), index=True)
 
 
   def add_supplementary_stats(self):
@@ -261,7 +265,7 @@ class L2MergeTogether:
 
   def to_csv_historical(self):
     save_fn = "t11c-confirmed+totalTests-historical.csv"
-    save_fn = join(self.dir_gitrepo, save_fn)
+    save_fn = join(self.dir_l2_withConf, save_fn)
     # Use na="" since arcgis.com doesn't support values for NAs
     # write.csv(conf_train, "t11c-confirmed+totalTests-v20200406-historical.csv")
     self.conf_train.reset_index().to_csv(save_fn, na_rep="", index=False) # , quote=False
@@ -320,4 +324,4 @@ class L2MergeTogether:
 
     # save to csv
     save_fn = "t11c-confirmed+totalTests-latestOnly.csv"
-    df_last.to_csv(join(self.dir_gitrepo, save_fn), index=False)
+    df_last.to_csv(join(self.dir_l2_withConf, save_fn), index=False)

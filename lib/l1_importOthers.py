@@ -3,12 +3,16 @@
 from os.path import join
 import pandas as pd
 import numpy as np
+import tempfile
 
 
 class L1ImportOthers:
 
   def __init__(self, dir_gdrive):
-    self.dir_gdrive = dir_gdrive
+    self.dir_l0_notion = join(dir_gdrive, "l0-notion_tables")
+    self.dir_l1a_others = join(dir_gdrive, "l1a-non-biominer_data")
+    self.dir_l1b_altogether = join(dir_gdrive, "l1b-altogether")
+    self.dir_temp = tempfile.mkdtemp()
 
 
   def get_owid_roser(self):
@@ -26,10 +30,10 @@ class L1ImportOthers:
     # download file
     import urllib.request
     csv_url = "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv"
-    urllib.request.urlretrieve(csv_url, join(self.dir_gdrive, fn_owid_roser))
+    urllib.request.urlretrieve(csv_url, join(self.dir_temp, fn_owid_roser))
 
     # Read
-    df_owid_roser = pd.read_csv(join(self.dir_gdrive, fn_owid_roser))
+    df_owid_roser = pd.read_csv(join(self.dir_temp, fn_owid_roser))
     df_owid_roser.Date = pd.to_datetime(df_owid_roser.Date)
 
     # Split the name and comment for simplicity
@@ -50,6 +54,10 @@ class L1ImportOthers:
     # some corrections for merging
     df_owid_roser.loc[df_owid_roser["Entity2"]=="Czech Republic", "Entity2"] = "Czechia"
 
+    # subset of columns
+    df_owid_roser = df_owid_roser[["Entity2","Date","Cumulative total"]]
+    df_owid_roser.to_csv(join(self.dir_l1a_others, fn_owid_roser), index=False)
+
     self.df_owid_roser = df_owid_roser
 
 
@@ -57,7 +65,7 @@ class L1ImportOthers:
     """### ourworldindata.org Ortiz page"""
 
     fn_owid_ortiz = "multiple-ourworldindata.org page 1 ortiz - v20200406.csv"
-    df_owid_ortiz = pd.read_csv(join(self.dir_gdrive, fn_owid_ortiz))
+    df_owid_ortiz = pd.read_csv(join(self.dir_l1a_others, fn_owid_ortiz))
 
     df_owid_ortiz.Date = pd.to_datetime(df_owid_ortiz.Date)
     # No need # df_owid_ortiz["Source Date"] = pd.to_datetime(df_owid_ortiz["Source Date"])
@@ -90,7 +98,7 @@ class L1ImportOthers:
     # (Shadi to copy Halim's file from gdrive to git repo and commit then upload back to gdrive)
     # fn_wiki = "multiple-Wikipedia_covid19_TotalTests_Table-20200406b.csv"
     fn_wiki = "multiple-Wikipedia_covid19_TotalTests_Table-gitrepo.csv"
-    df_wiki = pd.read_csv(join(self.dir_gdrive, fn_wiki))
+    df_wiki = pd.read_csv(join(self.dir_l1a_others, fn_wiki))
 
     # As of 2020-04-09, this is %Y-%m-%d
     # df_wiki["As of Date"] = pd.to_datetime(df_wiki["As of Date"], format="%d-%m-%y")
@@ -170,7 +178,7 @@ class L1ImportOthers:
     """### worldometers.info"""
 
     fn_worldometers = "multiple-worldometers.info-coronavirus-20200403 till 0406.csv"
-    df_worldometers = pd.read_csv(join(self.dir_gdrive, fn_worldometers))
+    df_worldometers = pd.read_csv(join(self.dir_l1a_others, fn_worldometers))
 
     df_worldometers.columns = [x.replace("\n"," ") for x in df_worldometers.columns.tolist()]
     df_worldometers.Date = pd.to_datetime(df_worldometers.Date)
@@ -222,7 +230,7 @@ class L1ImportOthers:
     # fn_biominers = "multiple-biominers-v20200406b.csv"
     fn_biominers = "multiple-biominers-gitrepo.csv"
     
-    df_biominers = pd.read_csv(join(self.dir_gdrive, fn_biominers))
+    df_biominers = pd.read_csv(join(self.dir_l0_notion, fn_biominers))
     
     df_biominers.Date = pd.to_datetime(df_biominers.Date)
 
@@ -298,7 +306,7 @@ class L1ImportOthers:
     # fn_analysis_agg = "multiple-analysis_of_aggregated_owid_wiki_worldometers-v20200406.csv"
     # fn_analysis_agg = "multiple-analysis_of_aggregated_owid_wiki_worldometers-v20200406b.csv"
     fn_analysis_agg = "multiple-analysis_of_aggregated_owid_wiki_worldometers-v20200406c.csv"
-    df_agg.to_csv(join(self.dir_gdrive, fn_analysis_agg))
+    df_agg.to_csv(join(self.dir_l1b_altogether, fn_analysis_agg))
 
 
   def one_field(self):
@@ -347,7 +355,7 @@ class L1ImportOthers:
     df_save = df_save[pd.notnull(df_save["total_cumul.all"])]
     df_save = df_save.sort_values(["Location","Date"], ascending=True)
     
-    df_save.to_csv(join(self.dir_gdrive, fn_agg), index=False)
+    df_save.to_csv(join(self.dir_l1b_altogether, fn_agg), index=False)
     
 
   def to_csv_all(self):
@@ -362,4 +370,4 @@ class L1ImportOthers:
     df_save = df_save[pd.notnull(df_save["total_cumul.all"])]
     df_save = df_save.sort_values(["Location","Date"], ascending=True)
     
-    df_save.to_csv(join(self.dir_gdrive, fn_agg), index=False)
+    df_save.to_csv(join(self.dir_l1b_altogether, fn_agg), index=False)
