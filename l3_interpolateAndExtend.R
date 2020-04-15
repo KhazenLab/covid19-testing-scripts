@@ -76,16 +76,10 @@ for(i in 1:length(countries))
 {
   countryData=histData[which(histData$CountryProv==countries[i]),]
   
-  indexfirst=min(which(!is.na(countryData$total_cumul.all)))
-  if(!is.finite(indexfirst))
-  {
+ 
     total=c(0,countryData$total_cumul.all)
     
-  }
-  else
-  {
-    total=c(countryData$total_cumul.all[c(1:indexfirst-1)],0,countryData$total_cumul.all[c(indexfirst:length(countryData$total_cumul.all))])
-  }
+  
   dailyTotal<-append(dailyTotal,diff(total))
 }
 
@@ -96,16 +90,9 @@ for(i in 1:length(countries))
 {
   countryData=histData[which(histData$CountryProv==countries[i]),]
   
-  indexfirst=min(which(!is.na(countryData$negative_cases)))
-  if(!is.finite(indexfirst))
-  {
     negative=c(0,countryData$negative_cases)
     
-  }
-  else
-  {
-    negative=c(countryData$negative_cases[c(1:indexfirst-1)],0,countryData$negative_cases[c(indexfirst:length(countryData$negative_cases))])
-  }
+  
   dailyNegative<-append(dailyNegative,diff(negative))
 }
 
