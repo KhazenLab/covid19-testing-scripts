@@ -130,6 +130,8 @@ class L2MergeTogether:
                        right_on=["Location","Date"],
                        how='left', sort=False
                     )
+    # only needed if how='outer' above
+    # conf_train["CountryProv"] = conf_train["CountryProv"].fillna(conf_train['Location'])
     del conf_train['Location']
 
     # fix few outliers where total tests < confirmed cases and is negligible
@@ -287,8 +289,13 @@ class L2MergeTogether:
     conf_train["negative_cases"] = conf_train["total_cumul.all"] - conf_train["ConfirmedCases"]
 
     # check missing Lat/Long
-    if pd.isnull(conf_train.Lat ).any(): raise Exception("Found some null Lats" )
-    if pd.isnull(conf_train.Long).any(): raise Exception("Found some null Longs")
+    if pd.isnull(conf_train.Lat ).any():
+      print("Details for exception below of null lats")
+      print(conf_train[pd.isnull(conf_train.Lat )].CountryProv.unique()[:100])
+      raise Exception("Found some null Lats" )
+
+    if pd.isnull(conf_train.Long).any():
+      raise Exception("Found some null Longs")
 
     conf_train.set_index(["CountryProv","Date"], inplace=True)
 
