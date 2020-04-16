@@ -3,6 +3,8 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- enh, l2: re-enable yemen, samoa, mariana
+- feat, l1: jhu deaths also and merge with confirmed
 - enh, l2: use jhu data instead of kaggle
 - enh, l1: get jhu confirmed cases
 - enh, l2: some more details for null lats

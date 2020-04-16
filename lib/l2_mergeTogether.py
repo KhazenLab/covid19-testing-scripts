@@ -34,7 +34,7 @@ class L2MergeTogether:
     # conf_fn_filename = "covid19-global-forecasting-week-2.v20200331.raw.RData"
     # conf_fn_filename = "covid19-global-forecasting-week-4.v20200408.raw.RData"
     # conf_fn_filename = "kaggle-confirmed.csv"
-    conf_fn_filename = "jhu-global-modified.csv"
+    conf_fn_filename = "jhu-confirmed+deaths.csv"
     conf_fn_full = join(self.dir_l1a_others, conf_fn_filename)
 
     # code copied from notebook t4e
@@ -42,20 +42,12 @@ class L2MergeTogether:
       raise Exception("Missing confirmed cases file")
 
     # read csv files
-    conf_train_global=pd.read_csv(conf_fn_full)
-
-    # repeat for usa file
-    conf_fn_usa = "jhu-usa-modified.csv"
-    conf_fn_usa = join(self.dir_l1a_others, conf_fn_usa)
-    conf_train_usa=pd.read_csv(conf_fn_usa)
-
-    # concatenate
-    conf_train= pd.concat([conf_train_global, conf_train_usa], axis=0)
+    conf_train=pd.read_csv(conf_fn_full)
 
     # continue
     conf_train["Date"] = pd.to_datetime(conf_train["Date"])
     conf_train["ConfirmedCases"] = conf_train.ConfirmedCases.astype(int)
-    # conf_train["Fatalities"    ] = conf_train.Fatalities.astype(int)
+    conf_train["Fatalities"    ] = conf_train.Fatalities.astype(int)
     conf_train["CountryProv"] = conf_train.apply(getCountryProv, axis=1)
 
     # check dupes
@@ -81,17 +73,19 @@ class L2MergeTogether:
     #del conf_train["UID"]
 
     # dropping entries for which we have no lat/long
-    drop_pairs = ['Canada – Diamond Princess', 'Canada – Grand Princess',
-      'Canada – Recovered', 'US', 'Yemen', 'US – American Samoa',
+    drop_pairs = [
+      'Canada – Diamond Princess', 'Canada – Grand Princess',
+      'Canada – Recovered',
+      'US',
+      #'Yemen',
+      #'US – American Samoa',
       'US – Diamond Princess', 'US – Grand Princess',
-      'US – Northern Mariana Islands']
+      #'US – Northern Mariana Islands'
+    ]
     d1=conf_train.shape[0]
     conf_train = conf_train[~(conf_train.CountryProv.isin(drop_pairs))]
     d2=conf_train.shape[0]
     assert ((d2 < d1) & (d2 > 26600))
-
-    # sort
-    conf_train = conf_train.sort_values(["CountryProv","Date"], ascending=True)
 
     self.conf_train = conf_train
 
@@ -290,7 +284,7 @@ class L2MergeTogether:
       "Country_Region", "Province_State",
       #"Id",# dropped after move from kaggle to JHU
       "ConfirmedCases",
-      # "Fatalities",# dropped after move from kaggle to JHU
+      "Fatalities",
       "Lat", "Long",
       #"Lat_Long", "is_validation", # lost after moving to using the kaggle dataset directly
       "total_cumul.all", "total_cumul.source", "Population", "tests_per_mil"
@@ -392,7 +386,7 @@ class L2MergeTogether:
 
     # get fields for confirmed based on date latest confirmed
     fx_confirmed = ["CountryProv","Date","ConfirmedCases",
-                    #"Fatalities",# dropped after move from kaggle to JHU
+                    "Fatalities",
                     "Population"]
     df_last = df_last.merge(df_hist[fx_confirmed], how='left', left_on=["CountryProv","Date_latest_confirmed"], right_on=["CountryProv","Date"])
 
@@ -402,7 +396,7 @@ class L2MergeTogether:
 
     # re-order columns
     df_last = df_last[[ "CountryProv", "Date_first_totals", "Date_latest_totals", "Date_count_totals", "Date_latest_confirmed", "ConfirmedCases",
-                        # "Fatalities", # dropped after move from kaggle to JHU
+                        "Fatalities",
                         "total_cumul.all", "Population", "tests_per_mil", "ratio_confirmed_total_pct", "negative_cases"]]
 
     # save to csv

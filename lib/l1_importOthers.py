@@ -7,19 +7,20 @@ import tempfile
 import urllib.request
 
 
-class L1ImportOthers:
+
+class JhuImporter:
 
   def __init__(self, dir_gdrive):
     self.dir_l0_notion = join(dir_gdrive, "l0-notion_tables")
     self.dir_l1a_others = join(dir_gdrive, "l1a-non-biominer_data")
     self.dir_l1b_altogether = join(dir_gdrive, "l1b-altogether")
     self.dir_temp = tempfile.mkdtemp()
-
-
+ 
   def get_jhu_confirmed_global(self):
     """
     Get confirmed cases from JHU github repo.
     This used to be from kaggle dataset, but it's more up-to-date to get it from JHU
+    Notebook t11b4, shadi
     """
     # Download JHU csv file
     fn_global = join(self.dir_temp, "jhu-global-original.csv")
@@ -45,13 +46,41 @@ class L1ImportOthers:
     
     # sort columns
     df_global = df_global[["Country_Region", "Province_State", "Date", "ConfirmedCases"]]
+
+    return df_global
+
+
+  def get_jhu_deaths_global(self):
+    """
+    Notebook t11b5 by Halim
+    """
+    fn_globalDeath = "time_series_covid19_deaths_global.csv"
+    url_globalDeath = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
+    urllib.request.urlretrieve(url_globalDeath, fn_globalDeath)
     
-    ## Save modified files"""
-    fn_save_global = join(self.dir_l1a_others, "jhu-global-modified.csv")
-    df_global.to_csv(fn_save_global, index=False)
+    df_globalDeath = pd.read_csv(fn_globalDeath)
+    df_globalDeath.rename(columns={"Country/Region": "Country_Region", "Province/State": "Province_State"}, inplace=True)
+
+    # index of 1st date
+    idx_dates=4
+    assert df_globalDeath.columns[idx_dates]=="1/22/20"
+    df_globalDeath = pd.melt(df_globalDeath,
+            id_vars=['Country_Region', 'Province_State'],
+            value_vars=df_globalDeath.columns[idx_dates:])
+
+    df_globalDeath.rename(columns={"variable": "Date", "value": "Fatalities"}, inplace=True)
+    df_globalDeath["Date"] = pd.to_datetime(df_globalDeath["Date"], format="%m/%d/%y")
+    df_globalDeath = df_globalDeath.sort_values(["Country_Region", "Province_State", "Date"])
+
+    df_globalDeath = df_globalDeath[["Country_Region", "Province_State", "Date", "Fatalities"]]
+
+    return df_globalDeath
 
 
   def get_jhu_confirmed_usa(self):
+    """
+    Notebook t11b4, shadi
+    """
     ## Download US file"""
     fn_usa = join(self.dir_temp, "jhu-usa-original.csv")
     url_usa = "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv"
@@ -79,11 +108,77 @@ class L1ImportOthers:
     
     # sort columns
     df_usa = df_usa[["Country_Region", "Province_State", "Date", "ConfirmedCases"]]
-    
-    ## Save modified files"""
-    fn_save_usa = join(self.dir_l1a_others, "jhu-usa-modified.csv")
-    df_usa.to_csv(fn_save_usa, index=False)
 
+    return df_usa
+
+
+  def get_jhu_deaths_usa(self):
+    """
+    Notebook t11b5 by Halim
+    """
+    
+    fn_USDeath = "time_series_covid19_deaths_US.csv"
+    url_USDeath = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv"
+    urllib.request.urlretrieve(url_USDeath, fn_USDeath)
+    
+    df_USDeath = pd.read_csv(fn_USDeath)
+
+    idx_dates = 12 # This is the first index of dates column
+    assert df_USDeath.columns[idx_dates]=="1/22/20"
+    df_USDeath = pd.melt(df_USDeath,
+            id_vars=['Country_Region', 'Province_State', 'Admin2'],
+            value_vars=df_USDeath.columns[idx_dates:])
+
+    df_USDeath.rename(columns={"variable": "Date", "value": "Fatalities"}, inplace=True)
+    df_USDeath["Date"] = pd.to_datetime(df_USDeath["Date"], format="%m/%d/%y")
+    df_USDeath = df_USDeath.sort_values(["Country_Region", "Province_State", "Admin2", "Date"])
+
+    df_USDeathcomb= df_USDeath.groupby(['Country_Region','Province_State','Date'])['Fatalities'].sum()
+    df_USDeathcomb = df_USDeathcomb.reset_index()
+
+    # sort columns
+    df_USDeathcomb = df_USDeathcomb[["Country_Region", "Province_State", "Date", "Fatalities"]]
+
+    return df_USDeathcomb
+
+
+
+class L1ImportOthers:
+
+  def __init__(self, dir_gdrive):
+    self.dir_l0_notion = join(dir_gdrive, "l0-notion_tables")
+    self.dir_l1a_others = join(dir_gdrive, "l1a-non-biominer_data")
+    self.dir_l1b_altogether = join(dir_gdrive, "l1b-altogether")
+    self.dir_temp = tempfile.mkdtemp()
+    self.jhu = JhuImporter(dir_gdrive)    
+
+
+  def get_jhu_conf_deaths(self):
+    df_conf_gl = self.jhu.get_jhu_confirmed_global()
+    df_conf_us = self.jhu.get_jhu_confirmed_usa()
+    df_dead_gl = self.jhu.get_jhu_deaths_global()
+    df_dead_us = self.jhu.get_jhu_deaths_usa()
+
+    df_conf_both = pd.concat([df_conf_gl, df_conf_us], axis=0)
+    df_dead_both = pd.concat([df_dead_gl, df_dead_us], axis=0)
+
+    df_all = df_conf_both.merge(
+               df_dead_both,
+               how='inner',
+               on=['Country_Region','Province_State','Date']
+             )
+
+    # sort columns
+    df_all = df_all[["Country_Region", "Province_State", "Date", "ConfirmedCases", "Fatalities"]]
+    df_all["ConfirmedCases"] = df_all["ConfirmedCases"].astype(int)
+    df_all["Fatalities"] = df_all["Fatalities"].astype(int)
+
+    # sort
+    df_all = df_all.sort_values(["Country_Region", "Province_State", "Date"], ascending=True)
+
+    ## Save modified files"""
+    fn_save = join(self.dir_l1a_others, "jhu-confirmed+deaths.csv")
+    df_all.to_csv(fn_save, index=False)
 
 
   def get_owid_roser(self):

@@ -47,8 +47,7 @@ def l1_importOthers(dir_gitrepo):
 
   factory = L1ImportOthers(dir_gitrepo)
 
-  factory.get_jhu_confirmed_global()
-  factory.get_jhu_confirmed_usa()
+  factory.get_jhu_conf_deaths()
   factory.get_owid_roser()
   factory.get_owid_ortiz()
   factory.get_covidtracking_usa()
