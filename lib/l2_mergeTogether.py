@@ -205,7 +205,9 @@ class L2MergeTogether:
     df_counts = pd.DataFrame(df_counts).transpose()
     df_counts["date"]=dt.datetime.now()
     df_counts = df_counts.reset_index(drop=True).set_index("date")
+    df_counts["Comment"] = ""
     colorder = [
+        'Comment',
         'owid/roser',
         'owid/ortiz',
         'covidtracking.com',
@@ -227,8 +229,8 @@ class L2MergeTogether:
     df_current.sort_index(ascending=True, inplace=True)
 
     # filter duplicates
-    dcd = df_current.diff()
-    dcd = pd.isnull(dcd).all(axis=1) | (dcd!=0).all(axis=1)
+    dcd = df_current[list(set(df_current.columns)-set(["Comment"]))].diff()
+    dcd = pd.isnull(dcd).all(axis=1) | (dcd!=0).any(axis=1)
     df_current = df_current.loc[dcd,]
 
     # save
