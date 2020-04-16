@@ -1,5 +1,6 @@
 library(zoo)
 histData=read.csv("../covid19-testing/l2-withConfirmed/t11c-confirmed+totalTests-historical.csv")
+chisquareData=read.csv("../covid19-testing/l2-withConfirmed/t11d-chisquared-ranks.csv")
 histData$CountryProv=as.character(histData$CountryProv)
 histData$Updated<-0
 histData$CountryProv=gsub('[*]',"",histData$CountryProv)
@@ -51,8 +52,6 @@ histData$tests_per_mil=histData$total_cumul.all*1000000/histData$Population;
 histData$ratio_confirmed_total_pct=histData$ConfirmedCases*100/histData$total_cumul.all;
 histData$negative_cases=histData$total_cumul.all-histData$ConfirmedCases;
 histData$tests_per_mil=floor(histData$tests_per_mil)
-tempdata=histData[,!(colnames(histData) %in% c("Lat", "Long","Updated","Country_Region","Province_State"))]
-write.csv(tempdata,"../covid19-testing/ArcGIS/v2/t11c-confirmedtotalTests-historical.csv",na="")
 #End Historical
 
 
@@ -117,3 +116,19 @@ res= data.frame("CountryProv"=country,"Date"=date,"dailyValue"=daily,"cumulative
 names(res)=c("CountryProv","Date","dailyValue","cumulativeValue","Positive/Negative")
 write.csv(res,"../covid19-testing/ArcGIS/v2/t11c-confirmedtotalTests-historical-stacked.csv",na="")
 #End Daily Stacked
+
+
+#Fix Chi square Data
+
+rhs=latest[,c("CountryProv","Lat","Long","Updated")]
+lhs=chisquareData
+
+res2=merge(lhs,
+           rhs,
+           by="CountryProv",
+           all.x=T, all.y=F, sort=F
+)
+
+write.csv(res2,"../covid19-testing/ArcGIS/v2/t11d-chisquared-ranks.csv",na="")
+
+#End Fix
