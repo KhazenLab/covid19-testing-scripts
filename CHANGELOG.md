@@ -3,6 +3,7 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- enh, l1: get jhu confirmed cases
 - enh, l2: some more details for null lats
 - enh, l2: count file now accumulates results
 - enh, l1: drop some spain outliers from wiki and worldometers and owid/ortiz

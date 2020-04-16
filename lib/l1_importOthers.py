@@ -16,6 +16,76 @@ class L1ImportOthers:
     self.dir_temp = tempfile.mkdtemp()
 
 
+  def get_jhu_confirmed_global(self):
+    """
+    Get confirmed cases from JHU github repo.
+    This used to be from kaggle dataset, but it's more up-to-date to get it from JHU
+    """
+    # Download JHU csv file
+    fn_global = join(self.dir_temp, "jhu-global-original.csv")
+    url_global = "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
+    urllib.request.urlretrieve(url_global, fn_global)
+    
+    ## Read global"""
+    df_global = pd.read_csv(fn_global)
+    df_global.rename(columns={"Country/Region": "Country_Region", "Province/State": "Province_State"}, inplace=True)
+    
+    # convert to long format
+    idx_dates=4
+    assert df_global.columns[idx_dates]=="1/22/20"
+    df_global = pd.melt(df_global,
+            # id_vars=['Country_Region', 'Province_State', "Lat", "Long"],
+            id_vars=['Country_Region', 'Province_State'],
+            value_vars=df_global.columns[idx_dates:])
+    
+    # postprocess
+    df_global.rename(columns={"variable": "Date", "value": "ConfirmedCases"}, inplace=True)
+    df_global["Date"] = pd.to_datetime(df_global["Date"], format="%m/%d/%y")
+    df_global = df_global.sort_values(["Country_Region", "Province_State", "Date"])
+    
+    # sort columns
+    df_global = df_global[["Country_Region", "Province_State", "Date", "ConfirmedCases"]]
+    
+    ## Save modified files"""
+    fn_save_global = join(self.dir_l1a_others, "jhu-global-modified.csv")
+    df_global.to_csv(fn_save_global, index=False)
+
+
+  def get_jhu_confirmed_usa(self):
+    ## Download US file"""
+    fn_usa = join(self.dir_temp, "jhu-usa-original.csv")
+    url_usa = "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv"
+    urllib.request.urlretrieve(url_usa, fn_usa)
+    
+    ## Read US"""
+    df_usa = pd.read_csv(fn_usa)
+    
+    # convert to long format
+    idx_dates = 11 # This is the first index of dates column
+    assert df_usa.columns[idx_dates]=="1/22/20"
+    df_usa = pd.melt(df_usa,
+            # id_vars=['Country_Region', 'Province_State', "Admin2", "Lat", "Long_"],
+            id_vars=['Country_Region', 'Province_State', "Admin2"],
+            value_vars=df_usa.columns[idx_dates:])
+    
+    # postprocess
+    df_usa.rename(columns={"variable": "Date", "value": "ConfirmedCases"}, inplace=True)
+    df_usa["Date"] = pd.to_datetime(df_usa["Date"], format="%m/%d/%y")
+    df_usa = df_usa.sort_values(["Country_Region", "Province_State", "Admin2", "Date"])
+    
+    # add up counties
+    df_usa = df_usa.groupby(["Country_Region", "Province_State", "Date"]).ConfirmedCases.agg(sum)
+    df_usa = df_usa.reset_index()
+    
+    # sort columns
+    df_usa = df_usa[["Country_Region", "Province_State", "Date", "ConfirmedCases"]]
+    
+    ## Save modified files"""
+    fn_save_usa = join(self.dir_l1a_others, "jhu-usa-modified.csv")
+    df_usa.to_csv(fn_save_usa, index=False)
+
+
+
   def get_owid_roser(self):
     """
     Download the data from ourworldindata.org that is referenced at
