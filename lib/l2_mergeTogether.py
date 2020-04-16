@@ -4,6 +4,7 @@ from os.path import join
 from os.path import isfile
 import pandas as pd
 import numpy as np
+import datetime as dt
 
 
 #Combine country and province into a single string
@@ -200,9 +201,40 @@ class L2MergeTogether:
     df_counts["total_cumul.source"] = df_counts["total_cumul.source"].apply(lambda x: "NA" if pd.isnull(x) else x)
     df_counts = df_counts["total_cumul.source"].value_counts()
 
+    # make dataframe
+    df_counts = pd.DataFrame(df_counts).transpose()
+    df_counts["date"]=dt.datetime.now()
+    df_counts = df_counts.reset_index(drop=True).set_index("date")
+    colorder = [
+        'owid/roser',
+        'owid/ortiz',
+        'covidtracking.com',
+        'wiki',
+        'worldometers',
+        'biominers',
+        'NA'
+    ]
+    colorder = colorder + sorted(list(set(df_counts.columns)-set(colorder)))
+    df_counts = df_counts[colorder]
+
+    # read current file and concatenate current counts
+    fn_csv = join(self.dir_l2_withConf, "count_sources.csv")
+    df_current = pd.read_csv(fn_csv)
+    df_current["date"] = pd.to_datetime(df_current["date"])
+    df_current.set_index("date", inplace=True)
+    df_current = df_current[colorder]
+    df_current = pd.concat([df_counts, df_current], axis=0)
+    df_current.sort_index(ascending=True, inplace=True)
+
+    # filter duplicates
+    dcd = df_current.diff()
+    dcd = pd.isnull(dcd).all(axis=1) | (dcd!=0).all(axis=1)
+    df_current = df_current.loc[dcd,]
+
     # save
-    from os.path import join
-    df_counts.to_csv(join(self.dir_l2_withConf, "count_sources.csv"), index=True)
+    #df_counts.to_csv(fn_csv, index=True)
+    df_current.sort_index(ascending=False, inplace=True)
+    df_current.to_csv(fn_csv, index=True)
 
 
   def add_supplementary_stats(self):

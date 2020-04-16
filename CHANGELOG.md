@@ -3,6 +3,7 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- enh, l2: count file now accumulates results
 - enh, l1: drop some spain outliers from wiki and worldometers and owid/ortiz
 - bug, l2: new york inconsistency between confirmed cases and total tests on march 12
 - feat, l1: add covidtracking.com source
