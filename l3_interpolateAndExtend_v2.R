@@ -51,7 +51,8 @@ histData$tests_per_mil=histData$total_cumul.all*1000000/histData$Population;
 histData$ratio_confirmed_total_pct=histData$ConfirmedCases*100/histData$total_cumul.all;
 histData$negative_cases=histData$total_cumul.all-histData$ConfirmedCases;
 histData$tests_per_mil=floor(histData$tests_per_mil)
-write.csv(histData[,c(1:13)],"../covid19-testing/ArcGIS/v2/t11c-confirmedtotalTests-historical.csv",na="")
+tempdata=histData[,!(colnames(histData) %in% c("Lat", "Long","Updated","Country_Region","Province_State"))]
+write.csv(tempdata,"../covid19-testing/ArcGIS/v2/t11c-confirmedtotalTests-historical.csv",na="")
 #End Historical
 
 
@@ -112,7 +113,7 @@ country=c(as.character(histData$CountryProv),as.character(histData$CountryProv))
 lat=c(histData$Lat,histData$Lat)
 long=c(histData$Long,histData$Long);
 
-res= data.frame("CountryProv"=country,"Date"=date,"Lat"=lat,"Long"=long,"dailyValue"=daily,"cumulativeValue"=cumulative,"Positive.Negative"=positiveNegative)
-names(res)=c("CountryProv","Date","Lat","Long","dailyValue","cumulativeValue","Positive/Negative")
+res= data.frame("CountryProv"=country,"Date"=date,"dailyValue"=daily,"cumulativeValue"=cumulative,"Positive.Negative"=positiveNegative)
+names(res)=c("CountryProv","Date","dailyValue","cumulativeValue","Positive/Negative")
 write.csv(res,"../covid19-testing/ArcGIS/v2/t11c-confirmedtotalTests-historical-stacked.csv",na="")
 #End Daily Stacked
