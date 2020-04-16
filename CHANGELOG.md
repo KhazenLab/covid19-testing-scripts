@@ -3,6 +3,7 @@ All entries in reverse chronological order.
 
 Version 0.2 (?)
 
+- enh, l2: use jhu data instead of kaggle
 - enh, l1: get jhu confirmed cases
 - enh, l2: some more details for null lats
 - enh, l2: count file now accumulates results
