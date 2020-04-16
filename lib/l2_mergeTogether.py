@@ -90,6 +90,9 @@ class L2MergeTogether:
     d2=conf_train.shape[0]
     assert ((d2 < d1) & (d2 > 26600))
 
+    # sort
+    conf_train = conf_train.sort_values(["CountryProv","Date"], ascending=True)
+
     self.conf_train = conf_train
 
 
