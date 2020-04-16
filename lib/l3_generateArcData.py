@@ -79,13 +79,14 @@ data={'CountryProv':country,'Date':date,'dailyValue':daily,'cumulativeValue':cum
 stacked=pd.DataFrame(data);
 
 #Save stacked in stacked csv
-stacked.to_csv('../../covid19-testing/ArcGIS/v2/t11c-confirmedtotalTests-historical-stacked.csv"')
+stacked.to_csv('../../covid19-testing/ArcGIS/v2/t11c-confirmedtotalTests-historical-stacked.csv')
 
 
 data={'CountryProv':historicalData['CountryProv'],'Lat':historicalData['Lat'],'Long':historicalData['Long'],'Updated':historicalData['Updated']}
 lhs=pd.DataFrame(data);
-res=chiSquareData.merge(lhs,on='CountryProv',how='inner')
 
+res=pd.merge(chiSquareData,lhs,on='CountryProv',how='inner')
+res=res.drop_duplicates(subset=['CountryProv'])
 
 #save res in chiSquare csv
 res.to_csv('../../covid19-testing/ArcGIS/v2/t11d-chisquared-ranks.csv')
