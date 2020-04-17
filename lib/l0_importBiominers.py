@@ -29,6 +29,8 @@ notion_map = {
     "South Africa": "https://www.notion.so/e7be19dda46349188a998c7feb7c861c?v=457a2e1ffc514b4b9ebb59c626711b67",
     "Uruguay": "https://www.notion.so/d9f406529d9e4b0aa000c5950e05779f?v=67daa5dc0deb40869780016b2fa62e22",
     "Vietnam": "https://www.notion.so/c20b8220238c4fab8b183b3ee8276603?v=b4382f1d9c4e4d74b7c05b1fcd9183aa",
+    #added on 2020-04-17
+    "Australia – Australian Capital Territory": "https://www.notion.so/a01b1d1d3f2c461b966d7e8217bea90f?v=e1f4ed7027964f939f21952d54d76375",
 }
 
 
@@ -135,14 +137,18 @@ class L0ImportBiominers:
   def fetch_tables(self):
     # get all
     df_global = []
-    for country_name in notion_map.keys():
+    for country_name in sorted(list(notion_map.keys())):
       print(country_name)
       df_single = get_table(self.client, country_name)
       print("%s .. %s"%(country_name, df_single.shape))
-
+      
       df_single = postprocess_table(country_name, df_single)
       # df_single = df_single[["Date","total_cumul"]]
-
+      #if country_name=="Lebanon":
+      #  import pdb
+      #  pdb.set_trace()
+      # df_single.head(1).transpose()
+        
       # At this point, all tables should have a total_cumul field and a Date field
       # whether it comes from the notion.so table directly, or from the postprocess_table function
       assert "Date" in df_single.columns
