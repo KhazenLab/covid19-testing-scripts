@@ -28,30 +28,27 @@ class L3GenerateArcData:
     for country in self.countries:
     
         indexHist= np.where(historicalData.CountryProv==country)
-        countryData=historicalData.iloc[indexHist]
-        tests=countryData['total_cumul.all'];
+        countryData=historicalData.iloc[indexHist].copy()
+        tests=countryData['total_cumul.all']
         
         if sum(tests.notna())==0:
             continue
-        indexfin=np.amax(np.where((tests.notna())))
-        isNotUpdated=True
+
+        # add 1 since R is 1-based and py is 0-based
+        indexfin=np.amax(np.where((tests.notna()))) + 1
+        isUpdated = (indexfin==len(tests)) or (indexfin==(len(tests)-1))
     
-        if indexfin==len(tests) or indexfin==len(tests)-1:
-            isNotUpdated=False
-    
-        if indexfin<len(tests):
-            indexafter = range((indexfin+1),len(tests) )
-            tests.iloc[indexafter]=tests.iloc[indexfin]
-            countryData['total_cumul.all']=tests
-        
-        countryData['total_cumul.all']=countryData['total_cumul.all'].interpolate();
-        if not(isNotUpdated):
-            countryData['Updated']="*"
-        else:
-            countryData['Updated']=""
+        # forward-fill the last NA for the sake of visualization
+        countryData.iloc[indexfin-1:, 'total_cumul.all'==countryData.columns] = tests.iloc[indexfin-1:].fillna(method="ffill")
+        countryData['total_cumul.all']=countryData['total_cumul.all'].interpolate()
+        countryData['Updated']="*" if isUpdated else ""
     
         historicalData.update(countryData)
 
+    # round after the interpolation
+    historicalData['total_cumul.all']=np.round(historicalData['total_cumul.all'],0)
+ 
+    # more stats
     historicalData['tests_per_mil']=np.floor(historicalData['total_cumul.all']*1000000/historicalData['Population'])
     historicalData['ratio_confirmed_total_pct']=historicalData['ConfirmedCases']*100/historicalData['total_cumul.all']
     historicalData['negative_cases']=historicalData['total_cumul.all']-historicalData['ConfirmedCases']
@@ -67,9 +64,25 @@ class L3GenerateArcData:
     selectColumns=historicalData[['CountryProv','Lat','Long','ConfirmedCases','Fatalities','total_cumul.all','negative_cases','tests_per_mil','ratio_confirmed_total_pct','Population','Updated']]
     
     latest=selectColumns.iloc[indexLatest]
+    latest = latest.rename(columns={
+      "ConfirmedCases": "Max - ConfirmedCases",
+      "Fatalities": "Max - Fatalities",
+      "total_cumul.all": "Max - total_cumul.all",
+      "negative_cases": "Max - negative_cases",
+      "tests_per_mil": "Max - tests_per_mil",
+      "ratio_confirmed_total_pct": "Max - ratio_confirmed_total_pct",
+      "Population": "Max - Population",
+    })
     
+    # sort column order
+    colorder = ["CountryProv", "Lat", "Long",
+                "Max - ConfirmedCases", "Max - Fatalities", "Max - total_cumul.all",
+                "Max - Population", "Max - tests_per_mil", "Max - ratio_confirmed_total_pct",
+                "Max - negative_cases", "Updated"]
+    latest = latest[colorder]
+
     #save latest to csv
-    latest.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-latestOnly.csv'))
+    latest.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-latestOnly.csv'), index=False)
 
 
   def write_dailyStacked(self):
@@ -102,9 +115,9 @@ class L3GenerateArcData:
     data={'CountryProv':country,'Date':date,'dailyValue':daily,'cumulativeValue':cumulative, 'Positive/Negative':positiveNegative} 
     
     stacked=pd.DataFrame(data);
-    
+
     #Save stacked in stacked csv
-    stacked.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical-stacked.csv'))
+    stacked.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical-stacked.csv'), index=False)
 
     self.historicalData = historicalData
 
@@ -121,4 +134,4 @@ class L3GenerateArcData:
     res=res.drop_duplicates(subset=['CountryProv'])
     
     #save res in chiSquare csv
-    res.to_csv(join(self.dir_l3_arcgis, 'v2', 't11d-chisquared-ranks.csv'))
+    res.to_csv(join(self.dir_l3_arcgis, 'v2', 't11d-chisquared-ranks.csv'), index=False)
