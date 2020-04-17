@@ -22,9 +22,17 @@ pip3 install visidata
 
 Step 0: import notion tables
 
+- This requires the notion token, as documented at https://github.com/jamalex/notion-py/
+- The exact documentation from that page of how to get this is:
+
+    Obtain the `token_v2` value by inspecting your browser cookies on a logged-in session on Notion.so"
+
+
+Command to run step 0:
+
 ```
 python3 main.py l0-importbiominers \
-    ~/Development/bitbucket.org/shadiakiki1986/shadi-configs/notion-shadiakiki1986-token_v2.txt \
+    path/to/notion/key.txt \
     ~/Development/gitlab.com/biominers/covid19-testing-data/l0-notion_tables/multiple-biominers-gitrepo.csv 
 ```
 
@@ -49,8 +57,14 @@ python3 main.py l2-mergetogether \
 ```
 
 
-Step 3: interpolate and extrapolate (R code run by Halim)
+Step 3: interpolate and extrapolate
 
 ```
-Rscript l3_interpolateAndExtend.R
+python3 main.py l3-generatearcdata \
+  ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
+
+Deprecated in favor of the new python command:
+
+- `l3_interpolateAndExtend.R`
+- `l3_interpolateAndExtend_v2.R`

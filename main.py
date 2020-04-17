@@ -4,6 +4,7 @@
 from lib.l0_importBiominers import L0ImportBiominers
 from lib.l1_importOthers import L1ImportOthers
 from lib.l2_mergeTogether import L2MergeTogether
+from lib.l3_generateArcData import L3GenerateArcData
 
 
 import click
@@ -80,6 +81,17 @@ def l2_mergeTogether(dir_gitrepo):
   factory.add_supplementary_stats()
   factory.to_csv_historical()
   factory.to_csv_latestOnly()
+
+
+@cli.command()
+@click.argument('dir_gitrepo')
+def l3_generateArcData(dir_gitrepo):
+  factory = L3GenerateArcData(dir_gitrepo)
+  factory.read_l2_historical()
+  factory.calculate_stats()
+  factory.write_latest()
+  factory.write_dailyStacked()
+  factory.write_chisquared()
 
 
 if __name__ == '__main__':

@@ -1,7 +1,12 @@
 All entries in reverse chronological order.
 
 
-Version 0.2 (?)
+Version 0.3 (?)
+
+- feat, l3: convert from R to py
+
+
+Version 0.2 (2020-04-16)
 
 - enh, l2: re-enable yemen, samoa, mariana
 - feat, l1: jhu deaths also and merge with confirmed
