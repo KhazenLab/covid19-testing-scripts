@@ -27,6 +27,10 @@ Step 0: import notion tables
 
     Obtain the `token_v2` value by inspecting your browser cookies on a logged-in session on Notion.so"
 
+- In Chrome, this means: More tools, Developer tools, Application, Cookies, notion.so, `token_v2` value
+  - and save that into a txt file
+- Also, in notion, you need to have your own workspace (other than the workspace in which the tables exist)
+
 
 Command to run step 0:
 
