@@ -31,6 +31,28 @@ notion_map = {
     "Vietnam": "https://www.notion.so/c20b8220238c4fab8b183b3ee8276603?v=b4382f1d9c4e4d74b7c05b1fcd9183aa",
     #added on 2020-04-17
     "Australia – Australian Capital Territory": "https://www.notion.so/a01b1d1d3f2c461b966d7e8217bea90f?v=e1f4ed7027964f939f21952d54d76375",
+    #added on 2020-04-18
+    "Australia – New South Wales": "https://www.notion.so/09df7a2004c54912b2520d7a4e28e794?v=c93dc0298be346649d2cb1cb6f5e5005",
+    "Australia – Northern Territory": "https://www.notion.so/c0d431e5685e418397a920ab900d6c76?v=fac2b1c5bdb648f885d23f9405916853",
+    "Australia – Queensland": "https://www.notion.so/9c7e2bfac4be48e5aaf6475e01cb328d?v=f0a2353eb1264aefabe9ba496f0f7f66",
+    "Australia – South Australia": "https://www.notion.so/58012bcae9604a5180d361fde6070bfc?v=e9f38fec9afe4fa6bc8a00533a6cc3c0",
+    "Australia – Tasmania": "https://www.notion.so/b2b52ed9616547508d30f3add5766791?v=00b54ebdebc04d76befb370ef243f448",
+    "Australia – Victoria": "https://www.notion.so/49b6a5b3a43c4717876544576e858ee7?v=f6cd19f331924b26b95f7a8521b69d59",
+    "Australia – Western Australia": "https://www.notion.so/9b4c4f79de3f47b4b76ec63322def4f0?v=c1e9c91ad08f44e2860703dfdb089549",
+    
+    "Canada – Alberta": "https://www.notion.so/ba7e7cd3c6824e95bcfb3e1da5767192?v=561e03d80ba94978b32f519cda949a7c5",
+    "Canada – British Columbia": "https://www.notion.so/ebf8e31657944d0e8d401116ccd4e927?v=433c297ed6a841b783124487bebe351f",
+    "Canada – Manitoba": "https://www.notion.so/5e5c3776a2e84e4a9db44a1456ff195e?v=648ca967aead499daa37672eff40b052",
+    "Canada – New Brunswick": "https://www.notion.so/49b83a8294cb4bc5aaaa8f788ca3f997?v=85f8d21012754ff19966a7526e1cfbf2",
+    "Canada – Newfoundland and Labrador": "https://www.notion.so/2e848b5df8d94d31a88460a8df3b544e?v=2985bf2a5c244d668f68bee3efaf07f4",
+    "Canada – Northwest Territories": "https://www.notion.so/4e00bbf18c644cf284e58b27b6f24945?v=6fe3114b96d649dba03d9b648b425ee7",
+    "Canada – Nova Scotia": "https://www.notion.so/62a5b14f8f46424cad12da61b493f4ec?v=7c9f1e85340549dfadb34fbb1311af10",
+    "Canada – Ontario": "https://www.notion.so/7faf169a1301432b8e9559cad1c22865?v=db11fd42916e46e298b7ece43f65ffa2",
+    "Canada – Prince Edward Island": "https://www.notion.so/eadcc5c64f30495687c0eeee6b5e1377?v=259544024ed1449a9f1b074acab48270",
+    "Canada – Quebec": "https://www.notion.so/e75f21ea02aa47b7b9d3195357e31caa?v=61246c07ad4f4f389f19819c88a14ae9",
+    "Canada – Saskatchewan": "https://www.notion.so/ea8de2b0aa4f43c3867336a25858b663?v=221ce365021547f588860fcc2b2fbd7f",
+    "Canada – Yukon": "https://www.notion.so/b3ba1b2380f14f0d837fa3a9b2c7a2c2?v=dd86dc0f36c94e33b9ed84fb6e8c3a6a",
+    
 }
 
 
