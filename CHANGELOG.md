@@ -3,6 +3,7 @@ All entries in reverse chronological order.
 
 Version 0.3 (?)
 
+- enh, l1: rename some countries for consistency across sources: US-DC, US-virgin islands, South Korea
 - bugfix, l0: for armenia: turns out that the column name called "negative" is actually "total_cumul", so no need for postprocessing anymore
 - feat, l1: give our biominers notion tables higher priority than wikipedia
 - enh, l0 argentina: use negative+confirmed only for entries in notion where we dont already have total_cumul

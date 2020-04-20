@@ -173,6 +173,10 @@ class L1ImportOthers:
     df_all["ConfirmedCases"] = df_all["ConfirmedCases"].astype(int)
     df_all["Fatalities"] = df_all["Fatalities"].astype(int)
 
+    # some renames. Usually we're renaming other sources to match with JHU, 
+    # but for south korea in particular, we don't like "Korea, South", so we're renaming here
+    df_all.loc[df_all.Country_Region=="Korea, South", "Country_Region"] = "South Korea"
+
     # sort
     df_all = df_all.sort_values(["Country_Region", "Province_State", "Date"], ascending=True)
 
@@ -275,6 +279,10 @@ class L1ImportOthers:
     
     # some postprocessing
     df_daily["total_cumul"] = df_daily.positive + df_daily.negative
+
+    # some renames to match with JHU
+    df_daily.loc[df_daily.name=="District Of Columbia", "name"] = "District of Columbia"
+    df_daily.loc[df_daily.name=="US Virgin Islands", "name"] = "Virgin Islands"
 
     # Use "US" prefix to match with kaggle confirmed cases convention
     df_daily["name"] = "US – " + df_daily.name
