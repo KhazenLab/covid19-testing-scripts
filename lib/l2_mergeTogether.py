@@ -107,7 +107,10 @@ class L2MergeTogether:
     totaltests_data.loc[ totaltests_data.Location=="Aruba",    "Location" ] = "Netherlands – Aruba"
     totaltests_data.loc[ totaltests_data.Location=="Cayman Islands", "Location" ] = "United Kingdom – Cayman Islands"
     totaltests_data.loc[ totaltests_data.Location=="Mayotte", "Location" ] = "France – Mayotte"
-    totaltests_data.loc[ totaltests_data.Location=="South Korea", "Location" ] = "Korea, South"
+
+    # update 2020-04-20, sticking to the "South Korea" nomenclature
+    # totaltests_data.loc[ totaltests_data.Location=="South Korea", "Location" ] = "Korea, South"
+
     totaltests_data.loc[ totaltests_data.Location=="Taiwan", "Location" ] = "Taiwan*"
     totaltests_data.loc[ totaltests_data.Location=="Bosnia", "Location" ] = "Bosnia and Herzegovina"
     totaltests_data.loc[ totaltests_data.Location=="Bermuda", "Location" ] = "United Kingdom – Bermuda"
