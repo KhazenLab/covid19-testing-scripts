@@ -56,6 +56,8 @@ class L3GenerateArcData:
     # save back into class member
     self.historicalData = historicalData
     
+    historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct"]]
+    historicalData.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
     
   def write_latest(self):
     historicalData = self.historicalData
