@@ -95,7 +95,7 @@ def postprocess_table(country_name, df_single):
   if country_name=="Argentina":
     # df_single["total_cumul"] = df_single[["neg cumul labs", "neg cumul epid", "confirmed cumulative"]].fillna(0).apply(sum, axis=1)
     # Update 2020-04-09: do not use neg cumul epid
-    df_single["total_cumul"] = df_single[["neg cumul labs", "confirmed cumulative"]].apply(sum, axis=1)
+    df_single.loc[df_single["total_cumul"].isnull(),'total_cumul'] = df_single[["neg cumul labs", "confirmed cumulative"]].apply(sum, axis=1)
     return df_single
   
   if country_name=="Armenia":
