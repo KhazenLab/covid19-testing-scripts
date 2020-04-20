@@ -3,6 +3,8 @@ All entries in reverse chronological order.
 
 Version 0.3 (?)
 
+- feat, l1: give our biominers notion tables higher priority than wikipedia
+- enh, l0 argentina: use negative+confirmed only for entries in notion where we dont already have total_cumul
 - feat, l3: convert from R to py
 
 

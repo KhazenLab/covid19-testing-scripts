@@ -521,18 +521,20 @@ class L1ImportOthers:
     """## Combine into a single dataset"""
     df_merged = self.df_merged
     
+    # if the sequence of priorities is changed, change in this part and the part below
     df_merged["total_cumul.all"] = df_merged["total_cumul.owid_roser"].fillna(
                                    df_merged["total_cumul.owid_ortiz"].fillna(
                                    df_merged["total_cumul.covusa"].fillna(
-                                     df_merged["total_cumul.wiki"].fillna(
-                                       df_merged["total_cumul.worldometers"].fillna(
-                                           df_merged["total_cumul.biominers"]
-                                       )
-                                     )
-                                    )
-                                    )
-                                    )
-    
+                                   df_merged["total_cumul.biominers"].fillna(
+                                   df_merged["total_cumul.wiki"].fillna(
+                                   df_merged["total_cumul.worldometers"]
+                                   )
+                                   )
+                                   )
+                                   )
+                                   )
+   
+    # if the sequence of priorities is changed, change in this part and the part above
     df_merged["total_cumul.source"] = df_merged.apply(lambda r:
                                         "owid/roser" if pd.notnull(r["total_cumul.owid_roser"])
                                         else "owid/ortiz" if pd.notnull(r["total_cumul.owid_ortiz"])
