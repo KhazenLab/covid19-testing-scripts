@@ -98,9 +98,10 @@ def postprocess_table(country_name, df_single):
     df_single.loc[df_single["total_cumul"].isnull(),'total_cumul'] = df_single[["neg cumul labs", "confirmed cumulative"]].apply(sum, axis=1)
     return df_single
   
-  if country_name=="Armenia":
-    df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
-    return df_single
+  #if country_name=="Armenia":
+    # update 2020-04-20: turns out that the column name called "negative" is actually "total_cumul", so no need for postprocessing anymore
+    #df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
+    #return df_single
 
   if country_name=="Bolivia":
     df_single["total_cumul"] = df_single[["cumulative negative", "cumulative confirmed"]].apply(sum, axis=1)
