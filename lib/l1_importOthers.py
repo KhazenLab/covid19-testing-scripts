@@ -537,9 +537,9 @@ class L1ImportOthers:
                                         "owid/roser" if pd.notnull(r["total_cumul.owid_roser"])
                                         else "owid/ortiz" if pd.notnull(r["total_cumul.owid_ortiz"])
                                         else "covidtracking.com" if pd.notnull(r["total_cumul.covusa"])
+                                        else "biominers" if pd.notnull(r["total_cumul.biominers"])
                                         else "wiki" if pd.notnull(r["total_cumul.wiki"])
                                         else "worldometers" if pd.notnull(r["total_cumul.worldometers"])
-                                        else "biominers" if pd.notnull(r["total_cumul.biominers"])
                                         else np.NaN,
                                         axis=1
                                       )
