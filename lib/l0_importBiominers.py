@@ -53,6 +53,25 @@ notion_map = {
     "Canada – Saskatchewan": "https://www.notion.so/ea8de2b0aa4f43c3867336a25858b663?v=221ce365021547f588860fcc2b2fbd7f",
     "Canada – Yukon": "https://www.notion.so/b3ba1b2380f14f0d837fa3a9b2c7a2c2?v=dd86dc0f36c94e33b9ed84fb6e8c3a6a",
     
+    
+    #added on 2020-04-21
+    #students
+    "Qatar": "https://www.notion.so/fbc2b37f8493465d90a0c14e9c960492?v=b1dfbbe4f9a94d4f8701b5200c75cbad",
+    "Uzbekistan": "https://www.notion.so/658821c24b2643069030d316ce3329bb?v=cef868fc67bb4fcc9a7b3084a6972c32",
+    "Iraq": "https://www.notion.so/a47b686a195141eea264686d5a8662d4?v=9c786876ba6c4aff902a925771f40d6a",
+    "Cyprus": "https://www.notion.so/d5f09ecf0140477d895bee865b06b05c?v=2f152c89b5164944a30fb822a9a9452f",
+    "San Marino": "https://www.notion.so/5b0dfd7d1462432fb8330d0f9b583e8b?v=f12c0c89e945463e8fa20cddbf85e15a",
+    "Iraq": "https://www.notion.so/a47b686a195141eea264686d5a8662d4?v=9c786876ba6c4aff902a925771f40d6a",
+    "France – Mayotte": "https://www.notion.so/7d5ccb5ba8b44ef4a9de0160ccb29860?v=e5ae93a6756f409594cf2b7f913e1599",
+    "West Bank and Gaza": "https://www.notion.so/3db554ac61594c8ab38645830677858d?v=e891533561364ba192918278b7060ab6",
+    "Mauritius":"https://www.notion.so/3a13f841e3ee4721860eeb33bd3b84c0?v=b573c84be994425d91b9dc68119771b8",
+    "Morocco":"https://www.notion.so/63cd3f20bb0f4a35b605574f3235e3f7?v=7233d159d00f4304a354c9811b651330",
+    "Dominican Republic":"https://www.notion.so/759c404422e744e486034e97befe5748?v=389dd435cbb849a7a9c1532c1682dcbf",
+    #HT
+    "Barbados": "https://www.notion.so/73588debe9e04254bd27cc64d19a15bb?v=ff4b2c52099a4d76aa7f88223251f400",
+    "Kosovo": "https://www.notion.so/6db35c5537004a36815aac221c04990c?v=f4005e62387541acb770adda09e52f09",
+    "Kazakhstan":"https://www.notion.so/3a29a9eb91cb4a85a5f6a3a73c92a90c?v=bf87f2e5037c49508d098eb7194a0679",
+    "Kyrgyzstan":"https://www.notion.so/8bfb2eb9576b418ab7740f54574de53a?v=de490e9e552640e6a3a012f44c1ccce0",
 }
 
 
@@ -102,6 +121,16 @@ def postprocess_table(country_name, df_single):
     # update 2020-04-20: turns out that the column name called "negative" is actually "total_cumul", so no need for postprocessing anymore
     #df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     #return df_single
+
+  PCR_tests
+  
+  if country_name=="Dominican Republic":
+    df_single["total_cumul"] = df_single["PCR_tests"]
+    return df_single
+
+  if country_name=="Morocco":
+    df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
+    return df_single
 
   if country_name=="Bolivia":
     df_single["total_cumul"] = df_single[["cumulative negative", "cumulative confirmed"]].apply(sum, axis=1)
