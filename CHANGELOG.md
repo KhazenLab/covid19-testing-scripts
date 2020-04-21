@@ -1,8 +1,14 @@
 All entries in reverse chronological order.
 
 
-Version 0.3 (?)
+Version 0.4 (?)
 
+- feat, l0: added 11 countries by students and 4 coutries by HT. Post processed morocco and dominican republic
+
+
+Version 0.3 (2020-04-20)
+
+- enh, l3: save historical containing ratio positives and tests/mill in separate file
 - enh, l1: rename some countries for consistency across sources: US-DC, US-virgin islands, South Korea
 - bugfix, l0: for armenia: turns out that the column name called "negative" is actually "total_cumul", so no need for postprocessing anymore
 - feat, l1: give our biominers notion tables higher priority than wikipedia
