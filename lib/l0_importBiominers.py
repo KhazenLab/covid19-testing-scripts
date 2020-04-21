@@ -70,6 +70,7 @@ notion_map = {
     "Mauritius":"https://www.notion.so/3a13f841e3ee4721860eeb33bd3b84c0?v=b573c84be994425d91b9dc68119771b8",
     "Morocco":"https://www.notion.so/63cd3f20bb0f4a35b605574f3235e3f7?v=7233d159d00f4304a354c9811b651330",
     "Dominican Republic":"https://www.notion.so/759c404422e744e486034e97befe5748?v=389dd435cbb849a7a9c1532c1682dcbf",
+    "United Kingdom – Isle of Man":"https://www.notion.so/2b08339f35a0423b9a73853b8a08e3ca?v=af9d6eb7ebae4a658c3c9b96c14899ab",
     #HT
     "Barbados": "https://www.notion.so/73588debe9e04254bd27cc64d19a15bb?v=ff4b2c52099a4d76aa7f88223251f400",
     "Kosovo": "https://www.notion.so/6db35c5537004a36815aac221c04990c?v=f4005e62387541acb770adda09e52f09",
