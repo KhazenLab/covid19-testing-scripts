@@ -122,7 +122,6 @@ def postprocess_table(country_name, df_single):
     #df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     #return df_single
 
-  PCR_tests
   
   if country_name=="Dominican Republic":
     df_single["total_cumul"] = df_single["PCR_tests"]
