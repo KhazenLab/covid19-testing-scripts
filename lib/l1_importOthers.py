@@ -241,11 +241,11 @@ class L1ImportOthers:
     # subset of columns
     df_owid_roser = df_owid_roser[["Entity2","Date","Cumulative total"]]
 
-    # drop some dupes data
-    # Dupe with: India - samples tested
+    # drop some dupes data, with: India - samples tested, United States - specimens tested (CDC), japan - tests performed, etc
     df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "India - people tested"]
-    # Dupe with: United States - specimens tested (CDC)
     df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "United States - inconsistent units (COVID Tracking Project)"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "Japan - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "Singapore - people tested"]
 
     # read file and save to csv
     df_owid_roser.to_csv(join(self.dir_l1a_others, fn_owid_roser), index=False)
