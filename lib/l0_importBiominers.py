@@ -12,6 +12,9 @@ notion_map = {
     "Lebanon": "https://www.notion.so/16670cd6b914491ebfc2b488ef1b9e89?v=b0b003183b814c33830396970fac5187",
     "Philippines": "https://www.notion.so/41f843de416c4f41b9266781361e5fdb?v=842f654ed1004b6f9022421bfce6c6d6",
 
+    # This was data that was dropped by owid in one of their commits
+    "Portugal": "https://www.notion.so/95bb43ce1ae448a386db7abaafa68e77?v=2d9cf85903d34eae8b84c4072644ec92",
+
     # Halim
     "Argentina": "https://www.notion.so/a09b8d4dd2c44745983ab1916445ed94?v=266d332fc93543069857c1f081ea37a6",
     "Australia":  "https://www.notion.so/519b9667ab114786be8be3b1a2306c68?v=14f86820859d48be8cbc5a3199392d25",

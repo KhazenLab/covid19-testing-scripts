@@ -3,6 +3,9 @@ All entries in reverse chronological order.
 
 Version 0.4 (?)
 
+- bug, l1: owid had some dupes in india and usa (2 sources for each)
+- feat, l1: add owid/freeze to avoid losing poitns that owid drop
+- feat, l0: add portugal from owid dropped data
 - feat, l0: added 11 countries by students and 4 coutries by HT. Post processed morocco and dominican republic
 
 

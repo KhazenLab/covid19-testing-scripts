@@ -185,17 +185,32 @@ class L1ImportOthers:
     df_all.to_csv(fn_save, index=False)
 
 
-  def get_owid_roser(self):
+  def get_owid_roser_freeze_20200420(self):
+    # This doesnt download and doesnt save to csv again since it's a frozen version
+    fn_owid_roser = "ourworldindata.org-roser-freeze_20200420.csv"
+    df_owid_roser = pd.read_csv(join(self.dir_l1a_others, fn_owid_roser))
+    df_owid_roser["Date"] = pd.to_datetime(df_owid_roser.Date)
+    self.df_owid_roser_v20200420 = df_owid_roser
+
+
+  def get_owid_roser_live(self):
     """
     Download the data from ourworldindata.org that is referenced at
     https://ourworldindata.org/coronavirus#the-total-number-of-tests-performed-or-people-tested-so-far
 
     Update 2020-04-14:
     Replace their csv from the ourworldindata.org article (download from plot) with the one from the github repo. It contains more dates/countries
+
+    Update 2020-04-20:
+    They're sometimes dropping historical points for no apparent reason, eg Urugual 2020-03-11 till 2020-03-28 and Portugal 2020-03
+    We copied these points over to our notion table to keep them.
+    We're also setting a secondary ourworldindata.org/roser source which is frozen as of 2020-04-20
+    This would help us avoid losing more data if they drop them
     """
 
     #fn_owid_roser = "multiple-ourworldindata.org page 2 roser - v20200406.csv"
-    fn_owid_roser = "multiple-ourworldindata.org page 2 roser - gitub.csv"
+    # fn_owid_roser = "multiple-ourworldindata.org page 2 roser - gitub.csv"
+    fn_owid_roser = "ourworldindata.org-roser-live.csv"
 
     # download file
     csv_url = "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv"
@@ -225,9 +240,16 @@ class L1ImportOthers:
 
     # subset of columns
     df_owid_roser = df_owid_roser[["Entity2","Date","Cumulative total"]]
-    df_owid_roser.to_csv(join(self.dir_l1a_others, fn_owid_roser), index=False)
 
-    self.df_owid_roser = df_owid_roser
+    # drop some dupes data
+    # Dupe with: India - samples tested
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "India - people tested"]
+    # Dupe with: United States - specimens tested (CDC)
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "United States - inconsistent units (COVID Tracking Project)"]
+
+    # read file and save to csv
+    df_owid_roser.to_csv(join(self.dir_l1a_others, fn_owid_roser), index=False)
+    self.df_owid_roser_live = df_owid_roser
 
 
   def get_owid_ortiz(self):
@@ -457,10 +479,20 @@ class L1ImportOthers:
     #df_biominers.columns
     
     # prep
-    df_1a = self.df_owid_roser.copy()
+    df_1a = self.df_owid_roser_live.copy()
     df_1a = df_1a.rename(columns={"Entity2": "Location", "Date": "Date", "Cumulative total": "total_cumul.owid_roser"})
     df_1a = df_1a[["Location","Date","total_cumul.owid_roser"]]
     
+    df_1c = self.df_owid_roser_v20200420.copy()
+    df_1c = df_1c.rename(columns={"Entity2": "Location", "Date": "Date", "Cumulative total": "total_cumul.owid_roser"})
+    df_1c = df_1c[["Location","Date","total_cumul.owid_roser"]]
+
+    # FIXME temporarily merge df_1a and df_1c to get a clean git diff in data repo
+    df_1a = pd.concat([df_1a, df_1c], axis=0)
+    df_1a = df_1a[~df_1a[["Location","Date"]].duplicated()]
+    del df_1c
+
+    # prep others 
     df_1b = self.df_owid_ortiz.copy()
     df_1b = df_1b.rename(columns={"Country or territory": "Location", "Date": "Date", "Total tests": "total_cumul.owid_ortiz"})
     df_1b = df_1b[["Location","Date","total_cumul.owid_ortiz"]]
