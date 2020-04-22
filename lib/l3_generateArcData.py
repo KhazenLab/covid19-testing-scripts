@@ -131,7 +131,9 @@ class L3GenerateArcData:
     historicalData["daily_ratio_confirmed_total_pct"]=np.round(dailyConfirmed*100/(dailyConfirmed+dailyNegative),2)
     historicalData["daily_tests_per_mil"]=np.floor(dailyTests*1000000/historicalData['Population'])
     historicalData.loc[historicalData["daily_tests_per_mil"]<0,"daily_tests_per_mil"]=0;
-    historicalData.loc[historicalData["daily_ratio_confirmed_total_pct"]<0,"daily_ratio_confirmed_total_pct"]=-1;   
+    historicalData.loc[dailyNegative<=0,"daily_ratio_confirmed_total_pct"]=-1;
+    historicalData.loc[dailyConfirmed<=0,"daily_ratio_confirmed_total_pct"]=-1;
+    historicalData.loc[historicalData["daily_tests_per_mil"]==0,"daily_ratio_confirmed_total_pct"]=-1;       
     historicalData["daily_tests_per_mil"]=historicalData["daily_tests_per_mil"].replace(0,np.nan);
     historicalData["daily_ratio_confirmed_total_pct"]=historicalData["daily_ratio_confirmed_total_pct"].replace(-1,np.nan);
     historicalData["daily_ratio_confirmed_total_pct"]=historicalData["daily_ratio_confirmed_total_pct"].replace([np.inf, -np.inf], np.nan)
