@@ -53,11 +53,7 @@ class L3GenerateArcData:
     historicalData['ratio_confirmed_total_pct']=historicalData['ConfirmedCases']*100/historicalData['total_cumul.all']
     historicalData['negative_cases']=historicalData['total_cumul.all']-historicalData['ConfirmedCases']
 
-    # save back into class member
-    self.historicalData = historicalData
-    historicalData["ratio_confirmed_total_pct"]=np.round(historicalData["ratio_confirmed_total_pct"],2)
-    historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct"]]
-    historicalData.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
+    
     
   def write_latest(self):
     historicalData = self.historicalData
@@ -92,6 +88,7 @@ class L3GenerateArcData:
 
     dailyConfirmed=pd.Series([])
     dailyNegative=pd.Series([])
+    dailyTests=pd.Series([])
     for country in self.countries:
       indexHist= np.where(historicalData.CountryProv==country)
       countryData=historicalData.iloc[indexHist]
@@ -105,7 +102,11 @@ class L3GenerateArcData:
       negative=pd.Series(negative)
       dailyNegative=pd.concat([dailyNegative,pd.Series(np.diff(negative))], ignore_index=True)
     
-    
+      tests=[0]
+      tests[1:] = countryData['total_cumul.all']
+      tests=pd.Series(tests)
+      dailyTests=pd.concat([dailyTests,pd.Series(np.diff(tests))], ignore_index=True)
+      
     date=pd.concat([historicalData['Date'],historicalData['Date']], ignore_index=True)
     historicalData['Negative']="Negative"
     historicalData['Positive']="Positive"
@@ -123,6 +124,14 @@ class L3GenerateArcData:
 
     self.historicalData = historicalData
 
+    # save back into class member
+    self.historicalData = historicalData
+    dailyConfirmed=pd.concat([dailyConfirmed,pd.Series(np.diff(confirmed))], ignore_index=True)
+    historicalData["ratio_confirmed_total_pct"]=np.round(historicalData["ratio_confirmed_total_pct"],2)
+    historicalData["daily_ratio_confirmed_total_pct"]=np.round(dailyConfirmed/(dailyConfirmed+dailyNegative),2)
+    historicalData["daily_tests_per_mil"]=np.floor(dailyTests*1000000/historicalData['Population'])
+    historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil"]]
+    historicalData.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
 
   def write_chisquared(self):
     historicalData = self.historicalData
