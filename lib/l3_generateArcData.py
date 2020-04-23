@@ -52,8 +52,9 @@ class L3GenerateArcData:
     historicalData['tests_per_mil']=np.floor(historicalData['total_cumul.all']*1000000/historicalData['Population'])
     historicalData['ratio_confirmed_total_pct']=historicalData['ConfirmedCases']*100/historicalData['total_cumul.all']
     historicalData['negative_cases']=historicalData['total_cumul.all']-historicalData['ConfirmedCases']
-
-    
+    historicalData.loc[historicalData["ratio_confirmed_total_pct"]>=100,"ratio_confirmed_total_pct"]=101;
+    historicalData["ratio_confirmed_total_pct"]=np.round(historicalData["ratio_confirmed_total_pct"],2)
+    historicalData["ratio_confirmed_total_pct"]=historicalData["ratio_confirmed_total_pct"].replace(101,np.nan);
     
   def write_latest(self):
     historicalData = self.historicalData
@@ -127,9 +128,6 @@ class L3GenerateArcData:
     # save back into class member
     self.historicalData = historicalData
     dailyConfirmed=pd.concat([dailyConfirmed,pd.Series(np.diff(confirmed))], ignore_index=True)
-    historicalData["ratio_confirmed_total_pct"]=np.round(historicalData["ratio_confirmed_total_pct"],2)
-    historicalData.loc[historicalData["ratio_confirmed_total_pct"]>=100,"ratio_confirmed_total_pct"]=101;
-    historicalData["ratio_confirmed_total_pct"]=historicalData["ratio_confirmed_total_pct"].replace(101,np.nan);
     historicalData["daily_ratio_confirmed_total_pct"]=np.round(dailyConfirmed*100/(dailyConfirmed+dailyNegative),2)
     historicalData["daily_tests_per_mil"]=np.floor(dailyTests*1000000/historicalData['Population'])
     historicalData.loc[historicalData["daily_tests_per_mil"]<0,"daily_tests_per_mil"]=0;   
