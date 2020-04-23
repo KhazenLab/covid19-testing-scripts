@@ -128,13 +128,16 @@ class L3GenerateArcData:
     self.historicalData = historicalData
     dailyConfirmed=pd.concat([dailyConfirmed,pd.Series(np.diff(confirmed))], ignore_index=True)
     historicalData["ratio_confirmed_total_pct"]=np.round(historicalData["ratio_confirmed_total_pct"],2)
+    historicalData.loc[historicalData["ratio_confirmed_total_pct"]>=100,"ratio_confirmed_total_pct"]=101;
+    historicalData["ratio_confirmed_total_pct"]=historicalData["ratio_confirmed_total_pct"].replace(101,np.nan);
     historicalData["daily_ratio_confirmed_total_pct"]=np.round(dailyConfirmed*100/(dailyConfirmed+dailyNegative),2)
     historicalData["daily_tests_per_mil"]=np.floor(dailyTests*1000000/historicalData['Population'])
-    historicalData.loc[historicalData["daily_tests_per_mil"]<0,"daily_tests_per_mil"]=0;
-    historicalData.loc[dailyNegative<=0,"daily_ratio_confirmed_total_pct"]=-1;
-    historicalData.loc[dailyConfirmed<=0,"daily_ratio_confirmed_total_pct"]=-1;
-    historicalData.loc[historicalData["daily_tests_per_mil"]==0,"daily_ratio_confirmed_total_pct"]=-1;       
+    historicalData.loc[historicalData["daily_tests_per_mil"]<0,"daily_tests_per_mil"]=0;   
     historicalData["daily_tests_per_mil"]=historicalData["daily_tests_per_mil"].replace(0,np.nan);
+    historicalData.loc[dailyNegative<=0,"daily_ratio_confirmed_total_pct"]=-1;
+    historicalData.loc[dailyConfirmed<0,"daily_ratio_confirmed_total_pct"]=0;
+    historicalData.loc[np.isnan(dailyNegative),"daily_ratio_confirmed_total_pct"]=-1;
+    historicalData.loc[historicalData["daily_tests_per_mil"]==0,"daily_ratio_confirmed_total_pct"]=-1;    
     historicalData["daily_ratio_confirmed_total_pct"]=historicalData["daily_ratio_confirmed_total_pct"].replace(-1,np.nan);
     historicalData["daily_ratio_confirmed_total_pct"]=historicalData["daily_ratio_confirmed_total_pct"].replace([np.inf, -np.inf], np.nan)
     historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil"]]
