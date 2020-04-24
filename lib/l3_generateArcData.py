@@ -130,7 +130,7 @@ class L3GenerateArcData:
     dailyConfirmed=pd.concat([dailyConfirmed,pd.Series(np.diff(confirmed))], ignore_index=True)
     
     historicalData["daily_ratio_confirmed_total_pct"]=np.round(dailyConfirmed*100/(dailyConfirmed+dailyNegative),2)
-    historicalData["daily_tests_per_mil"]=np.floor(dailyTests*1000000/historicalData['Population'])
+    historicalData["daily_tests_per_mil"]=(dailyTests*1000000/historicalData['Population'])
     historicalData.loc[historicalData["daily_tests_per_mil"]<=0,"daily_tests_per_mil"]=-1;   
     historicalData["daily_tests_per_mil"]=np.floor(historicalData["daily_tests_per_mil"])
     historicalData["daily_tests_per_mil"]=historicalData["daily_tests_per_mil"].replace(-1,np.nan);
