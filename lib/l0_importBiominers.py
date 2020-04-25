@@ -140,7 +140,7 @@ def postprocess_table(country_name, df_single):
     df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     return df_single
 
- if country_name=="Cyprus":
+  if country_name=="Cyprus":
     df_single["total_cumul"] = df_single[["total_cumul_north", "total_cumul_south"]].apply(sum, axis=1)
     return df_single 
  
