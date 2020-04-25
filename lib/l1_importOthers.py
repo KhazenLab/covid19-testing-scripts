@@ -448,7 +448,7 @@ class L1ImportOthers:
 
     self.df_worldometers = df_worldometers
    
-  def get_gov(self):
+  def get_uk_channel_jersey(self):
     #UK- Channel Islands Jersey
     url = 'https://opendata.gov.je/api/3/action/datastore_search?resource_id=85a4f87a-49f0-4ef0-b4db-731acdee94bb'  
     fileobj = urllib.request.urlopen(url)
@@ -456,10 +456,10 @@ class L1ImportOthers:
     df_jersey=pd.DataFrame(columns=["Country","Date","total_cumul"])
     for i in range(0,len(df["result"]["records"])):
         if isinstance(df["result"]["records"][i]["Totalpeopletested"],int):
-            row_df=pd.Series(["United Kingdom – Channel Islands (Jersey)",pd.to_datetime(df["result"]["records"][i]["Date"].split("T")[0]),df["result"]["records"][i]["Totalpeopletested"]], index=df_jersey.columns)
+            row_df=pd.Series(["United Kingdom – Channel Islands",pd.to_datetime(df["result"]["records"][i]["Date"].split("T")[0]),df["result"]["records"][i]["Totalpeopletested"]], index=df_jersey.columns)
             df_jersey=df_jersey.append(row_df, ignore_index=True)
     
-    self.df_gov = df_jersey
+    self.df_jersey = df_jersey
     
   def get_biominers(self):
     """### Biominers
@@ -527,19 +527,13 @@ class L1ImportOthers:
     df_5 = df_5.rename(columns={"country_t11": "Location", "Date": "Date", "total_cumul": "total_cumul.biominers"})
     df_5 = df_5[["Location","Date","total_cumul.biominers"]]
     
-    df_6 = self.df_gov.copy()
-    df_6 = df_6.rename(columns={"Country": "Location", "Date": "Date", "total_cumul": "total_cumul.gov"})
-    df_6 = df_6[["Location","Date","total_cumul.gov"]]
-    
     # merge
     df_merged = df_1a.merge(df_1b, on=["Location","Date"], how='outer'
                    ).merge(df_2, on=["Location","Date"], how='outer'
                    ).merge(df_3, on=["Location","Date"], how='outer'
                    ).merge(df_4, on=["Location","Date"], how='outer'
                    ).merge(df_5, on=["Location","Date"], how='outer'
-                   ).merge(df_6, on=["Location","Date"], how='outer'
                    )
-    
     self.df_merged = df_merged
 
 
@@ -556,7 +550,6 @@ class L1ImportOthers:
                                        "total_cumul.wiki": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.worldometers": lambda x: sum(pd.notnull(x)),
                                        "total_cumul.biominers": lambda x: sum(pd.notnull(x)),
-                                       "total_cumul.gov": lambda x: sum(pd.notnull(x)),
                                        })
     # df_agg.columns = ["dt_min", "dt_max", "len.owid_roser", "len.owid_ortiz", "len.wiki", "len.worldometers"]
     
@@ -583,11 +576,9 @@ class L1ImportOthers:
     df_merged["total_cumul.all"] = df_merged["total_cumul.owid_roser"].fillna(
                                    df_merged["total_cumul.owid_ortiz"].fillna(
                                    df_merged["total_cumul.covusa"].fillna(
-                                   df_merged["total_cumul.gov"].fillna(
                                    df_merged["total_cumul.biominers"].fillna(
                                    df_merged["total_cumul.wiki"].fillna(
                                    df_merged["total_cumul.worldometers"]
-                                   )
                                    )
                                    )
                                    )
@@ -598,7 +589,6 @@ class L1ImportOthers:
                                         "owid/roser" if pd.notnull(r["total_cumul.owid_roser"])
                                         else "owid/ortiz" if pd.notnull(r["total_cumul.owid_ortiz"])
                                         else "covidtracking.com" if pd.notnull(r["total_cumul.covusa"])
-                                        else "gov" if pd.notnull(r["total_cumul.gov"])
                                         else "biominers" if pd.notnull(r["total_cumul.biominers"])
                                         else "wiki" if pd.notnull(r["total_cumul.wiki"])
                                         else "worldometers" if pd.notnull(r["total_cumul.worldometers"])

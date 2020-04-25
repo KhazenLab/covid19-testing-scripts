@@ -55,7 +55,6 @@ def l1_importOthers(dir_gitrepo):
   factory.get_covidtracking_usa()
   factory.get_wikipedia()
   factory.get_worldometers()
-  factory.get_gov()
   factory.get_biominers()
   factory.merge_all()
   factory.aggregate_and_to_csv()
