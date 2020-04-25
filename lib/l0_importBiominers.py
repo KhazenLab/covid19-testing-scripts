@@ -76,6 +76,16 @@ notion_map = {
     "Kosovo": "https://www.notion.so/6db35c5537004a36815aac221c04990c?v=f4005e62387541acb770adda09e52f09",
     "Kazakhstan":"https://www.notion.so/3a29a9eb91cb4a85a5f6a3a73c92a90c?v=bf87f2e5037c49508d098eb7194a0679",
     "Kyrgyzstan":"https://www.notion.so/8bfb2eb9576b418ab7740f54574de53a?v=de490e9e552640e6a3a012f44c1ccce0",
+    
+    #added in 2020-04-25
+    "Saudi Arabia":"https://www.notion.so/391089760e4643678358aa9ef607be4f?v=e98f51aba3884022975f9f3e61cb8b6e",
+    "Algeria":"https://www.notion.so/149253c4a0d642f0bb48ef79c094f99b?v=d273558d79954244a73f26a066fdca81",
+    "Kuwait":"https://www.notion.so/a4c770fcc6794615b50fb7054ef37852?v=7adaf055ed374464a1dea61110c1011a",
+    "Afghanistan":"https://www.notion.so/e8091f37822a4ed6b20efcc3ceb656a6?v=8b5c8d739118434586ad72a14da174a1",
+    "Cote d'Ivoire":"https://www.notion.so/9339a6196ac8438e8e8ef9df6d2ac836?v=bf9d3184bae24d93a1978552a4ae51ae",
+    "Venezuela":"https://www.notion.so/95d00b9478534f2999ff57985a77903f?v=8e2579a773024dadb85f4ee1475da9c4",
+    "Georgia":"https://www.notion.so/53aef605320a44cea227bd32bc7136ab?v=cc149b2ecc3849c4bcc63ccf524afbb4",
+    "United Kingdom - Channel Islands (Guernsey)":"https://www.notion.so/8ad5e1613099456fab7ff7d8616bb4b5?v=34b492262de1482d8346fe260814b77c",
 }
 
 
