@@ -85,7 +85,7 @@ notion_map = {
     "Cote d'Ivoire":"https://www.notion.so/9339a6196ac8438e8e8ef9df6d2ac836?v=bf9d3184bae24d93a1978552a4ae51ae",
     "Venezuela":"https://www.notion.so/95d00b9478534f2999ff57985a77903f?v=8e2579a773024dadb85f4ee1475da9c4",
     "Georgia":"https://www.notion.so/53aef605320a44cea227bd32bc7136ab?v=cc149b2ecc3849c4bcc63ccf524afbb4",
-    "United Kingdom – Channel Islands (Guernsey)":"https://www.notion.so/8ad5e1613099456fab7ff7d8616bb4b5?v=34b492262de1482d8346fe260814b77c",
+    "United Kingdom – Channel Islands":"https://www.notion.so/8ad5e1613099456fab7ff7d8616bb4b5?v=34b492262de1482d8346fe260814b77c",
 }
 
 
