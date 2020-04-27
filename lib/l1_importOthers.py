@@ -176,7 +176,25 @@ class L1ImportOthers:
     # some renames. Usually we're renaming other sources to match with JHU, 
     # but for south korea in particular, we don't like "Korea, South", so we're renaming here
     df_all.loc[df_all.Country_Region=="Korea, South", "Country_Region"] = "South Korea"
-
+    
+    #2020-04-27 fixes for Canada Nova Scotia
+    # make a new single-index since pandas multi-index seems to be broken as of version 1.0
+    df_all["UID"] = df_all["Country_Region"] + " – "+ df_all["Province_State"].fillna("")+ "/" + df_all.Date.dt.strftime("%Y-%m-%d")
+    if df_all["UID"].duplicated().any(): raise Exception("UID not unique")
+    df_all.set_index("UID", inplace=True)
+    # replacements here
+    df_all.loc["Canada – Nova Scotia/2020-04-24","ConfirmedCases"] = 850
+    df_all.loc["Canada – Nova Scotia/2020-04-25","ConfirmedCases"] = 865
+    df_all.loc["Canada – Nova Scotia/2020-04-26","ConfirmedCases"] = 873
+    
+    df_all.loc["Canada – Nova Scotia/2020-04-24","Fatalities"] = 16
+    df_all.loc["Canada – Nova Scotia/2020-04-25","Fatalities"] = 22
+    df_all.loc["Canada – Nova Scotia/2020-04-26","Fatalities"] = 24
+    # done with index, so drop it
+    df_all.reset_index(inplace=True)
+    del df_all["UID"]
+    
+    
     # sort
     df_all = df_all.sort_values(["Country_Region", "Province_State", "Date"], ascending=True)
 
@@ -441,7 +459,7 @@ class L1ImportOthers:
     df_worldometers.loc["Spain/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["Spain/2020-04-05", "Total Tests"] = np.NaN
     df_worldometers.loc["Spain/2020-04-06", "Total Tests"] = np.NaN
-
+    
     # 
     df_worldometers.reset_index(inplace=True)
     del df_worldometers["UID"]
