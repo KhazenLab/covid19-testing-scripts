@@ -108,6 +108,11 @@ class L3GenerateArcData:
       tests=pd.Series(tests)
       dailyTests=pd.concat([dailyTests,pd.Series(np.diff(tests))], ignore_index=True)
       
+    
+    dailyConfirmed[dailyConfirmed<0]=0;
+    dailyTests[dailyTests<0]=0;
+    dailyTests[dailyTests<0]=0;
+    
     date=pd.concat([historicalData['Date'],historicalData['Date']], ignore_index=True)
     historicalData['Negative']="Negative"
     historicalData['Positive']="Positive"
@@ -116,6 +121,7 @@ class L3GenerateArcData:
     cumulative=pd.concat([historicalData['ConfirmedCases'],historicalData['negative_cases']], ignore_index=True)
     country=pd.concat([historicalData['CountryProv'],historicalData['CountryProv']], ignore_index=True)
     
+
     data={'CountryProv':country,'Date':date,'dailyValue':daily,'cumulativeValue':cumulative, 'Positive/Negative':positiveNegative} 
     
     stacked=pd.DataFrame(data);
@@ -129,17 +135,23 @@ class L3GenerateArcData:
     self.historicalData = historicalData
     dailyConfirmed=pd.concat([dailyConfirmed,pd.Series(np.diff(confirmed))], ignore_index=True)
     
-    historicalData["daily_ratio_confirmed_total_pct"]=np.round(dailyConfirmed*100/(dailyConfirmed+dailyNegative),2)
+    historicalData["daily_ratio_confirmed_total_pct"]=(dailyConfirmed*100/(dailyConfirmed+dailyNegative))
     historicalData["daily_tests_per_mil"]=(dailyTests*1000000/historicalData['Population'])
-    historicalData.loc[historicalData["daily_tests_per_mil"]<=0,"daily_tests_per_mil"]=-1;   
-    historicalData["daily_tests_per_mil"]=np.floor(historicalData["daily_tests_per_mil"])
+    
+    historicalData.loc[historicalData["daily_tests_per_mil"]<=0,"daily_tests_per_mil"]=-1;     
+    historicalData["daily_tests_per_mil"]=np.round(historicalData["daily_tests_per_mil"],2)
     historicalData["daily_tests_per_mil"]=historicalData["daily_tests_per_mil"].replace(-1,np.nan);
-    historicalData.loc[dailyNegative<=0,"daily_ratio_confirmed_total_pct"]=-1;
-    historicalData.loc[dailyConfirmed<0,"daily_ratio_confirmed_total_pct"]=0;
-    historicalData.loc[np.isnan(dailyNegative),"daily_ratio_confirmed_total_pct"]=-1;  
+    
+    historicalData.loc[historicalData["daily_ratio_confirmed_total_pct"]<0,"daily_ratio_confirmed_total_pct"]=-1;
+    historicalData.loc[historicalData["daily_ratio_confirmed_total_pct"]>=100,"daily_ratio_confirmed_total_pct"]=-1;  
     historicalData["daily_ratio_confirmed_total_pct"]=historicalData["daily_ratio_confirmed_total_pct"].replace(-1,np.nan);
     historicalData["daily_ratio_confirmed_total_pct"]=historicalData["daily_ratio_confirmed_total_pct"].replace([np.inf, -np.inf], np.nan)
-    historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil"]]
+    historicalData["daily_ratio_confirmed_total_pct"]=np.round(historicalData["daily_ratio_confirmed_total_pct"],2)
+    
+    historicalData["daily_tests_per_positive"]=np.round(dailyTests/dailyConfirmed,2);
+    historicalData["tests_per_positive"]=np.round(historicalData["total_cumul.all"]/historicalData["ConfirmedCases"],2);
+    
+    historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive"]]
     historicalData.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
 
   def write_chisquared(self):
