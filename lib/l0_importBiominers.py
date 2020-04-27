@@ -86,6 +86,9 @@ notion_map = {
     "Venezuela":"https://www.notion.so/95d00b9478534f2999ff57985a77903f?v=8e2579a773024dadb85f4ee1475da9c4",
     "Georgia":"https://www.notion.so/53aef605320a44cea227bd32bc7136ab?v=cc149b2ecc3849c4bcc63ccf524afbb4",
     "United Kingdom – Channel Islands":"https://www.notion.so/8ad5e1613099456fab7ff7d8616bb4b5?v=34b492262de1482d8346fe260814b77c",
+    
+    #added in 2020-04-27
+    "Denmark – Faroe Islands":"https://www.notion.so/4572876b326e4671b0ca8be614e3e5d7?v=9476926efadd4f1d9cf193c8fae969b0",
 }
 
 
@@ -135,7 +138,10 @@ def postprocess_table(country_name, df_single):
     # update 2020-04-20: turns out that the column name called "negative" is actually "total_cumul", so no need for postprocessing anymore
     #df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     #return df_single
-
+  if country_name=="Denmark – Faroe Islands":
+    df_single=df_single.sort_values("Date")
+    df_single["total_cumul"] = df_single["dailyTests"].cumsum()
+    return df_single
   if country_name=="United Kingdom – Channel Islands":
     df_single["total_cumul"] = df_single[["total_cumul_guernsey", "total_negative_jersey","total_positive_jersey"]].apply(sum, axis=1)
     return df_single
