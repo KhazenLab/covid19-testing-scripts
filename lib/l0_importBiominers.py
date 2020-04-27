@@ -89,6 +89,16 @@ notion_map = {
     
     #added in 2020-04-27
     "Denmark – Faroe Islands":"https://www.notion.so/4572876b326e4671b0ca8be614e3e5d7?v=9476926efadd4f1d9cf193c8fae969b0",
+    
+    #added in 2020-04-28
+    "Guyana":"https://www.notion.so/00b15b1cfaac40bbab115f8bc22a02b3?v=1bf323b9374044d98ae6a6e2f6252f37",
+    "United Kingdom – Bermuda":"https://www.notion.so/eae28caf7bb04e06ab7c425567fffd58?v=be204ee5e82a4ab98ef398daff47bd96",
+    "Netherlands – Aruba ":"https://www.notion.so/8108ba3f33b1481381b450e4d276a308?v=3896389fad144150a099232c30b6485e",
+    "Cambodia":"https://www.notion.so/9299191b17a746d4b81fd27dcc11e7a1?v=a9253a72a8ff418cbbf53e13bf4f6ce4",
+    "United Kingdom – Gibraltar":"https://www.notion.so/a0077de1de9a4bf9ab99e75479921cf9?v=a82972cb04774b76bee8e9921c842ddb",
+    "France – Martinique":"https://www.notion.so/705401eec6be49c8a146aa1b2e3d7626?v=cd9e38d58f6f48938ae1ae8145e88ada",
+    
+    
 }
 
 
