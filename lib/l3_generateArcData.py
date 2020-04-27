@@ -110,7 +110,7 @@ class L3GenerateArcData:
       
     
     dailyConfirmed[dailyConfirmed<0]=0;
-    dailyTests[dailyTests<0]=0;
+    dailyNegative[dailyNegative<0]=0;
     dailyTests[dailyTests<0]=0;
     
     date=pd.concat([historicalData['Date'],historicalData['Date']], ignore_index=True)
