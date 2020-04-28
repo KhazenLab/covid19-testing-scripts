@@ -1,6 +1,11 @@
 All entries in reverse chronological order.
 
 
+Version 0.6 (?)
+
+- enh, l3: drop the outdated R scripts
+
+
 Version 0.5 (2020-04-27)
 
 - 2020-04-27

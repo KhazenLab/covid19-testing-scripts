@@ -68,11 +68,6 @@ python3 main.py l3-generatearcdata \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
 
-Deprecated in favor of the new python command:
-
-- `l3_interpolateAndExtend.R`
-- `l3_interpolateAndExtend_v2.R`
-
 
 After running step 3, we currently need to open all the `ArcGIS/v2/*csv` files manually in excel/libreoffice and resave the csv to drop the `.0` suffixes of decimals.
 
