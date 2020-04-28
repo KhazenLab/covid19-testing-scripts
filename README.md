@@ -77,3 +77,12 @@ Deprecated in favor of the new python command:
 After running step 3, we currently need to open all the `ArcGIS/v2/*csv` files manually in excel/libreoffice and resave the csv to drop the `.0` suffixes of decimals.
 
 Casting the corresponding dataframe column to int doesnt work because it contains NAs, which cannot coexist in int column in pandas
+
+
+## Shiny apps
+
+The first shiny app was created for the comparison of different countries.
+
+It's committed in this repo at `shinyScripts/compareCountries/compareCountries.R`
+
+Follow instructions in the fil header there.

@@ -1,7 +1,42 @@
 All entries in reverse chronological order.
 
 
-Version 0.4 (?)
+Version 0.5 (2020-04-27)
+
+- 2020-04-27
+	- l0 added 5 country/state entries from students
+  - compareCountries Initial commit
+  - l3 fix
+  - l1 fix for nova scotia
+  - l3 added 2 new columns to historical and removed some visually weird data
+  - l0 added faroe islands
+- 2020-04-25
+  - l0 handle different columns in UK channel Islands
+  - l1 dropped jersey as api is not helpful
+  - l0 fix to match JHU name
+  - l0 fixed "-"
+  - l1 added gov source for jersey island
+  - fix indentation
+  - l0 handled cyprus
+  - l0 added 8 countries
+  - l0 changed Northern Macedonia to match dataset
+- 2020-04-24
+  - l3 fix so that countries with no reporting on daily testing have nas in daily test/million
+  - l3 fixed small mistake making total zero equal to na
+  - l3 moved lines dealing with cumratio>100 to affect latest as well
+- 2020-04-23
+  - l3 fix for daily ratio to allow zeros, and for cumulative ratios disallow values >100
+- 2020-04-22
+  - l3 added conditions dealing with negative ratios and >100 ratios
+  - l3 added condition to replace negative ratios with na
+  - l3 added conditions to drop negative test/millions and inf ratios
+  - l3 added 2 columns to historical (daily ratio and daily tests/million)
+- 2020-04-21
+  - l0 added isle of man
+
+
+
+Version 0.4 (2020-04-21)
 
 - bug, l1: owid had some dupes in india and usa (2 sources for each)
 - feat, l1: add owid/freeze to avoid losing poitns that owid drop
