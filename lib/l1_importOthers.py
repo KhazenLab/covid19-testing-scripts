@@ -265,6 +265,13 @@ class L1ImportOthers:
     df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "Japan - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "Singapore - people tested"]
 
+    # create index
+    df_owid_roser["UID"] = df_owid_roser["Entity2"] + "/" + df_owid_roser.Date.dt.strftime("%Y-%m-%d")
+    if df_owid_roser["UID"].duplicated().any(): raise Exception("UID not unique")
+
+    df_owid_roser.loc["Colombia/2020-02-29","Cumulative total"] = np.NaN
+    df_owid_roser.loc["Greece/2020-04-16","Cumulative total"] = np.NaN
+
     # read file and save to csv
     df_owid_roser.to_csv(join(self.dir_l1a_others, fn_owid_roser), index=False)
     self.df_owid_roser_live = df_owid_roser
@@ -294,6 +301,7 @@ class L1ImportOthers:
     df_owid_ortiz.loc["Japan/2020-03-19","Total tests"] = np.NaN
     df_owid_ortiz.loc["Ukraine/2020-03-20","Total tests"] = np.NaN
     df_owid_ortiz.loc["Spain/2020-03-18","Total tests"] = np.NaN
+    df_owid_ortiz.loc["Canada – Quebec/2020-03-19","Total tests"] = np.NaN
 
     df_owid_ortiz.reset_index(inplace=True)
     del df_owid_ortiz["UID"]
@@ -389,14 +397,32 @@ class L1ImportOthers:
     df_wiki.loc["Armenia//2020-04-07",    "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Austria//2020-03-01",    "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Azerbaijan//2020-04-01", "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Azerbaijan//2020-04-02", "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Azerbaijan//2020-04-03", "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Australia/Australian Capital Territory/2020-04-13", "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Australia/Australian Capital Territory/2020-04-24", "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Australia/Tasmania/2020-04-08", "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Bahrain//2020-04-07",    "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Bolivia//2020-03-19",    "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Canada/British Columbia/2020-04-13", "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Canada/British Columbia/2020-04-14", "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Canada/Ontario/2020-03-23", "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Canada/Ontario/2020-03-27", "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Canada/Prince Edward Island/2020-04-04", "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Canada/Quebec/2020-03-19",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Canada/Quebec/2020-03-21",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Canada/Quebec/2020-04-02",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Canada/Quebec/2020-04-24",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Croatia//2020-03-01",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Denmark//2020-03-22",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Denmark//2020-03-26",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Denmark//2020-03-28",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["France//2020-04-19",  "Cumulative Test Nb"] = np.NaN
+
+    df_wiki.loc["Germany//2020-03-26",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Germany//2020-04-05",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Germany//2020-04-15",  "Cumulative Test Nb"] = np.NaN
+
     df_wiki.loc["Greece//2020-04-07",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Japan//2020-03-01",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Japan//2020-03-19",  "Cumulative Test Nb"] = np.NaN
@@ -406,8 +432,15 @@ class L1ImportOthers:
     df_wiki.loc["Philippines//2020-03-05",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Philippines//2020-03-09",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Philippines//2020-03-12",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Philippines//2020-03-21",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Philippines//2020-03-26",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Philippines//2020-03-28",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Philippines//2020-03-31",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Philippines//2020-04-02",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Philippines//2020-04-16",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Philippines//2020-04-19",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Philippines//2020-04-20",  "Cumulative Test Nb"] = np.NaN
+
     df_wiki.loc["Russia//2020-03-20",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Spain//2020-03-18",  "Cumulative Test Nb"] = np.NaN # this was 30k, but it's very out of line wtih the 300k on 03-21, so dropping it
     df_wiki.loc["Taiwan//2020-03-19",  "Cumulative Test Nb"] = np.NaN
@@ -445,6 +478,7 @@ class L1ImportOthers:
     df_worldometers.loc["Argentina/2020-04-05", "Total Tests"] = np.NaN
     df_worldometers.loc["Argentina/2020-04-06", "Total Tests"] = np.NaN
     df_worldometers.loc["Armenia/2020-04-04", "Total Tests"] = np.NaN
+    df_worldometers.loc["Germany/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["Germany/2020-04-06", "Total Tests"] = np.NaN
     df_worldometers.loc["Hong Kong/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["India/2020-04-04", "Total Tests"] = np.NaN

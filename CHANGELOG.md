@@ -4,6 +4,8 @@ All entries in reverse chronological order.
 Version 0.6 (?)
 
 - enh, l3: drop the outdated R scripts
+- enh, l3: overwrite negative values with 0
+- bug, l1: data cleaning of numbers causing negative values
 
 
 Version 0.5 (2020-04-27)
