@@ -121,6 +121,7 @@ class L3GenerateArcData:
     cumulative=pd.concat([historicalData['ConfirmedCases'],historicalData['negative_cases']], ignore_index=True)
     country=pd.concat([historicalData['CountryProv'],historicalData['CountryProv']], ignore_index=True)
     
+    cumulative[cumulative<0]=0;
 
     data={'CountryProv':country,'Date':date,'dailyValue':daily,'cumulativeValue':cumulative, 'Positive/Negative':positiveNegative} 
     
