@@ -580,13 +580,15 @@ class L1ImportOthers:
     df_worldometers.set_index("UID", inplace=True)
 
     # drop these entries
+    # TODO replace np.nan overwrite with .drop(...) and just remove the row altogether
     df_worldometers.loc["Argentina/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["Argentina/2020-04-05", "Total Tests"] = np.NaN
     df_worldometers.loc["Argentina/2020-04-06", "Total Tests"] = np.NaN
     df_worldometers.loc["Armenia/2020-04-04", "Total Tests"] = np.NaN
+    df_worldometers.loc["China – Hong Kong/2020-04-04", "Total Tests"] = np.NaN
+    df_worldometers.loc["France – St Martin/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["Germany/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["Germany/2020-04-06", "Total Tests"] = np.NaN
-    df_worldometers.loc["Hong Kong/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["India/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["India/2020-04-06", "Total Tests"] = np.NaN
     df_worldometers.loc["Jordan/2020-04-04", "Total Tests"] = np.NaN
@@ -599,7 +601,7 @@ class L1ImportOthers:
     df_worldometers.loc["Spain/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["Spain/2020-04-05", "Total Tests"] = np.NaN
     df_worldometers.loc["Spain/2020-04-06", "Total Tests"] = np.NaN
-    
+   
     # 
     df_worldometers.reset_index(inplace=True)
     del df_worldometers["UID"]
