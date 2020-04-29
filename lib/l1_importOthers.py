@@ -535,6 +535,16 @@ class L1ImportOthers:
     df_worldometers.columns = [x.replace("\n"," ") for x in df_worldometers.columns.tolist()]
     df_worldometers.Date = pd.to_datetime(df_worldometers.Date)
 
+    # drop their extended points
+    df_worldometers = df_worldometers[["Country, Other", "Total Tests", "Date"]].copy()
+    df_worldometers.sort_values(["Country, Other", "Date"], inplace=True)
+    df_worldometers = df_worldometers[pd.notnull(df_worldometers["Total Tests"])]
+    df_worldometers["diffval"] = df_worldometers.groupby("Country, Other")["Total Tests"].apply(lambda s: s.diff())
+    df_worldometers = df_worldometers[df_worldometers.diffval.apply(pd.isnull) | (df_worldometers.diffval!=0)]
+    del df_worldometers["diffval"]
+
+
+    # some name corrections
     df_worldometers.loc[df_worldometers["Country, Other"]=="S. Korea", "Country, Other"] = "South Korea"
     df_worldometers.loc[df_worldometers["Country, Other"]=="UK", "Country, Other"] = "United Kingdom"
 
@@ -605,6 +615,7 @@ class L1ImportOthers:
     # 
     df_worldometers.reset_index(inplace=True)
     del df_worldometers["UID"]
+
 
     self.df_worldometers = df_worldometers
    

@@ -11,6 +11,7 @@ Version 0.6 (?)
 - bug, l1: drop using the owid frozen version. Check comments in function for more details
 - enh, l1: more worldometers country name corrections
 - enh, l1: worldometers using non-utf8 encoding in read csv
+- enh, l1: worldometers drop extended values
 
 
 Version 0.5 (2020-04-27)
