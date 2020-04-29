@@ -7,6 +7,35 @@ from lib.l2_mergeTogether import L2MergeTogether
 from lib.l3_generateArcData import L3GenerateArcData
 
 
+# Enable debug level messages
+# I used this section to see debug messages during the l0 run
+# Used as: NOTIONPY_LOG_LEVEL=debug LOG_LEVEL=debug python3 main.py ...
+# But definitely can be simplified. Anyway, in the end, it was an internet problem
+# https://stackoverflow.com/a/16043023/4126114
+#import os
+#import logging
+#logging.basicConfig() # you need to initialize logging, otherwise you will not see anything from requests
+#logging.getLogger().setLevel(logging.DEBUG)
+#requests_log = logging.getLogger("requests.packages.urllib3")
+#requests_log.propagate = True
+#print(os.environ.get("NOTIONPY_LOG_LEVEL"))
+#print(os.environ.get("LOG_LEVEL"))
+#from notion.logger import enable_debugging
+#enable_debugging()
+#
+#logging.getLogger("requests").setLevel(logging.DEBUG)
+#logging.getLogger("notion").setLevel(logging.DEBUG)
+#logging.getLogger("requests.packages.urllib3").setLevel(logging.DEBUG)
+#logging.getLogger("urllib3").setLevel(logging.DEBUG)
+#logging.getLogger("urllib").setLevel(logging.DEBUG)
+#
+#
+#for key in logging.Logger.manager.loggerDict:
+#    print(key)
+#    logging.getLogger(key).setLevel(logging.DEBUG)
+
+
+
 import click
 @click.group()
 def cli():
@@ -26,7 +55,6 @@ def l0_importBiominers(notion_fn, fn_biominers):
 
     Requires the notion.so unofficial API key
     """
-
     # notion_fn="notion-shadiakiki1986-token_v2.txt"
     # fn_biominers = "multiple-biominers-gitrepo.csv"
     factory = L0ImportBiominers()

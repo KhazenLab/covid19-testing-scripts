@@ -12,6 +12,10 @@ pew new biominers_covid19
 pip3 install notion pandas Click
 ```
 
+where `notion` is the "Unofficial Python API client for Notion.so" from https://github.com/jamalex/notion-py/
+also mentioned at https://www.notion.so/Notion-Hacks-27b92f71afcd4ae2ac9a4d14fef0ce47
+
+
 It also helps to see CSVs in the terminal with vd:
 
 ```
@@ -39,6 +43,8 @@ python3 main.py l0-importbiominers \
     path/to/notion/key.txt \
     ~/Development/gitlab.com/biominers/covid19-testing-data/l0-notion_tables/multiple-biominers-gitrepo.csv 
 ```
+
+To display more verbose logging during the l0 step, check related notes in main.py
 
 
 Step 1: import non-biominer tables and merge with biominer

@@ -238,17 +238,23 @@ class L1ImportOthers:
     df_owid_roser = pd.read_csv(join(self.dir_temp, fn_owid_roser))
     df_owid_roser.Date = pd.to_datetime(df_owid_roser.Date)
 
+    # drop some dupes data, with: India - samples tested, United States - specimens tested (CDC), japan - tests performed, etc
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "India - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United States - inconsistent units (COVID Tracking Project)"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Japan - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Singapore - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Italy - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United Kingdom - people tested"]
+
     # Split the name and comment for simplicity
-    df_splitname = pd.DataFrame(df_owid_roser.Entity.str.split("-").tolist(), columns=["Entity2","Comment"])
+    ent_uniq = df_owid_roser.Entity.unique()
+    df_splitname = pd.DataFrame([x.split("-") for x in ent_uniq], columns=["Entity2","Comment"])
+    df_splitname["Entity"] = ent_uniq
     df_splitname.Entity2 = df_splitname.Entity2.str.strip()
     df_splitname.Comment = df_splitname.Comment.str.strip()
 
-    df_corr = pd.concat([df_owid_roser,
-               df_splitname],
-              ignore_index=True,
-              axis=1
-             )
-    df_corr.columns = df_owid_roser.columns.tolist() + df_splitname.columns.tolist()
+    df_corr = df_owid_roser.merge(df_splitname, how='left', on='Entity')
+    assert df_corr.shape[0] == df_owid_roser.shape[0]
 
     df_owid_roser = df_corr
     del df_corr
@@ -257,22 +263,26 @@ class L1ImportOthers:
     df_owid_roser.loc[df_owid_roser["Entity2"]=="Czech Republic", "Entity2"] = "Czechia"
 
     # subset of columns
-    df_owid_roser = df_owid_roser[["Entity2","Date","Cumulative total"]]
-
-    # drop some dupes data, with: India - samples tested, United States - specimens tested (CDC), japan - tests performed, etc
-    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "India - people tested"]
-    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "United States - inconsistent units (COVID Tracking Project)"]
-    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "Japan - people tested"]
-    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "Singapore - people tested"]
+    df_owid_roser = df_owid_roser[["Entity2","Date","Cumulative total", "Entity"]]
 
     # create index
+    #print(df_owid_roser.set_index("Entity2").loc["United Kingdom"])
     df_owid_roser["UID"] = df_owid_roser["Entity2"] + "/" + df_owid_roser.Date.dt.strftime("%Y-%m-%d")
-    if df_owid_roser["UID"].duplicated().any(): raise Exception("UID not unique")
+    if df_owid_roser["UID"].duplicated().any():
+      dup_list = df_owid_roser[df_owid_roser.UID.duplicated()].Entity2
+      dup_list = df_owid_roser.set_index("Entity2").loc[dup_list].Entity.unique()[:5]
+      raise Exception("UID not unique, eg %s"%(", ".join(dup_list)))
+
+    df_owid_roser.set_index("UID", inplace=True)
 
     df_owid_roser.loc["Colombia/2020-02-29","Cumulative total"] = np.NaN
     df_owid_roser.loc["Greece/2020-04-16","Cumulative total"] = np.NaN
 
+    df_owid_roser.reset_index(inplace=True)
+    del df_owid_roser["UID"]
+
     # read file and save to csv
+    del df_owid_roser["Entity"]
     df_owid_roser.to_csv(join(self.dir_l1a_others, fn_owid_roser), index=False)
     self.df_owid_roser_live = df_owid_roser
 

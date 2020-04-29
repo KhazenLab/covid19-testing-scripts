@@ -228,12 +228,13 @@ class L0ImportBiominers:
 
   def fetch_tables(self):
     # get all
+    print("fetching all tables")
     df_global = []
     for country_name in sorted(list(notion_map.keys())):
-      print(country_name)
+      print(f"Getting table for {country_name}")
       df_single = get_table(self.client, country_name)
       print("%s .. %s"%(country_name, df_single.shape))
-      
+
       df_single = postprocess_table(country_name, df_single)
       # df_single = df_single[["Date","total_cumul"]]
       #if country_name=="Lebanon":
