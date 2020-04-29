@@ -7,6 +7,28 @@ import tempfile
 import urllib.request
 import json
 
+import requests
+import requests_cache
+SECS_PER_HOUR = 60*60
+requests_cache.install_cache('demo_cache', expire_after=SECS_PER_HOUR)
+
+
+def my_download(csv_url, csv_fn, description):
+    """
+    To replace     urllib.request.urlretrieve(url_global, fn_global)
+    and add cache
+    """
+    # download file
+    print(f"Download: {description}: start")
+    requests_cache.install_cache('demo_cache')
+    r = requests.get(csv_url, stream=True)
+    with open(csv_fn, 'wb') as handle:
+        for block in r.iter_content(1024):
+          handle.write(block)
+
+    print(f"Download: {description}: end")
+
+
 
 class JhuImporter:
 
@@ -25,7 +47,7 @@ class JhuImporter:
     # Download JHU csv file
     fn_global = join(self.dir_temp, "jhu-global-original.csv")
     url_global = "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
-    urllib.request.urlretrieve(url_global, fn_global)
+    my_download(url_global, fn_global, "jhu confirmed global")
     
     ## Read global"""
     df_global = pd.read_csv(fn_global)
@@ -56,7 +78,7 @@ class JhuImporter:
     """
     fn_globalDeath = "time_series_covid19_deaths_global.csv"
     url_globalDeath = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"
-    urllib.request.urlretrieve(url_globalDeath, fn_globalDeath)
+    my_download(url_globalDeath, fn_globalDeath, "jhu death global")
     
     df_globalDeath = pd.read_csv(fn_globalDeath)
     df_globalDeath.rename(columns={"Country/Region": "Country_Region", "Province/State": "Province_State"}, inplace=True)
@@ -84,7 +106,7 @@ class JhuImporter:
     ## Download US file"""
     fn_usa = join(self.dir_temp, "jhu-usa-original.csv")
     url_usa = "https://github.com/CSSEGISandData/COVID-19/raw/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_US.csv"
-    urllib.request.urlretrieve(url_usa, fn_usa)
+    my_download(url_usa, fn_usa, "jhu confirmed usa")
     
     ## Read US"""
     df_usa = pd.read_csv(fn_usa)
@@ -119,8 +141,8 @@ class JhuImporter:
     
     fn_USDeath = "time_series_covid19_deaths_US.csv"
     url_USDeath = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_US.csv"
-    urllib.request.urlretrieve(url_USDeath, fn_USDeath)
-    
+    my_download(url_USDeath, fn_USDeath, "jhu death usa")   
+
     df_USDeath = pd.read_csv(fn_USDeath)
 
     idx_dates = 12 # This is the first index of dates column
@@ -154,10 +176,12 @@ class L1ImportOthers:
 
 
   def get_jhu_conf_deaths(self):
+    print("JHU .. downloading")
     df_conf_gl = self.jhu.get_jhu_confirmed_global()
     df_conf_us = self.jhu.get_jhu_confirmed_usa()
     df_dead_gl = self.jhu.get_jhu_deaths_global()
     df_dead_us = self.jhu.get_jhu_deaths_usa()
+    print("JHU .. done")
 
     df_conf_both = pd.concat([df_conf_gl, df_conf_us], axis=0)
     df_dead_both = pd.concat([df_dead_gl, df_dead_us], axis=0)
@@ -203,15 +227,33 @@ class L1ImportOthers:
     df_all.to_csv(fn_save, index=False)
 
 
-  def get_owid_roser_freeze_20200420(self):
+  def _get_owid_roser_freeze_20200420(self):
+    """
+    Not sure if it's a good idea to do this.
+    Uruguay for example lost 2 weeks in owid, and we're not sure if it's a mistake or not.
+    OTOH, colombia had wrong entries altogether, and the live version fixed it.
+    Also, Greece 04-16 was wrong, but re-importing the frozen dataset brings it back.
+    Will keep this code and just comment out its usage from below
+    """
     # This doesnt download and doesnt save to csv again since it's a frozen version
     fn_owid_roser = "ourworldindata.org-roser-freeze_20200420.csv"
     df_owid_roser = pd.read_csv(join(self.dir_l1a_others, fn_owid_roser))
     df_owid_roser["Date"] = pd.to_datetime(df_owid_roser.Date)
-    self.df_owid_roser_v20200420 = df_owid_roser
+
+    # drop some countries
+    df_owid_roser.set_index("Entity2", inplace=True)
+    df_owid_roser.drop("Colombia", inplace=True) # weird numbers in frozen version
+    df_owid_roser.reset_index(inplace=True)
+
+    # drop some pairs
+    df_owid_roser.set_index(["Entity2","Date"], inplace=True)
+    df_owid_roser.drop(["Greece","2020-04-16"], inplace=True)
+    df_owid_roser.reset_index(inplace=True)
+
+    return df_owid_roser
 
 
-  def get_owid_roser_live(self):
+  def get_owid_roser(self):
     """
     Download the data from ourworldindata.org that is referenced at
     https://ourworldindata.org/coronavirus#the-total-number-of-tests-performed-or-people-tested-so-far
@@ -232,11 +274,12 @@ class L1ImportOthers:
 
     # download file
     csv_url = "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv"
-    urllib.request.urlretrieve(csv_url, join(self.dir_temp, fn_owid_roser))
+    my_download(csv_url, join(self.dir_temp, fn_owid_roser), "owid live")
 
     # Read
     df_owid_roser = pd.read_csv(join(self.dir_temp, fn_owid_roser))
     df_owid_roser.Date = pd.to_datetime(df_owid_roser.Date)
+    #df_owid_roser["Cumulative total"] = df_owid_roser["Cumulative total"].astype(int)
 
     # drop some dupes data, with: India - samples tested, United States - specimens tested (CDC), japan - tests performed, etc
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "India - people tested"]
@@ -267,22 +310,36 @@ class L1ImportOthers:
 
     # create index
     #print(df_owid_roser.set_index("Entity2").loc["United Kingdom"])
-    df_owid_roser["UID"] = df_owid_roser["Entity2"] + "/" + df_owid_roser.Date.dt.strftime("%Y-%m-%d")
-    if df_owid_roser["UID"].duplicated().any():
-      dup_list = df_owid_roser[df_owid_roser.UID.duplicated()].Entity2
+    df_UID = df_owid_roser["Entity2"] + "/" + df_owid_roser.Date.dt.strftime("%Y-%m-%d")
+    if df_UID.duplicated().any():
+      dup_list = df_owid_roser[df_UID.duplicated()].Entity2
       dup_list = df_owid_roser.set_index("Entity2").loc[dup_list].Entity.unique()[:5]
       raise Exception("UID not unique, eg %s"%(", ".join(dup_list)))
 
-    df_owid_roser.set_index("UID", inplace=True)
+    del df_owid_roser["Entity"]
 
-    df_owid_roser.loc["Colombia/2020-02-29","Cumulative total"] = np.NaN
-    df_owid_roser.loc["Greece/2020-04-16","Cumulative total"] = np.NaN
-
-    df_owid_roser.reset_index(inplace=True)
-    del df_owid_roser["UID"]
+    # read frozen data
+    # This doesnt download and doesnt save to csv again since it's a frozen version
+    #df_freeze = self._get_owid_roser_freeze_20200420()
+    #
+    # append frozen
+    #df_owid_roser = pd.concat([df_owid_roser, df_freeze], axis=0, ignore_index=True)
+    #df_owid_roser = df_owid_roser[~df_owid_roser[["Entity2","Date"]].duplicated()]
+    #df_owid_roser.sort_values(["Entity2","Date"], inplace=True)
+    #del df_freeze
+    #
+    # set index and drop some entries
+    #df_owid_roser["UID"] = df_UID
+    #df_owid_roser.set_index("UID", inplace=True)
+    #
+    #print(df_owid_roser.loc["Greece/2020-04-16"])
+    # (Pdb) df_owid_roser[df_owid_roser.Entity2=="Greece"]
+    #df_owid_roser.drop("Greece/2020-04-16", inplace=True)
+    #
+    #df_owid_roser.reset_index(inplace=True)
+    #del df_owid_roser["UID"]
 
     # read file and save to csv
-    del df_owid_roser["Entity"]
     df_owid_roser.to_csv(join(self.dir_l1a_others, fn_owid_roser), index=False)
     self.df_owid_roser_live = df_owid_roser
 
@@ -556,17 +613,7 @@ class L1ImportOthers:
     df_1a = self.df_owid_roser_live.copy()
     df_1a = df_1a.rename(columns={"Entity2": "Location", "Date": "Date", "Cumulative total": "total_cumul.owid_roser"})
     df_1a = df_1a[["Location","Date","total_cumul.owid_roser"]]
-    
-    df_1c = self.df_owid_roser_v20200420.copy()
-    df_1c = df_1c.rename(columns={"Entity2": "Location", "Date": "Date", "Cumulative total": "total_cumul.owid_roser"})
-    df_1c = df_1c[["Location","Date","total_cumul.owid_roser"]]
 
-    # FIXME temporarily merge df_1a and df_1c to get a clean git diff in data repo
-    df_1a = pd.concat([df_1a, df_1c], axis=0)
-    df_1a = df_1a[~df_1a[["Location","Date"]].duplicated()]
-    del df_1c
-
-    # prep others 
     df_1b = self.df_owid_ortiz.copy()
     df_1b = df_1b.rename(columns={"Country or territory": "Location", "Date": "Date", "Total tests": "total_cumul.owid_ortiz"})
     df_1b = df_1b[["Location","Date","total_cumul.owid_ortiz"]]
