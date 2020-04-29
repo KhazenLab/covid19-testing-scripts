@@ -527,7 +527,10 @@ class L1ImportOthers:
 
     # This file's name is 0403 till 0406 but it really contains till 0429
     fn_worldometers = "multiple-worldometers.info-coronavirus-20200403 till 0406.csv"
-    df_worldometers = pd.read_csv(join(self.dir_l1a_others, fn_worldometers))
+
+    # after updating till 2020-04-29, there are some non-utf-8 characters, so using latin1 (synonym of iso... below)
+    # http://stackoverflow.com/questions/18171739/ddg#18172249
+    df_worldometers = pd.read_csv(join(self.dir_l1a_others, fn_worldometers), encoding = "ISO-8859-1")
 
     df_worldometers.columns = [x.replace("\n"," ") for x in df_worldometers.columns.tolist()]
     df_worldometers.Date = pd.to_datetime(df_worldometers.Date)

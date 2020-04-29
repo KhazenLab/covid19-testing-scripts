@@ -10,6 +10,7 @@ Version 0.6 (?)
 - feat, l1: add caching for 1 hour for JHU and OWID live files
 - bug, l1: drop using the owid frozen version. Check comments in function for more details
 - enh, l1: more worldometers country name corrections
+- enh, l1: worldometers using non-utf8 encoding in read csv
 
 
 Version 0.5 (2020-04-27)
