@@ -9,6 +9,7 @@ Version 0.6 (?)
 - bug, l1: owid live had duplicates which showed up when added the UID field for data cleaning. Fixed
 - feat, l1: add caching for 1 hour for JHU and OWID live files
 - bug, l1: drop using the owid frozen version. Check comments in function for more details
+- enh, l1: more worldometers country name corrections
 
 
 Version 0.5 (2020-04-27)

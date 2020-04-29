@@ -525,6 +525,7 @@ class L1ImportOthers:
   def get_worldometers(self):
     """### worldometers.info"""
 
+    # This file's name is 0403 till 0406 but it really contains till 0429
     fn_worldometers = "multiple-worldometers.info-coronavirus-20200403 till 0406.csv"
     df_worldometers = pd.read_csv(join(self.dir_l1a_others, fn_worldometers))
 
@@ -533,6 +534,41 @@ class L1ImportOthers:
 
     df_worldometers.loc[df_worldometers["Country, Other"]=="S. Korea", "Country, Other"] = "South Korea"
     df_worldometers.loc[df_worldometers["Country, Other"]=="UK", "Country, Other"] = "United Kingdom"
+
+    # added the below with halim after he updated the worldometers csv file till apr 29
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Anguilla", "Country, Other"] = "United Kingdom – Anguilla"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Aruba", "Country, Other"] = "Netherlands – Aruba"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Bermuda", "Country, Other"] = "United Kingdom – Bermuda"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="British Virgin Islands", "Country, Other"] = "United Kingdom – British Virgin Islands"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="CAR", "Country, Other"] = "Central African Republic"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Cayman Islands", "Country, Other"] = "United Kingdom – Cayman Islands"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Channel Islands", "Country, Other"] = "United Kingdom – Channel Islands"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Congo", "Country, Other"] = "Congo (Brazzaville)"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Curaçao", "Country, Other"] = "Netherlands – Curacao"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="DRC", "Country, Other"] = "Congo (Kinshasa)"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Faeroe Islands", "Country, Other"] = "Denmark – Faroe Islands"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Falkland Islands", "Country, Other"] = "United Kingdom – Falkland Islands (Malvinas)"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="French Guiana", "Country, Other"] = "France – French Guiana"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="French Polynesia", "Country, Other"] = "France – French Polynesia "
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Gibraltar", "Country, Other"] = "United Kingdom – Gibraltar"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Greenland", "Country, Other"] = "Denmark – Greenland"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Guadeloupe", "Country, Other"] = "France – Guadeloupe"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Guadeloupe", "Country, Other"] = "France – Guadeloupe"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Hong Kong", "Country, Other"] = "China – Hong Kong"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Isle of Man", "Country, Other"] = "United Kingdom Isle of Man"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Ivory Coast", "Country, Other"] = "Cote d'Ivoire"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Martinique", "Country, Other"] = "France – Martinique"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Montserrat", "Country, Other"] = "United Kingdom – Montserrat"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="New Caledonia", "Country, Other"] = "France – New Caledonia"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Palestine", "Country, Other"] = "West Bank and Gaza"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Réunion", "Country, Other"] = "France – Reunion"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Saint Martin", "Country, Other"] = "France – St Martin"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Saint Pierre Miquelon", "Country, Other"] = "France – Saint Pierre and Miquelon"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Sint Maarten", "Country, Other"] = "Netherlands – Sint Maarten"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="St. Barth", "Country, Other"] = "France – Saint Barthelemy"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="St. Vincent Grenadines", "Country, Other"] = "Saint Vincent and the Grenadines"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Turks and Caicos", "Country, Other"] = "United Kingdom – Turks and Caicos Islands"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="UAE", "Country, Other"] = "United Arab Emirates"
 
     # previous usages of multi-index didn't work, so going ahead with my own single-index
     # df_worldometers.set_index(["Country, Other","Date"], inplace=True)
