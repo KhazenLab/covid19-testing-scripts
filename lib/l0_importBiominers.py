@@ -98,7 +98,13 @@ notion_map = {
     "United Kingdom – Gibraltar":"https://www.notion.so/a0077de1de9a4bf9ab99e75479921cf9?v=a82972cb04774b76bee8e9921c842ddb",
     "France – Martinique":"https://www.notion.so/705401eec6be49c8a146aa1b2e3d7626?v=cd9e38d58f6f48938ae1ae8145e88ada",
     
-    
+    #added in 2020-04-30
+    "Bulgaria":"https://www.notion.so/09504393f2df4b93bf5d9a8a4414791e?v=7baa0d43b7de4a60bb27f5939a3b1b0e",
+    "Malta":"https://www.notion.so/077758ffdd184c50a45e276d67c4c5f1?v=abf9ee814dcd4f2b8d3aa77cc1cc0da6",
+    "Montenegro":"https://www.notion.so/f97ef019adab47a6ab06761ebd80c153?v=93b48999c450468688d058a7cc1964f9",
+    "Rwanda":"https://www.notion.so/14edfcd8ff15418c9c39a66b33833ff4?v=5043dc278a4f492189fa77bec58a64db",
+    "Togo":"https://www.notion.so/0e1839209d964cd59b77912cc121414e?v=6c0f00d5c139413f8f41bb9cf956fb12",
+    "Burma":"https://www.notion.so/54048bda9f1a43b68ff5730cb46068ab?v=970181c8096a4e9998a0e7c48b94f307",
 }
 
 
