@@ -127,6 +127,8 @@ Finally I delete all the rows marked with "candel", drop the dupe column, and sa
 
 ## Part 2: daily tests less than daily confirmed
 
+## Part 2a: due to extended data
+
 Saved in `l0/drop_tests_lessthan_confirmed.csv'
 
 Based on `l2/t11c-confirmed+totalTests-historical.csv`, and prioritized in notebook t11d in the section that highlights countries with tests less than confirmed < -1k for example
@@ -138,3 +140,9 @@ Procedure
 - set in S4 formula `=IF(OR(R4="d",R3="d",R2="d",R5="d",R6="d"), "x", "")` to get some context
 - drop everything that has empty in the context
 - drop unnecessary columns
+
+## Part 2b: due to linear interpolation mismatch with concave confirmed cases
+
+Data from notion table `Artificial biominers data` (Link: https://www.notion.so/Artificial-biominers-data-dabae264d80b4c8fb9f7751730c05632 )
+
+Check also the section `Data cleaning` (link: https://www.notion.so/Testing-Statistics-Data-Collection-c9ee53ecacfc4eee950fcc466b8dfb72#1ae3ae9a07d04bb891084702d1bbae9a )
