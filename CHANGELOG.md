@@ -1,7 +1,15 @@
 All entries in reverse chronological order.
 
 
-Version 0.6 (?)
+Version 0.7 (?)
+
+- feat, l1: start using `drop_entries.csv` for datacleaning
+- enh, l0: abort if duplicates in biominers data
+- enh, l1: wiki and worldometers had nans, dropped
+- bug, l1: covidtracking.com updated urls
+
+
+Version 0.6 (2020-04-29)
 
 - enh, l3: drop the outdated R scripts
 - enh, l3: overwrite negative values with 0

@@ -158,6 +158,7 @@ def postprocess_table(country_name, df_single):
     df_single=df_single.sort_values("Date")
     df_single["total_cumul"] = df_single["dailyTests"].cumsum()
     return df_single
+
   if country_name=="United Kingdom – Channel Islands":
     df_single["total_cumul"] = df_single[["total_cumul_guernsey", "total_negative_jersey","total_positive_jersey"]].apply(sum, axis=1)
     return df_single
@@ -261,6 +262,10 @@ class L0ImportBiominers:
     df_global = df_global.loc[pd.notnull(df_global.total_cumul),]
     df_global["total_cumul"] = df_global.total_cumul.astype(int)
     df_global = df_global.sort_values(["country_t11", "Date"], ascending=True)
+
+    if df_global[["country_t11","Date"]].duplicated().any():
+      raise Exception("Found %i duplicates in biominers data"%(df_global[["country_t11","Date"]].duplicated().sum()))
+
     self.df_global = df_global
 
   def to_csv(self, fn_biominers):

@@ -19,7 +19,7 @@ def my_download(csv_url, csv_fn, description):
     and add cache
     """
     # download file
-    print(f"Download: {description}: start")
+    print(f"Download: {description} to {csv_fn}: start")
     requests_cache.install_cache('demo_cache')
     r = requests.get(csv_url, stream=True)
     with open(csv_fn, 'wb') as handle:
@@ -379,10 +379,12 @@ class L1ImportOthers:
   def get_covidtracking_usa(self):
     fn_covusa_daily = join(self.dir_temp, "covidtracking.com-states_daily.csv")
     fn_covusa_info  = join(self.dir_temp, "covidtracking.com-states_info.csv" )
-    url_daily = "https://covidtracking.com/api/states/daily.csv"
-    url_info  = "https://covidtracking.com/api/states/info.csv"
-    urllib.request.urlretrieve(url_daily, fn_covusa_daily)
-    urllib.request.urlretrieve(url_info , fn_covusa_info)
+    url_daily = "https://covidtracking.com/api/v1/states/daily.csv"
+    url_info  = "https://covidtracking.com/api/v1/states/info.csv"
+    #urllib.request.urlretrieve(url_daily, fn_covusa_daily)
+    #urllib.request.urlretrieve(url_info , fn_covusa_info)
+    my_download(url_daily, fn_covusa_daily, "cov usa daily")
+    my_download(url_info, fn_covusa_info, "cov usa info")
     
     df_daily = pd.read_csv(fn_covusa_daily)
     df_info  = pd.read_csv(fn_covusa_info )
@@ -519,6 +521,9 @@ class L1ImportOthers:
     df_wiki.reset_index(inplace=True)
     del df_wiki["UID"]
 
+    # drop nan entries
+    df_wiki = df_wiki[pd.notnull(df_wiki.Country)]
+
     self.df_wiki = df_wiki
 
 
@@ -616,6 +621,8 @@ class L1ImportOthers:
     df_worldometers.reset_index(inplace=True)
     del df_worldometers["UID"]
 
+    # drop nan
+    df_worldometers = df_worldometers[pd.notnull(df_worldometers["Country, Other"])]
 
     self.df_worldometers = df_worldometers
    
@@ -679,7 +686,7 @@ class L1ImportOthers:
     df_3["Location"] = df_3.apply(lambda r: r.Country if r.Region=="" else str(r.Country)+' – '+str(r.Region), axis=1)
     df_3 = df_3.rename(columns={"Location": "Location", "As of Date": "Date", "Cumulative Test Nb": "total_cumul.wiki"})
     df_3 = df_3[["Location","Date","total_cumul.wiki"]]
-    
+
     df_4 = self.df_worldometers.copy()
     df_4 = df_4.rename(columns={"Country, Other": "Location", "Date": "Date", "Total Tests": "total_cumul.worldometers"})
     df_4 = df_4[["Location","Date","total_cumul.worldometers"]]
@@ -695,7 +702,32 @@ class L1ImportOthers:
                    ).merge(df_4, on=["Location","Date"], how='outer'
                    ).merge(df_5, on=["Location","Date"], how='outer'
                    )
-    self.df_merged = df_merged
+
+    # get drop_entries.csv file
+    fn_drop = "drop_entries.csv"
+    df_drop = pd.read_csv(join(self.dir_l0_notion, fn_drop))
+    df_drop.Date = pd.to_datetime(df_drop.Date)
+    df_drop = df_drop[df_drop["drop row"]=="d"]
+    df_drop["source"] = "total_cumul."+df_drop["source"]
+
+    # drop entries from df_drop
+    dfm_long = pd.melt(df_merged, id_vars=['Location','Date'], value_vars=['total_cumul.owid_roser', 'total_cumul.owid_ortiz', 'total_cumul.covusa', 'total_cumul.wiki', 'total_cumul.worldometers', 'total_cumul.biominers']).rename(columns={"variable":"source"})
+    dfm_long = dfm_long.merge(df_drop[['Location','Date','source','drop row']], on=['Location','Date','source'], how='left')
+    dfm_long = dfm_long[pd.isnull(dfm_long["drop row"])]
+    dfm_long = dfm_long.sort_values(['Location','Date','source'])
+    del dfm_long["drop row"]
+
+    if dfm_long[['Location','Date','source']].duplicated().any():
+      print(dfm_long[dfm_long[['Location','Date','source']].duplicated()].head())
+      raise Exception("Duplicates in merged altogether data. Above is top 5 examples")
+
+    dfm_wide = dfm_long.set_index(['Location','Date','source']).unstack('source')
+    dfm_wide = dfm_wide.xs('value', axis=1, drop_level=True)
+    dfm_wide.reset_index(inplace=True)
+    dfm_wide = dfm_wide[['Location', 'Date', 'total_cumul.owid_roser', 'total_cumul.owid_ortiz', 'total_cumul.covusa', 'total_cumul.wiki', 'total_cumul.worldometers', 'total_cumul.biominers']]
+
+    # save to class
+    self.df_merged = dfm_wide
 
 
   def aggregate_and_to_csv(self):
