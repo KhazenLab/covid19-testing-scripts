@@ -91,6 +91,8 @@ Follow instructions in the fil header there.
 
 ## Data cleaning
 
+### Part 1: daily tests being negative
+
 We first started doing data cleaning inline in the source code.
 Then we started complementing that with a `drop_entries.csv` file in the data repo,
 which we read here in the CLI.
@@ -114,3 +116,25 @@ If it's a biominers entry, then I fix the issue in the notion tables.
 I finally save it as `drop_entries.csv` for example in the data repo.
 
 For future rows that also need to be dropped, I will need to concatenate the newly done file above with the existing one in the repo.
+
+Update: Adding new batch of data cleaning now.
+First, I sort by Location, Date, source.
+Then I add a new column `dupe` with `=IF(AND(A2=A1,B2=B1,J2=J1), IF(M2="d",IF(M1<>"d", "important", "candel"), "candel"), "")` in the `drop_entries.csv` file
+after I pasted the new rows to be dropped.
+Then I needed to mark the row above the dupe with "d" since I need to delete the dupe rows.
+Finally I delete all the rows marked with "candel", drop the dupe column, and save to csv.
+
+
+## Part 2: daily tests less than daily confirmed
+
+Saved in `l0/drop_tests_lessthan_confirmed.csv'
+
+Based on `l2/t11c-confirmed+totalTests-historical.csv`, and prioritized in notebook t11d in the section that highlights countries with tests less than confirmed < -1k for example
+
+Procedure
+- rename CountryProv to Location, `total_cumul.source` to source
+- add `d conf` and `d test` and `test - conf` columns for info
+- mark `drop row` manually
+- set in S4 formula `=IF(OR(R4="d",R3="d",R2="d",R5="d",R6="d"), "x", "")` to get some context
+- drop everything that has empty in the context
+- drop unnecessary columns

@@ -704,18 +704,40 @@ class L1ImportOthers:
                    )
 
     # get drop_entries.csv file
-    fn_drop = "drop_entries.csv"
-    df_drop = pd.read_csv(join(self.dir_l0_notion, fn_drop))
-    df_drop.Date = pd.to_datetime(df_drop.Date)
-    df_drop = df_drop[df_drop["drop row"]=="d"]
-    df_drop["source"] = "total_cumul."+df_drop["source"]
+    fn_drop1 = "drop_entries.csv"
+    df_drop1 = pd.read_csv(join(self.dir_l0_notion, fn_drop1))
+    df_drop1.Date = pd.to_datetime(df_drop1.Date)
+    df_drop1 = df_drop1[df_drop1["drop row"]=="d"]
+    df_drop1["source"] = df_drop1["source"].str.replace("covidtracking.com","covusa")
+    df_drop1["source"] = df_drop1["source"].str.replace("owid/ortiz","owid_ortiz")
+    df_drop1["source"] = df_drop1["source"].str.replace("owid/roser","owid_roser")
+    df_drop1["source"] = "total_cumul."+df_drop1["source"]
 
-    # drop entries from df_drop
+    # go to long format
     dfm_long = pd.melt(df_merged, id_vars=['Location','Date'], value_vars=['total_cumul.owid_roser', 'total_cumul.owid_ortiz', 'total_cumul.covusa', 'total_cumul.wiki', 'total_cumul.worldometers', 'total_cumul.biominers']).rename(columns={"variable":"source"})
-    dfm_long = dfm_long.merge(df_drop[['Location','Date','source','drop row']], on=['Location','Date','source'], how='left')
+
+    # drop entries from df_drop1
+    dfm_long = dfm_long.merge(df_drop1[['Location','Date','source','drop row']], on=['Location','Date','source'], how='left')
     dfm_long = dfm_long[pd.isnull(dfm_long["drop row"])]
-    dfm_long = dfm_long.sort_values(['Location','Date','source'])
     del dfm_long["drop row"]
+
+    # get drop_tests_lessthan_confirmed.csv file
+    fn_drop2 = "drop_tests_lessthan_confirmed.csv"
+    df_drop2 = pd.read_csv(join(self.dir_l0_notion, fn_drop2))
+    df_drop2.Date = pd.to_datetime(df_drop2.Date)
+    df_drop2 = df_drop2[df_drop2["drop row"]=="d"]
+    df_drop2["source"] = df_drop2["source"].str.replace("covidtracking.com","covusa")
+    df_drop2["source"] = df_drop2["source"].str.replace("owid/ortiz","owid_ortiz")
+    df_drop2["source"] = df_drop2["source"].str.replace("owid/roser","owid_roser")
+    df_drop2["source"] = "total_cumul."+df_drop2["source"]
+
+    # drop entries from df_drop2
+    dfm_long = dfm_long.merge(df_drop2[['Location','Date','source','drop row']], on=['Location','Date','source'], how='left')
+    dfm_long = dfm_long[pd.isnull(dfm_long["drop row"])]
+    del dfm_long["drop row"]
+
+    # sort
+    dfm_long = dfm_long.sort_values(['Location','Date','source'])
 
     if dfm_long[['Location','Date','source']].duplicated().any():
       print(dfm_long[dfm_long[['Location','Date','source']].duplicated()].head())
@@ -792,8 +814,11 @@ class L1ImportOthers:
     # check that there are no dips in the data, eg mixing different sources with one being lagged
     # FIXME should do something about these
     country_dipped = df_merged.groupby("Location")["total_cumul.all"].apply(lambda g: g.diff().min())
-    print("Top country dips in total tests:")
-    print(country_dipped.sort_values(ascending=True).head(20))
+    country_dipped = country_dipped[country_dipped < 0]
+    if country_dipped.shape[0] > 0:
+      print("Top country dips in total tests:")
+      print(country_dipped.sort_values(ascending=True).head(20))
+      raise Exception("Found %i countries with drops in cumulatives (i.e. negative values in diff). Above is top 20."%(country_dipped.shape[0]))
 
     self.df_merged = df_merged
 

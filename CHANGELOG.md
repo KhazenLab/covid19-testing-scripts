@@ -7,6 +7,7 @@ Version 0.7 (?)
 - enh, l0: abort if duplicates in biominers data
 - enh, l1: wiki and worldometers had nans, dropped
 - bug, l1: covidtracking.com updated urls
+- feat, l1: start using `l0/drop_tests_lessthan_confirmed.csv` for datacleaning
 
 
 Version 0.6 (2020-04-29)
