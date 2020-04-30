@@ -87,3 +87,30 @@ The first shiny app was created for the comparison of different countries.
 It's committed in this repo at `shinyScripts/compareCountries/compareCountries.R`
 
 Follow instructions in the fil header there.
+
+
+## Data cleaning
+
+We first started doing data cleaning inline in the source code.
+Then we started complementing that with a `drop_entries.csv` file in the data repo,
+which we read here in the CLI.
+The way the `drop_entries.csv` file was built is by opening the `l1b/side-by-side.csv` file in a worksheet editor,
+then adding 2 columns to it:
+
+- neg diff: in K2 then drag down:
+
+`=IF(A2=A1, IF(I2-I1<0, "x", ""), "")`
+
+- diff with context: in L21 then drag down:
+
+`=IF(OR(K21="x", K20="x", K19="x", K18="x", K17="x", K16="x", K22="x", K23="x", K24="x", K25="x", K26="x"), "y", "")`
+
+Then I filter the sheet for `diff with context = y`.
+
+Finally I add a `drop row` column which I manually annotate with `d` for rows that I inspect and decide to drop.
+Sometimes I drop the row marked with `neg diff=x`, othertimes it's the rows before or after it.
+If it's a biominers entry, then I fix the issue in the notion tables.
+
+I finally save it as `drop_entries.csv` for example in the data repo.
+
+For future rows that also need to be dropped, I will need to concatenate the newly done file above with the existing one in the repo.
