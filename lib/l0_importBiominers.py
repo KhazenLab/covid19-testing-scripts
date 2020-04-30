@@ -105,6 +105,12 @@ notion_map = {
     "Rwanda":"https://www.notion.so/14edfcd8ff15418c9c39a66b33833ff4?v=5043dc278a4f492189fa77bec58a64db",
     "Togo":"https://www.notion.so/0e1839209d964cd59b77912cc121414e?v=6c0f00d5c139413f8f41bb9cf956fb12",
     "Burma":"https://www.notion.so/54048bda9f1a43b68ff5730cb46068ab?v=970181c8096a4e9998a0e7c48b94f307",
+    
+    #added in 2020-05-01
+    "France – Guadeloupe":"https://www.notion.so/c00bf4bac08e448ba9f6c18aae2602e3?v=19f396ece82c4920b743cbf687ed7692",
+    "United Kingdom – Cayman Islands":"https://www.notion.so/38d75cfb2e244864bbad129d9c1bb351?v=6afa466f971445f2b5abc6bf5612c74a",
+    "Zambia":"https://www.notion.so/895d0f2ba719431ca74abf525f9e6eae?v=98e06d80eb3049a4a98f2b146e2ad15c",
+
 }
 
 
