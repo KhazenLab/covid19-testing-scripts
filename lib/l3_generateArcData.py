@@ -40,7 +40,34 @@ class L3GenerateArcData:
     
         # forward-fill the last NA for the sake of visualization
         countryData.iloc[indexfin-1:, 'total_cumul.all'==countryData.columns] = tests.iloc[indexfin-1:].fillna(method="ffill")
-        countryData['total_cumul.all']=countryData['total_cumul.all'].interpolate()
+        
+        
+        #countryData['total_cumul.all']=countryData['total_cumul.all'].interpolate()
+        
+        #interpolate using method7
+        tests=countryData["total_cumul.all"].copy()
+        confirmed=countryData["ConfirmedCases"].copy()
+        indexMinNonNA= tests.iloc[(np.where((tests.notna())))[0]].index.min()
+        indexNAafterFirstNb = tests.iloc[np.where((tests.isna() & (tests.index>indexMinNonNA)))[0]].index
+
+
+        if len(indexNAafterFirstNb)>0:
+            for indexCurrent in indexNAafterFirstNb:
+          
+              indexNbBefore= tests.iloc[(np.where((tests.notna() & (tests.index<indexCurrent))))[0]].index.max()
+              indexNbAfter= tests.iloc[(np.where((tests.notna() & (tests.index>indexCurrent))))[0]].index.min()
+              if tests[indexNbAfter]==tests[indexNbBefore]:
+                tests[indexCurrent]=tests[indexNbBefore]
+                continue
+              if tests[indexNbAfter]<tests[indexNbBefore]:
+                raise InterpolationError("This function is only for increasing cumulative vec_with_na, check country:"+country)
+              translateFirst=tests[indexNbBefore]-confirmed[indexNbBefore]
+              scaleLast=(tests[indexNbAfter]-(confirmed[indexNbAfter]+translateFirst))/(confirmed[indexNbAfter]+translateFirst)
+            
+              tests[indexCurrent]=(confirmed[indexCurrent]+translateFirst)*(1+scaleLast*((indexCurrent-indexNbBefore)/(indexNbAfter-indexNbBefore)))
+              tests[indexCurrent]=np.floor(tests[indexCurrent])
+        
+        countryData["total_cumul.all"].update(tests)
         countryData['Updated']="*" if isUpdated else ""
     
         historicalData.update(countryData)
