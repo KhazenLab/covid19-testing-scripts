@@ -406,7 +406,16 @@ class L1ImportOthers:
 
     # drop na
     df_daily = df_daily[pd.notnull(df_daily.total_cumul)]
+    
+    #drop a dip in total tests
+    df_daily["UID"] = df_daily["name"] + "/" + df_daily["date"].dt.strftime("%Y-%m-%d")
+    if df_daily["UID"].duplicated().any(): raise Exception("UID not unique")
+    df_daily.set_index("UID", inplace=True)
 
+    df_daily.loc["US – West Virginia/2020-04-27", "total_cumul"] = np.NaN
+    # 
+    df_daily.reset_index(inplace=True)
+    del df_daily["UID"]
     # save
     fn_covusa_save = join(self.dir_l1a_others, "covidtracking.com-distilled.csv")
     df_daily.to_csv(fn_covusa_save, index=False)
@@ -518,6 +527,12 @@ class L1ImportOthers:
     df_wiki.loc["Ukraine//2020-03-20",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Ukraine//2020-04-01",  "Cumulative Test Nb"] = np.NaN
 
+    df_wiki.loc["Netherlands//2020-04-20",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Netherlands//2020-04-13",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Netherlands//2020-04-06",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Denmark//2020-03-24",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Slovenia//2020-03-01",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["North Korea//2020-04-22",  "Cumulative Test Nb"] = np.NaN
     df_wiki.reset_index(inplace=True)
     del df_wiki["UID"]
 
@@ -616,7 +631,18 @@ class L1ImportOthers:
     df_worldometers.loc["Spain/2020-04-04", "Total Tests"] = np.NaN
     df_worldometers.loc["Spain/2020-04-05", "Total Tests"] = np.NaN
     df_worldometers.loc["Spain/2020-04-06", "Total Tests"] = np.NaN
-   
+    df_worldometers.loc["Rwanda/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Cyprus/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Russia/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Belgium/2020-04-29", "Total Tests"] = np.NaN
+    df_worldometers.loc["Israel/2020-04-30", "Total Tests"] = np.NaN
+    df_worldometers.loc["Cuba/2020-04-30", "Total Tests"] = np.NaN
+    df_worldometers.loc["Tunisia/2020-04-29", "Total Tests"] = np.NaN
+    df_worldometers.loc["Paraguay/2020-04-30", "Total Tests"] = np.NaN
+    df_worldometers.loc["Myanmar/2020-04-30", "Total Tests"] = np.NaN
+    df_worldometers.loc["Netherlands/2020-04-07", "Total Tests"] = np.NaN
+    df_worldometers.loc["Netherlands/2020-04-13", "Total Tests"] = np.NaN
+    
     # 
     df_worldometers.reset_index(inplace=True)
     del df_worldometers["UID"]
