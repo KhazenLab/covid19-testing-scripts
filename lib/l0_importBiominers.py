@@ -110,7 +110,10 @@ notion_map = {
     "France – Guadeloupe":"https://www.notion.so/c00bf4bac08e448ba9f6c18aae2602e3?v=19f396ece82c4920b743cbf687ed7692",
     "United Kingdom – Cayman Islands":"https://www.notion.so/38d75cfb2e244864bbad129d9c1bb351?v=6afa466f971445f2b5abc6bf5612c74a",
     "Zambia":"https://www.notion.so/895d0f2ba719431ca74abf525f9e6eae?v=98e06d80eb3049a4a98f2b146e2ad15c",
-
+    "France – French Polynesia":"https://www.notion.so/324a0640ffdb45079f1e10a7538d662c?v=f13fa4692f054eafa986682b333be8ee",
+    "Netherlands – Sint Maarten":"https://www.notion.so/432baba684a64e80aac8acb28c03d1b9?v=6a11dfc353344c58b45bd6659568b727",
+    "Brunei":"https://www.notion.so/8e51e427687045708e29e2cb1df59e3d?v=20049dd68d264743ad8a7aadd258ac9f",
+    
 }
 
 
