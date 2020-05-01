@@ -195,9 +195,10 @@ def postprocess_table(country_name, df_single):
     df_single["total_cumul"] = df_single[["negative_cumul", "positive_cumul"]].apply(sum, axis=1)
     return df_single
 
-  if country_name=="Colombia":
-    df_single["total_cumul"] = df_single[["confirmed cumul", "negative cumul"]].apply(sum, axis=1)
-    return df_single
+  #Updated 2020-05-01 Halim added total_cumul from source 
+  #if country_name=="Colombia":
+  #  df_single["total_cumul"] = df_single[["confirmed cumul", "negative cumul"]].apply(sum, axis=1)
+  #  return df_single
 
   if country_name=="Costa Rica":
     df_single["total_cumul"] = df_single[["confirmed cumul", "negative cumul"]].apply(sum, axis=1)
