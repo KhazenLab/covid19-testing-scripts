@@ -60,7 +60,7 @@ class L3GenerateArcData:
                 tests[indexCurrent]=tests[indexNbBefore]
                 continue
               if tests[indexNbAfter]<tests[indexNbBefore]:
-                raise InterpolationError("This function is only for increasing cumulative vec_with_na, check country:"+country)
+                raise Exception("This function is only for increasing cumulative vec_with_na, check country:"+country)
               translateFirst=tests[indexNbBefore]-confirmed[indexNbBefore]
               scaleLast=(tests[indexNbAfter]-(confirmed[indexNbAfter]+translateFirst))/(confirmed[indexNbAfter]+translateFirst)
             

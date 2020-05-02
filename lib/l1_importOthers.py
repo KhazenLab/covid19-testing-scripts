@@ -533,6 +533,10 @@ class L1ImportOthers:
     df_wiki.loc["Denmark//2020-03-24",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Slovenia//2020-03-01",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["North Korea//2020-04-22",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Belgium//2020-04-30",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Portugal//2020-04-30",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["South Korea//2020-05-02",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Japan//2020-05-01",  "Cumulative Test Nb"] = np.NaN
     df_wiki.reset_index(inplace=True)
     del df_wiki["UID"]
 
@@ -642,6 +646,27 @@ class L1ImportOthers:
     df_worldometers.loc["Myanmar/2020-04-30", "Total Tests"] = np.NaN
     df_worldometers.loc["Netherlands/2020-04-07", "Total Tests"] = np.NaN
     df_worldometers.loc["Netherlands/2020-04-13", "Total Tests"] = np.NaN
+    df_worldometers.loc["Belgium/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Belgium/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Rwanda/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Portugal/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Portugal/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Cyprus/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Denmark/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Czechia/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Finland/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Slovenia/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Georgia/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Georgia/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Estonia/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Tunisia/2020-04-30", "Total Tests"] = np.NaN
+    df_worldometers.loc["Croatia/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Iceland/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Afghanistan/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Afghanistan/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Paraguay/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Japan/2020-05-01", "Total Tests"] = np.NaN
+    
     
     # 
     df_worldometers.reset_index(inplace=True)
