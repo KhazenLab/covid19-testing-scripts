@@ -288,7 +288,7 @@ class L1ImportOthers:
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Singapore - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Italy - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United Kingdom - people tested"]
-
+    
     # Split the name and comment for simplicity
     ent_uniq = df_owid_roser.Entity.unique()
     df_splitname = pd.DataFrame([x.split("-") for x in ent_uniq], columns=["Entity2","Comment"])
@@ -304,7 +304,7 @@ class L1ImportOthers:
 
     # some corrections for merging
     df_owid_roser.loc[df_owid_roser["Entity2"]=="Czech Republic", "Entity2"] = "Czechia"
-
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity2 != "Rwanda"]
     # subset of columns
     df_owid_roser = df_owid_roser[["Entity2","Date","Cumulative total", "Entity"]]
 
@@ -537,6 +537,8 @@ class L1ImportOthers:
     df_wiki.loc["Portugal//2020-04-30",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["South Korea//2020-05-02",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Japan//2020-05-01",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Japan//2020-05-02",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Netherlands//2020-05-02",  "Cumulative Test Nb"] = np.NaN
     df_wiki.reset_index(inplace=True)
     del df_wiki["UID"]
 
@@ -646,13 +648,16 @@ class L1ImportOthers:
     df_worldometers.loc["Myanmar/2020-04-30", "Total Tests"] = np.NaN
     df_worldometers.loc["Netherlands/2020-04-07", "Total Tests"] = np.NaN
     df_worldometers.loc["Netherlands/2020-04-13", "Total Tests"] = np.NaN
+    df_worldometers.loc["Netherlands/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["Belgium/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["Belgium/2020-05-02", "Total Tests"] = np.NaN
     df_worldometers.loc["Rwanda/2020-05-02", "Total Tests"] = np.NaN
     df_worldometers.loc["Portugal/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["Portugal/2020-05-02", "Total Tests"] = np.NaN
     df_worldometers.loc["Cyprus/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Cyprus/2020-05-03", "Total Tests"] = np.NaN
     df_worldometers.loc["Denmark/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Denmark/2020-05-03", "Total Tests"] = np.NaN
     df_worldometers.loc["Czechia/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["Finland/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["Slovenia/2020-05-01", "Total Tests"] = np.NaN
@@ -666,6 +671,12 @@ class L1ImportOthers:
     df_worldometers.loc["Afghanistan/2020-05-02", "Total Tests"] = np.NaN
     df_worldometers.loc["Paraguay/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["Japan/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Japan/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Finland/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Israel/2020-05-03", "Total Tests"] = np.NaN
+    df_worldometers.loc["Cuba/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["Tunisia/2020-05-01", "Total Tests"] = np.NaN
+    df_worldometers.loc["North Macedonia/2020-05-02", "Total Tests"] = np.NaN
     
     
     # 
