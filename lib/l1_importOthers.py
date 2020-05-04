@@ -9,8 +9,10 @@ import json
 
 import requests
 import requests_cache
-SECS_PER_HOUR = 60*60
-requests_cache.install_cache('demo_cache', expire_after=SECS_PER_HOUR)
+from datetime import timedelta
+expire_after = timedelta(hours=1)
+requests_cache.install_cache('demo_cache', expire_after=expire_after)
+requests_cache.remove_expired_responses()
 
 
 def my_download(csv_url, csv_fn, description):
@@ -891,12 +893,15 @@ class L1ImportOthers:
 
     # check that there are no dips in the data, eg mixing different sources with one being lagged
     # FIXME should do something about these
-    country_dipped = df_merged.groupby("Location")["total_cumul.all"].apply(lambda g: g.diff().min())
+    # Update: do the diff after dropping na's
+    df_merged = df_merged.sort_values(["Location","Date"], ascending=True)
+    country_dipped = df_merged.groupby("Location")["total_cumul.all"].apply(lambda g: g[pd.notnull(g)].diff().min())
     country_dipped = country_dipped[country_dipped < 0]
     if country_dipped.shape[0] > 0:
       print("Top country dips in total tests:")
       print(country_dipped.sort_values(ascending=True).head(20))
-      raise Exception("Found %i countries with drops in cumulatives (i.e. negative values in diff). Above is top 20."%(country_dipped.shape[0]))
+      import warnings
+      warnings.warn("Found %i countries with drops in cumulatives (i.e. negative values in diff). Above is top 20."%(country_dipped.shape[0]))
 
     self.df_merged = df_merged
 

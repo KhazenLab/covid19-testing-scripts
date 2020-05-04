@@ -8,6 +8,11 @@ Version 0.7 (?)
 - enh, l1: wiki and worldometers had nans, dropped
 - bug, l1: covidtracking.com updated urls
 - feat, l1: start using `l0/drop_tests_lessthan_confirmed.csv` for datacleaning
+- feat, l3: start using interpolation by transformation
+- enh, l1: more data cleaning (done in code, but will do in `l0/drop_entries.csv` later, by Halim)
+- enh, l0: new countries from notion
+- bug, l1: fix expiry setting on cache
+- enh, l1: convert exception to warning when dips are found + calculate diff on non-na's
 
 
 Version 0.6 (2020-04-29)
