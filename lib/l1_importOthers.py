@@ -413,6 +413,7 @@ class L1ImportOthers:
     df_daily.set_index("UID", inplace=True)
 
     df_daily.loc["US – West Virginia/2020-04-27", "total_cumul"] = np.NaN
+    df_daily.loc["US – Virginia/2020-05-02", "total_cumul"] = np.NaN
     # 
     df_daily.reset_index(inplace=True)
     del df_daily["UID"]
@@ -539,6 +540,8 @@ class L1ImportOthers:
     df_wiki.loc["Japan//2020-05-01",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Japan//2020-05-02",  "Cumulative Test Nb"] = np.NaN
     df_wiki.loc["Netherlands//2020-05-02",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Canada//2020-05-02",  "Cumulative Test Nb"] = np.NaN
+    df_wiki.loc["Japan//2020-05-03",  "Cumulative Test Nb"] = np.NaN
     df_wiki.reset_index(inplace=True)
     del df_wiki["UID"]
 
@@ -677,6 +680,19 @@ class L1ImportOthers:
     df_worldometers.loc["Cuba/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["Tunisia/2020-05-01", "Total Tests"] = np.NaN
     df_worldometers.loc["North Macedonia/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Spain/2020-04-29", "Total Tests"] = np.NaN
+    df_worldometers.loc["Denmark/2020-05-03", "Total Tests"] = np.NaN
+    df_worldometers.loc["Cuba/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Dominican Republic/2020-05-03", "Total Tests"] = np.NaN
+    df_worldometers.loc["Tunisia/2020-05-02", "Total Tests"] = np.NaN
+    df_worldometers.loc["Zambia/2020-05-04", "Total Tests"] = np.NaN
+    df_worldometers.loc["Slovenia/2020-05-03", "Total Tests"] = np.NaN
+    df_worldometers.loc["North Macedonia/2020-05-03", "Total Tests"] = np.NaN
+    df_worldometers.loc["Denmark/2020-05-04", "Total Tests"] = np.NaN
+    df_worldometers.loc["Belgium/2020-05-03", "Total Tests"] = np.NaN
+    df_worldometers.loc["Ecuador/2020-05-03", "Total Tests"] = np.NaN
+    df_worldometers.loc["Japan/2020-05-03", "Total Tests"] = np.NaN
+    
     
     
     # 

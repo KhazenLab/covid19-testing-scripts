@@ -46,6 +46,7 @@ class L3GenerateArcData:
         
         #interpolate using method7
         tests=countryData["total_cumul.all"].copy()
+        tests2=countryData["total_cumul.all"].copy()
         confirmed=countryData["ConfirmedCases"].copy()
         indexMinNonNA= tests.iloc[(np.where((tests.notna())))[0]].index.min()
         indexNAafterFirstNb = tests.iloc[np.where((tests.isna() & (tests.index>indexMinNonNA)))[0]].index
@@ -53,21 +54,21 @@ class L3GenerateArcData:
 
         if len(indexNAafterFirstNb)>0:
             for indexCurrent in indexNAafterFirstNb:
-          
+              
               indexNbBefore= tests.iloc[(np.where((tests.notna() & (tests.index<indexCurrent))))[0]].index.max()
               indexNbAfter= tests.iloc[(np.where((tests.notna() & (tests.index>indexCurrent))))[0]].index.min()
               if tests[indexNbAfter]==tests[indexNbBefore]:
-                tests[indexCurrent]=tests[indexNbBefore]
+                tests2[indexCurrent]=tests[indexNbBefore]
                 continue
               if tests[indexNbAfter]<tests[indexNbBefore]:
-                raise Exception("This function is only for increasing cumulative vec_with_na, check country:"+country)
+                raise Exception("This function is only for increasing cumulative vec_with_na, check country:"+country +", testNbAfter:"+str(tests[indexNbAfter])+", testNbBefore"+str(tests[indexNbBefore]))
               translateFirst=tests[indexNbBefore]-confirmed[indexNbBefore]
               scaleLast=(tests[indexNbAfter]-(confirmed[indexNbAfter]+translateFirst))/(confirmed[indexNbAfter]+translateFirst)
             
-              tests[indexCurrent]=(confirmed[indexCurrent]+translateFirst)*(1+scaleLast*((indexCurrent-indexNbBefore)/(indexNbAfter-indexNbBefore)))
-              tests[indexCurrent]=np.floor(tests[indexCurrent])
+              tests2[indexCurrent]=(confirmed[indexCurrent]+translateFirst)*(1+scaleLast*((indexCurrent-indexNbBefore)/(indexNbAfter-indexNbBefore)))
+              tests2[indexCurrent]=np.floor(tests2[indexCurrent])
         
-        countryData["total_cumul.all"].update(tests)
+        countryData["total_cumul.all"].update(tests2)
         countryData['Updated']="*" if isUpdated else ""
     
         historicalData.update(countryData)
