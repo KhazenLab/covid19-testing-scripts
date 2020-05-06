@@ -65,7 +65,8 @@ def l0_importBiominers(notion_fn, fn_biominers):
 
 @cli.command()
 @click.argument('dir_gitrepo')
-def l1_importOthers(dir_gitrepo):
+@click.option("--skip-download", is_flag=True, default=False)
+def l1_importOthers(dir_gitrepo, skip_download):
   """
   Original notebook at
       t11b-shadi-collect biominers and non-biominers sources.ipynb
@@ -74,7 +75,7 @@ def l1_importOthers(dir_gitrepo):
   Read data from other non-biominer sources
   """
 
-  factory = L1ImportOthers(dir_gitrepo)
+  factory = L1ImportOthers(dir_gitrepo, do_download = not skip_download)
 
   factory.get_jhu_conf_deaths()
   factory.get_owid_roser()
@@ -86,6 +87,7 @@ def l1_importOthers(dir_gitrepo):
   factory.merge_all()
   factory.aggregate_and_to_csv()
   factory.one_field()
+  factory.drop_outlaws()
   factory.to_csv_subcols()
   factory.to_csv_all()
 
@@ -104,6 +106,7 @@ def l2_mergeTogether(dir_gitrepo):
   factory.read_confirmed_cases()
   factory.read_totaltests()
   factory.merge_conf_total()
+  factory.drop_outlaws()
   factory.merge_country_meta()
   factory.export_count_per_source()
   factory.add_supplementary_stats()

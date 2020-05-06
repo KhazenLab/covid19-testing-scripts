@@ -50,6 +50,9 @@ class L2MergeTogether:
     conf_train["Fatalities"    ] = conf_train.Fatalities.astype(int)
     conf_train["CountryProv"] = conf_train.apply(getCountryProv, axis=1)
 
+    # move rename Taiwan from read_totaltests below to here
+    conf_train.loc[conf_train["CountryProv"]=="Taiwan*", "CountryProv"] = "Taiwan" # drop asterisk
+
     # check dupes
     if conf_train[["CountryProv","Date"]].duplicated().sum()>0:
       raise Exception("Found dupes")
@@ -104,18 +107,33 @@ class L2MergeTogether:
     totaltests_data.sort_values(["Location", "Date"], inplace=True)
 
     # name corrections
-    totaltests_data.loc[ totaltests_data.Location=="Aruba",    "Location" ] = "Netherlands – Aruba"
-    totaltests_data.loc[ totaltests_data.Location=="Cayman Islands", "Location" ] = "United Kingdom – Cayman Islands"
-    totaltests_data.loc[ totaltests_data.Location=="Mayotte", "Location" ] = "France – Mayotte"
+    def my_name_corr(n1, n2):
+      if not (totaltests_data.Location==n1).any():
+        print(f"Error: Useless rename from {n1} since none exists")
+        return
+
+      if (totaltests_data.Location==n2).any():
+        print(f"Error: Unsafe to replace name {n1} -> {n2} since {n2} already exists")
+        print(totaltests_data.set_index(["Location"]).loc[n1])
+        print(totaltests_data.set_index(["Location"]).loc[n2])
+        import sys
+        sys.exit(1)
+      totaltests_data.loc[ totaltests_data.Location==n1,    "Location" ] = n2
+
+    # Update 2020-05-06: Renames in general should no longer be done here.
+    # Taiwan specifically was moved up to the conf function above
+    #my_name_corr("Aruba", "Netherlands – Aruba")
+    #my_name_corr("Cayman Islands", "United Kingdom – Cayman Islands")
+    #my_name_corr("Mayotte", "France – Mayotte")
 
     # update 2020-04-20, sticking to the "South Korea" nomenclature
     # totaltests_data.loc[ totaltests_data.Location=="South Korea", "Location" ] = "Korea, South"
 
-    totaltests_data.loc[ totaltests_data.Location=="Taiwan", "Location" ] = "Taiwan*"
-    totaltests_data.loc[ totaltests_data.Location=="Bosnia", "Location" ] = "Bosnia and Herzegovina"
-    totaltests_data.loc[ totaltests_data.Location=="Bermuda", "Location" ] = "United Kingdom – Bermuda"
-    totaltests_data.loc[ totaltests_data.Location=="Brunei ", "Location" ] = "Brunei"
-    totaltests_data.loc[ totaltests_data.Location=="Greenland", "Location" ] = "Denmark – Greenland"
+    #my_name_corr("Taiwan", "Taiwan*")
+    #my_name_corr("Bosnia", "Bosnia and Herzegovina")
+    #my_name_corr("Bermuda", "United Kingdom – Bermuda")
+    #my_name_corr("Brunei ", "Brunei")
+    #my_name_corr("Greenland", "Denmark – Greenland")
 
     # drop dupes
     totaltests_data = totaltests_data.loc[ ~totaltests_data[["Location","Date"]].duplicated(),]
@@ -173,14 +191,19 @@ class L2MergeTogether:
     conf_train.loc["Sierra Leone/2020-04-04","total_cumul.all"] = 4 # was 2 from worldometers
 
     # inconsistency between covidtracking.com and kaggle confirmed cases
-    assert conf_train.loc["US – New York/2020-03-12","total_cumul.all"] == 308
-    conf_train.loc["US – New York/2020-03-12","total_cumul.all"] = 328
+    # As of 2020-05-06, this point is dropped
+    print("US/NY/03-12:")
+    print(conf_train.loc["US – New York/2020-03-12","total_cumul.all"])
+    #assert conf_train.loc["US – New York/2020-03-12","total_cumul.all"] == 308
+    #conf_train.loc["US – New York/2020-03-12","total_cumul.all"] = 328
+    assert pd.isnull(conf_train.loc["US – New York/2020-03-12","total_cumul.all"])
 
     conf_train.reset_index(inplace=True)
     del conf_train["UID"]
 
     # continue with index as usual
     conf_train.set_index(["CountryProv","Date"], inplace=True)
+    conf_train.sort_index(inplace=True)
 
     # check that total tests >= Confirmed cases
     conf_breach = conf_train[(conf_train["total_cumul.all"] < conf_train["ConfirmedCases"])]
@@ -190,6 +213,99 @@ class L2MergeTogether:
       raise Exception("Found breach totals<confirmed for: (only top 5 shown above)")
 
     self.conf_train = conf_train
+
+
+  def drop_outlaws(self):
+    """
+    Parallel of l1 drop_outlaws
+    but for tests < confirmed
+    """
+    fn_wrong = join(self.dir_l2_withConf, "dropped_outlaws_l2.csv")
+
+    df_merged = self.conf_train.reset_index().copy()
+    df_merged.rename(columns={"CountryProv": "Location"}, inplace=True) # for compatibility with L1.drop_outlaws
+
+    # identify country/state/date triplets where the number of tests < number of confirmed cases
+    df_merged = df_merged[pd.notnull(df_merged["total_cumul.all"])]
+    df_merged["daily_conf"] = df_merged.groupby("Location")["ConfirmedCases"].diff()
+    df_merged["daily_test"] = df_merged.groupby("Location")["total_cumul.all"].diff()
+    #df_merged = df_merged[(df_merged.daily_test < 0) | (df_merged.daily_test < df_merged.daily_conf)]
+
+    loc_wrong = df_merged.daily_test < df_merged.daily_conf
+    if not loc_wrong.any():
+      # just clean the csv from the context entries
+      #df_old = pd.read_csv(fn_wrong)
+      #df_old["Date"] = pd.to_datetime(df_old.Date)
+      #df_old = df_old.sort_values(["Location", "Date", "total_cumul.source"])
+      #df_old = df_old.loc[pd.notnull(df_old.is_approved)]
+      #df_old.to_csv(fn_wrong, index=False)
+      return
+
+    df_merged["is_wrong"] = False
+    df_merged.loc[loc_wrong, "is_wrong"] = True
+
+    #np.convolve([0,0,1,0,0],[1,1,1],mode='same')
+    #loc_context = np.convolve(loc_wrong, [1]*6)
+    conv_len = 6
+    loc_context = df_merged.groupby("Location")["is_wrong"].apply(lambda x: np.convolve(x, [1]*np.min([conv_len, x.shape[0]]), mode="same").astype(bool))
+    loc_context = np.concatenate(loc_context.values)
+
+    df_merged["is_approved"] = False
+    idx_approved = ( loc_wrong &
+                     ( (df_merged["total_cumul.source"]=="worldometers")|
+                       (df_merged.daily_test==0)
+                     )
+                   )
+    df_merged.loc[idx_approved, "is_approved"] = True
+
+    no_work_required = df_merged.loc[loc_wrong].is_approved.all()
+
+    df_merged = df_merged[["Location", "Date", "total_cumul.source",
+                           "ConfirmedCases", "total_cumul.all",
+                           "daily_conf", "daily_test", "is_wrong", "is_approved"]]
+
+    print("Found %i triplets with number of confirmed cases > number of tests. Here are the top 20:"%loc_wrong.sum())
+    print(df_merged.loc[loc_wrong].head(20))
+
+    # save wrong values into separate csv
+    df_merged["is_wrong"] = df_merged.is_wrong.map(lambda x: "x" if x else "")
+    df_merged["is_approved"] = df_merged.is_approved.map(lambda x: "x" if x else "")
+
+    df_context = df_merged.loc[loc_context]
+
+    df_old = pd.read_csv(fn_wrong)
+    df_old["Date"] = pd.to_datetime(df_old.Date)
+
+    df_new = df_context.merge(df_old, how="outer", on=["Location","Date","total_cumul.source"], suffixes=["","_old"])
+    for fx in ["ConfirmedCases", "total_cumul.all", "daily_conf", "daily_test", "is_wrong", "is_approved"]:
+      df_new[fx] = df_new[fx].fillna(df_new[fx+"_old"])
+      del df_new[fx+"_old"]
+
+    df_new = df_new.sort_values(["Location", "Date", "total_cumul.source"])
+    df_new = df_new.loc[~df_new.duplicated()]
+    df_new.to_csv(fn_wrong, index=False)
+
+    # Note: need to re-run rather than just overwrite these values with nan so that the next-best source can provide the number
+    #       Also, some cases are not easy to automate and require human judgement
+    import click
+    if no_work_required:
+      msg = """
+      WARNING: Found daily cases > daily tests => appended rows to drop in l2-withConfirmed/dropped_outlaws_l2.csv
+               but all were marked as approved automatically because it is all from worldometers data.
+               Just re-run l1 then l2.
+      """
+      click.secho(msg, fg="yellow")
+    else:
+      msg = """
+      WARNING: Found daily cases > daily tests => appended rows to drop in l2-withConfirmed/dropped_outlaws_l2.csv
+               Please mark approved (or fix) there
+               then re-run l1 and l2 to re-calculate selected source per country/state/date triplet
+               Hint: by default, we mark worldometers drops as approved
+      """
+      click.secho(msg, fg="red")
+
+    import sys
+    sys.exit(1)
 
 
   def merge_country_meta(self):

@@ -13,6 +13,11 @@ Version 0.7 (?)
 - enh, l0: new countries from notion
 - bug, l1: fix expiry setting on cache
 - enh, l1: convert exception to warning when dips are found + calculate diff on non-na's
+- bug, l2: renames of countries that already exist. Injected a check about it
+- feat, l1+l2: CLI outputs l1/drop and l2/drop with enough fields to perform the datacleaning without needing to vimdiff with other csv files
+- enh, l0: cambodia table column got renamed
+- feat, l1: add skip-download option
+- enh, l0: moved some renames from l2 to l0
 
 
 Version 0.6 (2020-04-29)

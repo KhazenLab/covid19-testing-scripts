@@ -34,6 +34,7 @@ Step 0: import notion tables
 - In Chrome, this means: More tools, Developer tools, Application, Cookies, notion.so, `token_v2` value
   - and save that into a txt file
 - Also, in notion, you need to have your own workspace (other than the workspace in which the tables exist)
+- Finally, note that if the l0 step is giving an "unauthorized" error, check if your token needs updating
 
 
 Command to run step 0:
@@ -55,6 +56,8 @@ Step 1: import non-biominer tables and merge with biominer
 python3 main.py l1-importothers \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
+
+or add `--skip-download` to avoid downloading JHU, OWID, etc
 
 
 Step 2: merge with confirmed cases

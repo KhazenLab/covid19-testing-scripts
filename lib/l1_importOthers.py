@@ -169,15 +169,19 @@ class JhuImporter:
 
 class L1ImportOthers:
 
-  def __init__(self, dir_gdrive):
+  def __init__(self, dir_gdrive, do_download):
     self.dir_l0_notion = join(dir_gdrive, "l0-notion_tables")
     self.dir_l1a_others = join(dir_gdrive, "l1a-non-biominer_data")
     self.dir_l1b_altogether = join(dir_gdrive, "l1b-altogether")
+    self.dir_l2_withConf = join(dir_gdrive, "l2-withConfirmed")
     self.dir_temp = tempfile.mkdtemp()
-    self.jhu = JhuImporter(dir_gdrive)    
+    self.jhu = JhuImporter(dir_gdrive)
+    self.do_download = do_download
 
 
   def get_jhu_conf_deaths(self):
+    if not self.do_download: return
+
     print("JHU .. downloading")
     df_conf_gl = self.jhu.get_jhu_confirmed_global()
     df_conf_us = self.jhu.get_jhu_confirmed_usa()
@@ -275,6 +279,12 @@ class L1ImportOthers:
     fn_owid_roser = "ourworldindata.org-roser-live.csv"
 
     # download file
+    if not self.do_download:
+      self.df_owid_roser_live = pd.read_csv(join(self.dir_l1a_others, fn_owid_roser))
+      self.df_owid_roser_live["Date"] = pd.to_datetime(self.df_owid_roser_live.Date)
+      return
+
+    # download
     csv_url = "https://github.com/owid/covid-19-data/raw/master/public/data/testing/covid-testing-all-observations.csv"
     my_download(csv_url, join(self.dir_temp, fn_owid_roser), "owid live")
 
@@ -379,6 +389,13 @@ class L1ImportOthers:
 
 
   def get_covidtracking_usa(self):
+    fn_covusa_save = join(self.dir_l1a_others, "covidtracking.com-distilled.csv")
+
+    if not self.do_download:
+      self.df_covusa = pd.read_csv(fn_covusa_save)
+      self.df_covusa["date"] = pd.to_datetime(self.df_covusa.date)
+      return
+
     fn_covusa_daily = join(self.dir_temp, "covidtracking.com-states_daily.csv")
     fn_covusa_info  = join(self.dir_temp, "covidtracking.com-states_info.csv" )
     url_daily = "https://covidtracking.com/api/v1/states/daily.csv"
@@ -420,7 +437,6 @@ class L1ImportOthers:
     df_daily.reset_index(inplace=True)
     del df_daily["UID"]
     # save
-    fn_covusa_save = join(self.dir_l1a_others, "covidtracking.com-distilled.csv")
     df_daily.to_csv(fn_covusa_save, index=False)
 
     self.df_covusa = df_daily
@@ -566,6 +582,10 @@ class L1ImportOthers:
     df_worldometers.columns = [x.replace("\n"," ") for x in df_worldometers.columns.tolist()]
     df_worldometers.Date = pd.to_datetime(df_worldometers.Date)
 
+    # if accidentally someone inserts a thousands comma separator in the total tests field, eg "3,123"
+    if df_worldometers["Total Tests"].dtypes == object:
+      df_worldometers["Total Tests"] = df_worldometers["Total Tests"].str.replace(",","").astype(float)
+
     # drop their extended points
     df_worldometers = df_worldometers[["Country, Other", "Total Tests", "Date"]].copy()
     df_worldometers.sort_values(["Country, Other", "Date"], inplace=True)
@@ -582,6 +602,7 @@ class L1ImportOthers:
     # added the below with halim after he updated the worldometers csv file till apr 29
     df_worldometers.loc[df_worldometers["Country, Other"]=="Anguilla", "Country, Other"] = "United Kingdom – Anguilla"
     df_worldometers.loc[df_worldometers["Country, Other"]=="Aruba", "Country, Other"] = "Netherlands – Aruba"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Brunei ", "Country, Other"] = "Brunei" # drop space
     df_worldometers.loc[df_worldometers["Country, Other"]=="Bermuda", "Country, Other"] = "United Kingdom – Bermuda"
     df_worldometers.loc[df_worldometers["Country, Other"]=="British Virgin Islands", "Country, Other"] = "United Kingdom – British Virgin Islands"
     df_worldometers.loc[df_worldometers["Country, Other"]=="CAR", "Country, Other"] = "Central African Republic"
@@ -601,6 +622,7 @@ class L1ImportOthers:
     df_worldometers.loc[df_worldometers["Country, Other"]=="Hong Kong", "Country, Other"] = "China – Hong Kong"
     df_worldometers.loc[df_worldometers["Country, Other"]=="Isle of Man", "Country, Other"] = "United Kingdom Isle of Man"
     df_worldometers.loc[df_worldometers["Country, Other"]=="Ivory Coast", "Country, Other"] = "Cote d'Ivoire"
+    df_worldometers.loc[df_worldometers["Country, Other"]=="Mayotte", "Country, Other"] = "France – Mayotte"
     df_worldometers.loc[df_worldometers["Country, Other"]=="Martinique", "Country, Other"] = "France – Martinique"
     df_worldometers.loc[df_worldometers["Country, Other"]=="Montserrat", "Country, Other"] = "United Kingdom – Montserrat"
     df_worldometers.loc[df_worldometers["Country, Other"]=="New Caledonia", "Country, Other"] = "France – New Caledonia"
@@ -783,9 +805,44 @@ class L1ImportOthers:
                    ).merge(df_5, on=["Location","Date"], how='outer'
                    )
 
-    # get drop_entries.csv file
+    # sort
+    df_merged = df_merged.sort_values(['Location','Date'])
+
+    # get drop_entries.csv file (manually dropped points with 
     fn_drop1 = "drop_entries.csv"
     df_drop1 = pd.read_csv(join(self.dir_l0_notion, fn_drop1))
+    df_drop1 = df_drop1[["Location", "Date", "source", "drop row"]]
+
+    # get drop_tests_lessthan_confirmed.csv file
+    fn_drop2 = "drop_tests_lessthan_confirmed.csv"
+    df_drop2 = pd.read_csv(join(self.dir_l0_notion, fn_drop2))
+    df_drop2 = df_drop2[["Location", "Date", "source", "drop row"]]
+
+    # get dropped rows from l1 drop_outlaws
+    fn_drop3 = "dropped_outlaws_l1.csv"
+    df_drop3 = pd.read_csv(join(self.dir_l1b_altogether, fn_drop3))
+    df_drop3 = df_drop3.loc[pd.notnull(df_drop3.is_approved)]
+    df_drop3 = df_drop3[["Location", "Date", "total_cumul.source"]]
+    df_drop3["drop row"] = "d"
+    df_drop3.rename(columns={"total_cumul.source": "source"}, inplace=True)
+    
+    # get dropped rows from l2 drop_outlaws
+    fn_drop4 = "dropped_outlaws_l2.csv"
+    df_drop4 = pd.read_csv(join(self.dir_l2_withConf, fn_drop4))
+    df_drop4 = df_drop4.loc[pd.notnull(df_drop4.is_approved)]
+    df_drop4 = df_drop4[["Location", "Date", "total_cumul.source"]]
+    df_drop4["drop row"] = "d"
+    df_drop4.rename(columns={"total_cumul.source": "source"}, inplace=True)
+
+    # combine drop files
+    df_drop1 = pd.concat([df_drop1, df_drop2, df_drop3, df_drop4], axis=0)
+    #df_drop1 = pd.concat([df_drop1, df_drop2], axis=0)
+
+    del df_drop2
+    del df_drop3
+    del df_drop4
+
+    # prep
     df_drop1.Date = pd.to_datetime(df_drop1.Date)
     df_drop1 = df_drop1[df_drop1["drop row"]=="d"]
     df_drop1["source"] = df_drop1["source"].str.replace("covidtracking.com","covusa")
@@ -795,24 +852,10 @@ class L1ImportOthers:
 
     # go to long format
     dfm_long = pd.melt(df_merged, id_vars=['Location','Date'], value_vars=['total_cumul.owid_roser', 'total_cumul.owid_ortiz', 'total_cumul.covusa', 'total_cumul.wiki', 'total_cumul.worldometers', 'total_cumul.biominers']).rename(columns={"variable":"source"})
+    dfm_long.sort_values(["Location", "Date", "source"], inplace=True)
 
     # drop entries from df_drop1
     dfm_long = dfm_long.merge(df_drop1[['Location','Date','source','drop row']], on=['Location','Date','source'], how='left')
-    dfm_long = dfm_long[pd.isnull(dfm_long["drop row"])]
-    del dfm_long["drop row"]
-
-    # get drop_tests_lessthan_confirmed.csv file
-    fn_drop2 = "drop_tests_lessthan_confirmed.csv"
-    df_drop2 = pd.read_csv(join(self.dir_l0_notion, fn_drop2))
-    df_drop2.Date = pd.to_datetime(df_drop2.Date)
-    df_drop2 = df_drop2[df_drop2["drop row"]=="d"]
-    df_drop2["source"] = df_drop2["source"].str.replace("covidtracking.com","covusa")
-    df_drop2["source"] = df_drop2["source"].str.replace("owid/ortiz","owid_ortiz")
-    df_drop2["source"] = df_drop2["source"].str.replace("owid/roser","owid_roser")
-    df_drop2["source"] = "total_cumul."+df_drop2["source"]
-
-    # drop entries from df_drop2
-    dfm_long = dfm_long.merge(df_drop2[['Location','Date','source','drop row']], on=['Location','Date','source'], how='left')
     dfm_long = dfm_long[pd.isnull(dfm_long["drop row"])]
     del dfm_long["drop row"]
 
@@ -891,20 +934,103 @@ class L1ImportOthers:
                                         axis=1
                                       )
 
-    # check that there are no dips in the data, eg mixing different sources with one being lagged
-    # FIXME should do something about these
-    # Update: do the diff after dropping na's
+    # drop dates where we couldn't select anything
+    # This happens if we originally had data but it got dropped
+    df_merged = df_merged[pd.notnull(df_merged["total_cumul.source"])]
+
+    # sort
     df_merged = df_merged.sort_values(["Location","Date"], ascending=True)
-    country_dipped = df_merged.groupby("Location")["total_cumul.all"].apply(lambda g: g[pd.notnull(g)].diff().min())
-    country_dipped = country_dipped[country_dipped < 0]
-    if country_dipped.shape[0] > 0:
-      print("Top country dips in total tests:")
-      print(country_dipped.sort_values(ascending=True).head(20))
-      import warnings
-      warnings.warn("Found %i countries with drops in cumulatives (i.e. negative values in diff). Above is top 20."%(country_dipped.shape[0]))
 
     self.df_merged = df_merged
 
+
+  def drop_outlaws(self):
+    fn_wrong = join(self.dir_l1b_altogether, "dropped_outlaws_l1.csv")
+
+    df_merged = self.df_merged.copy()
+
+    # identify dips in the number of tests, supposedly cumulative
+    # Also identify country/state/date triplets where the number of tests < number of confirmed cases
+    df_merged["daily_test"] = df_merged.groupby("Location")["total_cumul.all"].apply(lambda g: g.fillna(method="ffill").diff()).fillna(0)
+    #df_merged["UID"] = df_merged.Location + '/' + df_merged.Date.dt.strftime("%Y-%m-%d")
+
+    # append starting date per Location
+    #dt_min = df_merged[["Location","Date"]].groupby("Location").Date.min().reset_index().rename(columns={"Date": "dt_min"})
+    #df_merged = df_merged.merge(dt_min, how="left", on="Location")
+
+    #df_wrong = df_merged[pd.notnull(df_merged["total_cumul.all"])].copy()
+    #df_wrong["daily_test"] = df_wrong.groupby("Location")["total_cumul.all"].diff()
+    # Mark negative daily tests or daily=0 from wiki or worldometers
+    # Update: allow daily=0 as this will be cleaned up in the comparison with confirmed cases, i.e. if there was at least 1 new confirmed case, then it's not possible to have 0 new tests.
+    loc_wrong = (df_merged.daily_test < 0)
+    #loc_zer = ((df_merged.daily_test==0) & (df_merged["total_cumul.source"].isin(["wikipedia","worldometers"]))) & (df_merged.Date != df_merged.dt_min)
+    # df_wrong = loc_neg | loc_zer
+    if not loc_wrong.any():
+      # just clean the csv from the context entries
+      df_old = pd.read_csv(fn_wrong)
+      df_old["Date"] = pd.to_datetime(df_old.Date)
+      df_old = df_old.sort_values(["Location", "Date", "total_cumul.source"])
+      df_old = df_old.loc[pd.notnull(df_old.is_approved)]
+      df_old.to_csv(fn_wrong, index=False)
+      return
+
+    df_merged["is_wrong"] = False
+    df_merged.loc[loc_wrong, "is_wrong"] = True
+
+    #np.convolve([0,0,1,0,0],[1,1,1],mode='same')
+    conv_len = 10
+    loc_context = np.concatenate(df_merged.groupby("Location")["is_wrong"].apply(lambda x: np.convolve(x, [1]*np.min([conv_len, x.shape[0]]), mode="same").astype(bool)).values)
+
+    df_merged["is_approved"] = False
+    df_merged.loc[loc_wrong & (df_merged["total_cumul.source"]=="worldometers"), "is_approved"] = True
+
+    no_work_required = df_merged.loc[loc_wrong].is_approved.all()
+
+    df_merged = df_merged[["Location", "Date", "total_cumul.source", "total_cumul.all", "is_wrong", "is_approved"]]
+
+    print("Found %i triplets with dips in their cumulative tests. Here are the top 20:"%loc_wrong.sum())
+    print(df_merged.loc[loc_wrong].head(20))
+
+    # save wrong values into separate csv
+    df_merged["is_wrong"] = df_merged.is_wrong.map(lambda x: "x" if x else "")
+    df_merged["is_approved"] = df_merged.is_approved.map(lambda x: "x" if x else "")
+
+    df_context = df_merged.loc[loc_context]
+
+    df_old = pd.read_csv(fn_wrong)
+    df_old["Date"] = pd.to_datetime(df_old.Date)
+
+    #df_new = pd.concat([df_context, df_old], axis=0)
+    df_new = df_context.merge(df_old, how="outer", on=["Location","Date","total_cumul.source"], suffixes=["","_old"])
+    for fx in ["total_cumul.all", "is_wrong", "is_approved"]:
+      df_new[fx] = df_new[fx].fillna(df_new[fx+"_old"])
+      del df_new[fx+"_old"]
+
+    df_new = df_new.sort_values(["Location", "Date", "total_cumul.source"])
+    df_new = df_new.loc[~df_new.duplicated()]
+    #import os
+    #df_new.to_csv(fn_wrong, index=False, mode='a', header=not os.path.isfile(fn_wrong), sep="\t")
+    df_new.to_csv(fn_wrong, index=False)
+
+    # Note: need to re-run rather than just overwrite these values with nan so that the next-best source can provide the number
+    #       Also, some cases are not easy to automate and require human judgement
+    import click
+    if no_work_required:
+      msg = """
+      WARNING: added new entries to drop in l1b/dropped_outlaws_l1.csv,
+               but all were marked as approved automatically because it is all from worldometers data.
+               Just re-run l1.
+      """
+      click.secho(msg, fg="yellow")
+    else:
+      msg = """
+      WARNING: Please mark approved (or fix) in l1b/dropped_outlaws_l1.csv then re-run l1 to re-calculate selected source per country/state/date triplet
+      Hint: by default, we mark worldometers drops as approved
+      """
+      click.secho(msg, fg="red")
+
+    import sys
+    sys.exit(1)
 
 
   def to_csv_subcols(self):

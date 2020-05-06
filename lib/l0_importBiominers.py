@@ -163,6 +163,11 @@ def postprocess_table(country_name, df_single):
     # update 2020-04-20: turns out that the column name called "negative" is actually "total_cumul", so no need for postprocessing anymore
     #df_single["total_cumul"] = df_single[["confirmed", "negative"]].apply(sum, axis=1)
     #return df_single
+
+  if country_name=="Cambodia":
+    df_single["total_cumul"] = df_single["total_cumul_persons"]
+    return df_single
+
   if country_name=="Denmark – Faroe Islands":
     df_single=df_single.sort_values("Date")
     df_single["total_cumul"] = df_single["dailyTests"].cumsum()
