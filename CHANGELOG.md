@@ -1,7 +1,12 @@
 All entries in reverse chronological order.
 
 
-Version 0.7 (?)
+Version 0.8 (2020-05-??)
+
+- feat, l4: add command l4-plots to generate plots from publication 1
+
+
+Version 0.7 (2020-05-06)
 
 - feat, l1: start using `drop_entries.csv` for datacleaning
 - enh, l0: abort if duplicates in biominers data

@@ -9,7 +9,7 @@ Scripts that process data from/into the git repo `covid19-testing-data`
 ```
 pip3 install pew
 pew new biominers_covid19
-pip3 install notion pandas Click requests_cache==0.5.2
+pip3 install notion pandas Click requests_cache==0.5.2 seaborn==0.10.1 matplotlib==2.1.2
 ```
 
 where `notion` is the "Unofficial Python API client for Notion.so" from https://github.com/jamalex/notion-py/
@@ -81,6 +81,15 @@ python3 main.py l3-generatearcdata \
 After running step 3, we currently need to open all the `ArcGIS/v2/*csv` files manually in excel/libreoffice and resave the csv to drop the `.0` suffixes of decimals.
 
 Casting the corresponding dataframe column to int doesnt work because it contains NAs, which cannot coexist in int column in pandas
+
+
+Step 4: generate plots
+
+```
+python3 main.py l4-plots \
+  ~/Development/gitlab.com/biominers/covid19-testing-data/l2-withConfirmed/t11c-confirmed+totalTests-historical.csv \
+  ~/Documents/khazen-lab/2020-05-05_dataPlots/
+```
 
 
 ## Shiny apps
