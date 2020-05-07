@@ -521,3 +521,52 @@ class L2MergeTogether:
     # save to csv
     save_fn = "t11c-confirmed+totalTests-latestOnly.csv"
     df_last.to_csv(join(self.dir_l2_withConf, save_fn), index=False)
+
+
+  def to_csv_interpolated(self):
+    from .interpolateByTemplate import interpolate_by_translation_multigap
+    df = self.conf_train.reset_index().copy()
+
+    # Use cummax method. Note that this is kind of similar to fillna(method="ffill") after replacing all the dips with NA
+    # A manual data-cleaning would be preferable, but not enought time ATM
+    df["conf_cummax"] = df.groupby("CountryProv").ConfirmedCases.cummax()
+
+    # verify
+    #df.set_index("CountryProv").loc["Australia – Northern Territory"].conf_cummax.values
+    #df.set_index("CountryProv").loc["Australia – Northern Territory"].conf_cummax.diff().values
+
+
+    # drop points in ConfirmedCases that are not cumulative
+    # Iterate 10 times for the case: 0,0,0,1,1,0,0,0,1,2,3,4
+    # whose diff will only detect the first 1->0 dip, but not the remaining 0's
+    # and linearly interpolate
+    #n_total = df.shape[0]
+    #df["ConfirmedCases_cumulInterpolated"] = df["ConfirmedCases"]
+    #for i in range(30):
+    #  df["daily_conf"] = df.groupby("CountryProv")["ConfirmedCases_cumulInterpolated"].diff()
+    #  idx_negdaily = df.daily_conf < 0
+    #  if not idx_negdaily.any(): break
+    #  df.loc[idx_negdaily, "ConfirmedCases"] = np.nan
+    #  df["ConfirmedCases_cumulInterpolated"] = df.groupby("CountryProv")["ConfirmedCases"].apply(lambda v: np.floor(v.interpolate())).astype(int)
+    #  n_neg = idx_negdaily.sum()
+    #  print(f"ConfirmedCases: drop dips in cumul. Iteration {i+1}. {n_neg} points out of total of {n_total}")
+
+
+    # perform interpolation by templating
+    def interpol_df(g):
+      country_name = g.CountryProv.unique()[0]
+      print(f"interpolate template: {country_name}")
+      #return interpolate_by_translation_multigap(g["total_cumul.all"], g["ConfirmedCases_cumulInterpolated"], country_name)
+      return interpolate_by_translation_multigap(g["total_cumul.all"], g["conf_cummax"], country_name)
+
+    #if country_name=="Australia – Australian Capital Territory":
+#    if country_name=="Afghanistan":
+
+    # around 5 countries/states per second (out of ~300 total)
+    tests_cumulInterpolated = df.groupby("CountryProv").apply(interpol_df)
+    df["tests_cumulInterpolated"] = tests_cumulInterpolated.values
+    df = df[["CountryProv", "Date", "ConfirmedCases", "conf_cummax", "total_cumul.all", "tests_cumulInterpolated"]]
+
+    save_fn = "interpolated_by_transformation.csv"
+    df.to_csv(join(self.dir_l2_withConf, save_fn), index=False)
+

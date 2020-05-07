@@ -4,6 +4,8 @@ All entries in reverse chronological order.
 Version 0.8 (2020-05-??)
 
 - feat, l4: add command l4-plots to generate plots from publication 1
+- feat, l2: interpolation in tests by translate + scale from the number of confirmed cases
+  - This ensures that the daily number of tests is always greater than or equal to the number of confirmed cases
 
 
 Version 0.7 (2020-05-06)
