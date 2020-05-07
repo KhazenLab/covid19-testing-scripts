@@ -7,11 +7,8 @@ import numpy as np
 import datetime as dt
 
 
-#Combine country and province into a single string
-def getCountryProv(r):
-  if r.Province_State=="" or pd.isnull(r.Province_State): return r.Country_Region
-  cp = "%s – %s"%(r.Country_Region, r.Province_State)
-  return cp
+from .utils import getCountryProv, add_context_to_bool_loc
+
 
 
 class L2MergeTogether:
@@ -91,6 +88,60 @@ class L2MergeTogether:
     assert ((d2 < d1) & (d2 > 26600))
 
     self.conf_train = conf_train
+
+
+  def replace_wrong_conf(self):
+    """
+    Identified dips in cumulative confirmed cases using notebook t15 and manually selected replacement values
+    """
+    df_rep = pd.read_csv(join(self.dir_l0_notion, "t15-drop_dipsInConfirmedCumulative.csv"))
+    df_rep["Date"] = pd.to_datetime(df_rep.Date)
+    df_rep = df_rep[["CountryProv", "Date", "ConfirmedCases", "conf_replace"]]
+    df_ori = self.conf_train.copy()
+    df_ori = df_ori.merge(df_rep, how="left", on=["CountryProv", "Date"], suffixes=["", "_validate"])
+
+    # Validate that nothing changed yet
+    df_diff = df_ori[pd.notnull(df_ori.ConfirmedCases_validate)]
+    loc_diff = df_diff.ConfirmedCases != df_diff.ConfirmedCases_validate
+    if loc_diff.any():
+      print(df_diff.loc[loc_diff].head(n=10))
+      import click
+      click.secho("""
+      Error: In replacements for confirmed cases
+      ConfirmedCases field in validation csv does not match with values in upstream JHU file (top 10 rows shown above).
+      This might be due to JHU making data corrections.
+      Please update data/l0/t15.csv accordingly and re-run l2.
+      """, fg="red")
+      import sys
+      sys.exit(1)
+
+    # make replacements
+    df_ori["ConfirmedCases"] = df_ori["conf_replace"].fillna(df_ori["ConfirmedCases"])
+    del df_ori["conf_replace"]
+    del df_ori["ConfirmedCases_validate"]
+
+    self.conf_train = df_ori
+
+
+  def check_no_conf_dips(self):
+    df = self.conf_train.copy()
+    df["diff_conf"] = df.groupby("CountryProv")["ConfirmedCases"].diff()
+    df["is_neg"] = df.diff_conf < 0
+    if not df.is_neg.any(): return
+    
+    # add some context
+    idx_ctx = add_context_to_bool_loc(df, "CountryProv", "is_neg", 6)
+
+    # display message and exit
+    print(df.loc[idx_ctx].head(30))
+    import click
+    click.secho("""
+    Error: Detected confirmed cases that decrease in the cumulative values.
+           Top rows shown above. Consider re-running notebook t15 (or integrate it here)
+           Aborting.
+    """, fg="red")
+    import sys
+    sys.exit(1)
 
 
   def read_totaltests(self):
@@ -244,11 +295,7 @@ class L2MergeTogether:
     df_merged["is_wrong"] = False
     df_merged.loc[loc_wrong, "is_wrong"] = True
 
-    #np.convolve([0,0,1,0,0],[1,1,1],mode='same')
-    #loc_context = np.convolve(loc_wrong, [1]*6)
-    conv_len = 6
-    loc_context = df_merged.groupby("Location")["is_wrong"].apply(lambda x: np.convolve(x, [1]*np.min([conv_len, x.shape[0]]), mode="same").astype(bool))
-    loc_context = np.concatenate(loc_context.values)
+    loc_context = add_context_to_bool_loc(df_merged, "Location", "is_wrong", 6)
 
     df_merged["is_approved"] = False
     idx_approved = ( loc_wrong &

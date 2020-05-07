@@ -108,6 +108,8 @@ def l2_mergeTogether(dir_gitrepo):
   """
   factory = L2MergeTogether(dir_gitrepo)
   factory.read_confirmed_cases()
+  factory.replace_wrong_conf()
+  factory.check_no_conf_dips()
   factory.read_totaltests()
   factory.merge_conf_total()
   factory.drop_outlaws()

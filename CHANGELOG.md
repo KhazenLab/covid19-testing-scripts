@@ -6,6 +6,8 @@ Version 0.8 (2020-05-??)
 - feat, l4: add command l4-plots to generate plots from publication 1
 - feat, l2: interpolation in tests by translate + scale from the number of confirmed cases
   - This ensures that the daily number of tests is always greater than or equal to the number of confirmed cases
+- feat, l1+l2: split out common code for adding context to boolean column
+- feat, l2: incorporate manually-done datacleaning of confirmed cases + add check that no negatives
 
 
 Version 0.7 (2020-05-06)

@@ -6,6 +6,7 @@ import numpy as np
 import tempfile
 import urllib.request
 import json
+from .utils import add_context_to_bool_loc
 
 import requests
 import requests_cache
@@ -977,9 +978,7 @@ class L1ImportOthers:
     df_merged["is_wrong"] = False
     df_merged.loc[loc_wrong, "is_wrong"] = True
 
-    #np.convolve([0,0,1,0,0],[1,1,1],mode='same')
-    conv_len = 10
-    loc_context = np.concatenate(df_merged.groupby("Location")["is_wrong"].apply(lambda x: np.convolve(x, [1]*np.min([conv_len, x.shape[0]]), mode="same").astype(bool)).values)
+    loc_context = add_context_to_bool_loc(df_merged, "Location", "is_wrong", 10)
 
     df_merged["is_approved"] = False
     df_merged.loc[loc_wrong & (df_merged["total_cumul.source"]=="worldometers"), "is_approved"] = True
