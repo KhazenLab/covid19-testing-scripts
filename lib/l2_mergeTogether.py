@@ -576,45 +576,45 @@ class L2MergeTogether:
     from .interpolateByTemplate import interpolate_by_translation_multigap
     df = self.conf_train.reset_index().copy()
 
-    # Use cummax method. Note that this is kind of similar to fillna(method="ffill") after replacing all the dips with NA
-    # A manual data-cleaning would be preferable, but not enought time ATM
-    df["conf_cummax"] = df.groupby("CountryProv").ConfirmedCases.cummax()
-
-    # verify
-    #df.set_index("CountryProv").loc["Australia – Northern Territory"].conf_cummax.values
-    #df.set_index("CountryProv").loc["Australia – Northern Territory"].conf_cummax.diff().values
-
-
-    # drop points in ConfirmedCases that are not cumulative
-    # Iterate 10 times for the case: 0,0,0,1,1,0,0,0,1,2,3,4
-    # whose diff will only detect the first 1->0 dip, but not the remaining 0's
-    # and linearly interpolate
-    #n_total = df.shape[0]
-    #df["ConfirmedCases_cumulInterpolated"] = df["ConfirmedCases"]
-    #for i in range(30):
-    #  df["daily_conf"] = df.groupby("CountryProv")["ConfirmedCases_cumulInterpolated"].diff()
-    #  idx_negdaily = df.daily_conf < 0
-    #  if not idx_negdaily.any(): break
-    #  df.loc[idx_negdaily, "ConfirmedCases"] = np.nan
-    #  df["ConfirmedCases_cumulInterpolated"] = df.groupby("CountryProv")["ConfirmedCases"].apply(lambda v: np.floor(v.interpolate())).astype(int)
-    #  n_neg = idx_negdaily.sum()
-    #  print(f"ConfirmedCases: drop dips in cumul. Iteration {i+1}. {n_neg} points out of total of {n_total}")
-
-
     # perform interpolation by templating
-    def interpol_df(g):
-      country_name = g.CountryProv.unique()[0]
+    def interpol_df(g1):
+      country_name = g1.CountryProv.unique()[0]
       print(f"interpolate template: {country_name}")
-      #return interpolate_by_translation_multigap(g["total_cumul.all"], g["ConfirmedCases_cumulInterpolated"], country_name)
-      return interpolate_by_translation_multigap(g["total_cumul.all"], g["conf_cummax"], country_name)
 
-    #if country_name=="Australia – Australian Capital Territory":
-#    if country_name=="Afghanistan":
+      # if no data to begin with, keep it as such
+      if pd.isnull(g1["total_cumul.all"]).all():
+        print("\tAll NA. Keeping it as such")
+        return g1["total_cumul.all"]
+
+      # assume testing starts at 0 for all countries at first date. Can review later.
+      g2 = g1.copy()
+      if pd.isnull(g2.iloc[0, "total_cumul.all"==g2.columns].values[0]):
+        g2.iloc[0, "total_cumul.all"==g2.columns] = 0
+
+      # forward-fill last NA if needed
+      # Update 2020-05-06: Use mid of allowed controls using inverse zubin ellipse in notebook t11d
+      #if pd.isnull(g2["total_cumul.all"].tail(1).values[0]):
+      #  lastval = g2.loc[pd.notnull(g2["total_cumul.all"]), "total_cumul.all"].tail(1).values[0]
+      #  nrow = g2.shape[0]
+      #  g2.iloc[nrow-1, "total_cumul.all"==g2.columns] = lastval
+
+      # calculate interpolation
+      o = interpolate_by_translation_multigap(g2["total_cumul.all"], g2["ConfirmedCases"], country_name)
+      return o
 
     # around 5 countries/states per second (out of ~300 total)
     tests_cumulInterpolated = df.groupby("CountryProv").apply(interpol_df)
-    df["tests_cumulInterpolated"] = tests_cumulInterpolated.values
-    df = df[["CountryProv", "Date", "ConfirmedCases", "conf_cummax", "total_cumul.all", "tests_cumulInterpolated"]]
+
+    # Update 2020-05-06: current changes to set the first entry to 0 and the last NA to ffill
+    # have caused the above apply to return a dataframe of shape 318x106 rather than 33708x1.
+    # Make the reshape here
+    # Update: after keeping the all-na data as na, this is back to 33708x1, so no need to reshape anymore
+    # tests_cumulInterpolated = tests_cumulInterpolated.to_numpy().reshape([-1,1])
+    tests_cumulInterpolated = np.floor(tests_cumulInterpolated).values
+
+    # now add as column and save to csv
+    df["tests_cumulInterpolated"] = tests_cumulInterpolated
+    df = df[["CountryProv", "Date", "ConfirmedCases", "total_cumul.all", "tests_cumulInterpolated"]]
 
     save_fn = "interpolated_by_transformation.csv"
     df.to_csv(join(self.dir_l2_withConf, save_fn), index=False)

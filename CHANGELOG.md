@@ -8,6 +8,7 @@ Version 0.8 (2020-05-??)
   - This ensures that the daily number of tests is always greater than or equal to the number of confirmed cases
 - feat, l1+l2: split out common code for adding context to boolean column
 - feat, l2: incorporate manually-done datacleaning of confirmed cases + add check that no negatives
+- enh, l2: improvements to the interpolation after testing in notebook
 
 
 Version 0.7 (2020-05-06)

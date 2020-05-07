@@ -88,6 +88,11 @@ def interpolate_by_translation(vec_with_na, vec_template):
     if tests_0 > tests_T:
         raise InterpolationError("This function is only for increasing cumulative vec_with_na")
 
+    if conf_0 == conf_T:
+      # the template vector is flat => just linearly interpolate the na vector
+      # Btw, this covers the case of conf_T_tr=0 below which causes a DivisionByZero exception
+      return vec_with_na.interpolate()
+
     # translation and scaling factors
     translateFirst=tests_0-conf_0
     conf_T_tr = conf_T+translateFirst
