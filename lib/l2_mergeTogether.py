@@ -110,7 +110,7 @@ class L2MergeTogether:
       Error: In replacements for confirmed cases
       ConfirmedCases field in validation csv does not match with values in upstream JHU file (top 10 rows shown above).
       This might be due to JHU making data corrections.
-      Please update data/l0/t15.csv accordingly and re-run l2.
+      Please re-run notebook t15, download the conf_diff.csv, vimdiff with data/l2/t15.csv, add entries, manually mark the replacements, and finally re-run l2.
       """, fg="red")
       import sys
       sys.exit(1)
