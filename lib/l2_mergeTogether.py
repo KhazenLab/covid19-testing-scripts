@@ -94,7 +94,7 @@ class L2MergeTogether:
     """
     Identified dips in cumulative confirmed cases using notebook t15 and manually selected replacement values
     """
-    df_rep = pd.read_csv(join(self.dir_l0_notion, "t15-drop_dipsInConfirmedCumulative.csv"))
+    df_rep = pd.read_csv(join(self.dir_l2_withConf, "t15-drop_dipsInConfirmedCumulative.csv"))
     df_rep["Date"] = pd.to_datetime(df_rep.Date)
     df_rep = df_rep[["CountryProv", "Date", "ConfirmedCases", "conf_replace"]]
     df_ori = self.conf_train.copy()
@@ -138,7 +138,8 @@ class L2MergeTogether:
     click.secho("""
     Error: Detected confirmed cases that decrease in the cumulative values.
            Top rows shown above. Consider re-running notebook t15 (or integrate it here)
-           Aborting.
+           to edit the l2/t15.csv file, then re-run l1.
+           Aborting for now.
     """, fg="red")
     import sys
     sys.exit(1)
@@ -300,6 +301,7 @@ class L2MergeTogether:
     df_merged["is_approved"] = False
     idx_approved = ( loc_wrong &
                      ( (df_merged["total_cumul.source"]=="worldometers")|
+                       (df_merged["total_cumul.source"]=="covidtracking.com")|
                        (df_merged.daily_test==0)
                      )
                    )
@@ -347,7 +349,7 @@ class L2MergeTogether:
       WARNING: Found daily cases > daily tests => appended rows to drop in l2-withConfirmed/dropped_outlaws_l2.csv
                Please mark approved (or fix) there
                then re-run l1 and l2 to re-calculate selected source per country/state/date triplet
-               Hint: by default, we mark worldometers drops as approved
+               Hint: by default, we mark worldometers and covidtracking.com drops as approved automatically
       """
       click.secho(msg, fg="red")
 
