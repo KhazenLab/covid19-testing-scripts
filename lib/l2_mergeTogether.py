@@ -5,6 +5,7 @@ from os.path import isfile
 import pandas as pd
 import numpy as np
 import datetime as dt
+from scipy.signal import find_peaks
 
 
 from .utils import getCountryProv, add_context_to_bool_loc
@@ -101,7 +102,7 @@ class L2MergeTogether:
     df_ori = df_ori.merge(df_rep, how="left", on=["CountryProv", "Date"], suffixes=["", "_validate"])
 
     # Validate that nothing changed yet
-    df_diff = df_ori[pd.notnull(df_ori.ConfirmedCases_validate)]
+    df_diff = df_ori[pd.notnull(df_ori.conf_replace)]
     loc_diff = df_diff.ConfirmedCases != df_diff.ConfirmedCases_validate
     if loc_diff.any():
       print(df_diff.loc[loc_diff].head(n=10))
@@ -128,12 +129,15 @@ class L2MergeTogether:
     df["diff_conf"] = df.groupby("CountryProv")["ConfirmedCases"].diff()
     df["is_neg"] = df.diff_conf < 0
     if not df.is_neg.any(): return
+
+    print(df[df.is_neg].head(30))
     
     # add some context
+    # Update 2020-05-10: I think I have a bug somewhere about this because for is_neg on France/Reunion it shows context for France/Barthelemy
     idx_ctx = add_context_to_bool_loc(df, "CountryProv", "is_neg", 6)
+    print(df.iloc[idx_ctx].head(30))
 
     # display message and exit
-    print(df.loc[idx_ctx].head(30))
     import click
     click.secho("""
     Error: Detected confirmed cases that decrease in the cumulative values.
@@ -244,11 +248,14 @@ class L2MergeTogether:
 
     # inconsistency between covidtracking.com and kaggle confirmed cases
     # As of 2020-05-06, this point is dropped
+    # As of 2020-05-10, this point is back? Not sure what's going on about this. It keeps bouncing between nan and 308, so will jsut change from assert to if condition
     print("US/NY/03-12:")
     print(conf_train.loc["US – New York/2020-03-12","total_cumul.all"])
     #assert conf_train.loc["US – New York/2020-03-12","total_cumul.all"] == 308
     #conf_train.loc["US – New York/2020-03-12","total_cumul.all"] = 328
-    assert pd.isnull(conf_train.loc["US – New York/2020-03-12","total_cumul.all"])
+    #assert pd.isnull(conf_train.loc["US – New York/2020-03-12","total_cumul.all"])
+    if conf_train.loc["US – New York/2020-03-12","total_cumul.all"] == 308:
+      conf_train.loc["US – New York/2020-03-12","total_cumul.all"] = 328
 
     conf_train.reset_index(inplace=True)
     del conf_train["UID"]
@@ -332,7 +339,7 @@ class L2MergeTogether:
 
     df_new = df_new.sort_values(["Location", "Date", "total_cumul.source"])
     df_new = df_new.loc[~df_new.duplicated()]
-    df_new.to_csv(fn_wrong, index=False)
+    df_new.to_csv(fn_wrong+".new", index=False)
 
     # Note: need to re-run rather than just overwrite these values with nan so that the next-best source can provide the number
     #       Also, some cases are not easy to automate and require human judgement
@@ -341,12 +348,15 @@ class L2MergeTogether:
       msg = """
       WARNING: Found daily cases > daily tests => appended rows to drop in l2-withConfirmed/dropped_outlaws_l2.csv
                but all were marked as approved automatically because it is all from worldometers data.
+               Do a vimdiff l2/drop.csv with l2/drop.csv.new, copy the new rows, and
                Just re-run l1 then l2.
       """
       click.secho(msg, fg="yellow")
     else:
       msg = """
-      WARNING: Found daily cases > daily tests => appended rows to drop in l2-withConfirmed/dropped_outlaws_l2.csv
+      WARNING: Found daily cases > daily tests
+               => appended rows to drop in l2-withConfirmed/dropped_outlaws_l2.csv.new
+               Do a vimdiff l2/drop.csv with l2/drop.csv.new, copy the new rows, and
                Please mark approved (or fix) there
                then re-run l1 and l2 to re-calculate selected source per country/state/date triplet
                Hint: by default, we mark worldometers and covidtracking.com drops as approved automatically
@@ -603,6 +613,7 @@ class L2MergeTogether:
       return o
 
     # around 5 countries/states per second (out of ~300 total)
+    print("Interpolating")
     tests_cumulInterpolated = df.groupby("CountryProv").apply(interpol_df)
 
     # Update 2020-05-06: current changes to set the first entry to 0 and the last NA to ffill
@@ -614,8 +625,50 @@ class L2MergeTogether:
 
     # now add as column and save to csv
     df["tests_cumulInterpolated"] = tests_cumulInterpolated
-    df = df[["CountryProv", "Date", "ConfirmedCases", "total_cumul.all", "tests_cumulInterpolated"]]
 
+    # drop spikes (from notebook t15b)
+    # Update 2020-05-11: changed from cap_peaks before interpolation to ease_peaks after interpolation (also from notebook t15b)
+    def ease_peaks(g1):
+        vec_d = g1["total_cumul.all"]
+        height_1 = (vec_d.max() - vec_d.min()) / (pd.notnull(vec_d).sum())
+        height_2 = 3*height_1
+    
+        g2=g1["tests_daily"].reset_index(drop=True)
+    
+        peaks, _ = find_peaks(g2, height=height_2)
+    
+        s1 = np.nan*g2
+        s1.iloc[peaks] = g2.iloc[peaks]
+    
+        s_all = []
+        for i, pk_i in enumerate(peaks):
+          s3 = np.nan*g2
+          s3.iloc[pk_i] = g2.iloc[pk_i]
+          if i==0: s3.iloc[0] = 0
+          else: s3.iloc[peaks[i-1]] = 0
+          s3 = s3.interpolate(limit_area="inside")
+          s_all.append(s3)
+    
+        s_all = pd.DataFrame(s_all)
+        s_all = s_all.sum(axis=0)#.iloc[::-1].cumsum().iloc[::-1]
+        s_all = s_all - s1.fillna(0)
+        #print(s_all)
+        #s_all = s_all.astype(int)
+        s3 = s_all
+    
+        g3 = g1["total_cumul.all"].reset_index(drop=True)
+        v1 = g3 + s3
+        return v1
+    
+    print("Easing spikes")
+    df["tests_daily"] = df.groupby("CountryProv")["total_cumul.all"].apply(lambda g: g.interpolate().diff().fillna(0)).astype(int)
+    tests_cumulClean = df.groupby("CountryProv").apply(ease_peaks)
+    #tests_cumulClean = tests_cumulClean.values
+    tests_cumulClean = np.floor(tests_cumulClean).to_numpy().reshape([-1,1])
+    df["total_cumul.all"] = tests_cumulClean
+
+    # subset columns and save
+    df = df[["CountryProv", "Date", "ConfirmedCases", "total_cumul.all", "tests_cumulInterpolated"]]
     save_fn = "interpolated_by_transformation.csv"
     df.to_csv(join(self.dir_l2_withConf, save_fn), index=False)
 

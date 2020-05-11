@@ -113,6 +113,9 @@ notion_map = {
     "France – French Polynesia":"https://www.notion.so/324a0640ffdb45079f1e10a7538d662c?v=f13fa4692f054eafa986682b333be8ee",
     "Netherlands – Sint Maarten":"https://www.notion.so/432baba684a64e80aac8acb28c03d1b9?v=6a11dfc353344c58b45bd6659568b727",
     "Brunei":"https://www.notion.so/8e51e427687045708e29e2cb1df59e3d?v=20049dd68d264743ad8a7aadd258ac9f",
+
+    # 2020-05-11
+    "Brazil": "https://www.notion.so/086536d4083d41d1af1ddb4af92ed08f?v=9b9987e7c1ab4bd39fb6e48877224e8f",
     
 }
 
