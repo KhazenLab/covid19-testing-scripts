@@ -86,10 +86,23 @@ Casting the corresponding dataframe column to int doesnt work because it contain
 Step 4: generate plots
 
 ```
+NEWDIR=~/Documents/khazen-lab/2020-05-05_dataPlots/v_`date +%Y%m%dT%H%M%S`
+mkdir $NEWDIR
 python3 main.py l4-plots \
-  ~/Development/gitlab.com/biominers/covid19-testing-data/l2-withConfirmed/t11c-confirmed+totalTests-historical.csv \
-  ~/Documents/khazen-lab/2020-05-05_dataPlots/
+  ~/Development/gitlab.com/biominers/covid19-testing-data/ \
+  $NEWDIR
 ```
+
+Upload plots to AWS S3 bucket as static html
+
+```
+AWS_PROFILE=shadi_shadi aws s3 sync www/ s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+```
+
+If the `--acl` doesn't work (it works as of 2020-05-12), then make the folder public manually in aws web console.
+
+(https://github.com/aws/aws-cli/issues/1560)
+
 
 
 ## Shiny apps

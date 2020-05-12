@@ -5,7 +5,7 @@ from lib.l0_importBiominers import L0ImportBiominers
 from lib.l1_importOthers import L1ImportOthers
 from lib.l2_mergeTogether import L2MergeTogether
 from lib.l3_generateArcData import L3GenerateArcData
-from lib.l4_plots import L4Plots
+from lib.l4_plots import L4Plots, PostprocessingDashboard
 
 
 # Enable debug level messages
@@ -136,14 +136,19 @@ def l3_generateArcData(dir_gitrepo):
 
 
 @cli.command()
-@click.argument('csv_l2_historical')
+@click.argument('dir_gitrepo')
 @click.argument('dir_plot_destination')
-def l4_plots(csv_l2_historical, dir_plot_destination):
+def l4_plots(dir_gitrepo, dir_plot_destination):
   """
   Generate plots, eg figure of stacked number of countries/states per day per source
   """
+
+  f2 = PostprocessingDashboard()
+  f2.read_csv(dir_gitrepo)
+  f2.to_html(dir_plot_destination)
+
   factory = L4Plots()
-  factory.read_csv(csv_l2_historical)
+  factory.read_csv(dir_gitrepo)
   factory.prep_plots()
   factory.plot_line(dir_plot_destination)
   factory.plot_stacked(dir_plot_destination)

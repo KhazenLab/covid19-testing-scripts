@@ -11,6 +11,8 @@ Version 0.8 (2020-05-??)
 - enh, l2: improvements to the interpolation after testing in notebook
 - feat, l2: drop spikes by easing (from notebook t15b)
 - enh, l0: add brazil
+- feat, l4: add static html dashboard built with bokeh for postprocessing data
+- feat, www: create a new www folder that can be synced to s3 as our internal dashboard
 
 
 Version 0.7 (2020-05-06)

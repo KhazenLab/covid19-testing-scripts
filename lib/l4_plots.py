@@ -27,7 +27,8 @@ class L4Plots:
     self.dt_now = dt.datetime.now().strftime("%Y%m%d_%H%M%S")
 
 
-  def read_csv(self, csv_l2_historical):
+  def read_csv(self, dir_gitrepo):
+    csv_l2_historical = join(dir_gitrepo, "l2-withConfirmed", "t11c-confirmed+totalTests-historical.csv")
     df_agg = pd.read_csv(csv_l2_historical)
     df_agg.Date = pd.to_datetime(df_agg.Date)
 
@@ -94,7 +95,8 @@ class L4Plots:
     plt.ylim(0)
     plt.xlim(right=df_agg3.index.max())
     
-    fn_line = join(dir_plot_destination, 't12b-plotSourcesOverTime-lines-v%s.png'%self.dt_now)
+    #fn_line = join(dir_plot_destination, 't12b-plotSourcesOverTime-lines-v%s.png'%self.dt_now)
+    fn_line = join(dir_plot_destination, 't12b-plotSourcesOverTime-lines.png')
     plt.savefig(fn_line, dpi = 300, bbox_inches="tight")
 
 
@@ -132,9 +134,78 @@ class L4Plots:
     plt.xlim(right=dt.date(2020,5,1))
     
     # png for doc, and jpg for attachment to submission
-    fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.png'%self.dt_now)
+    #fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.png'%self.dt_now)
+    fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked.png')
     plt.savefig(fn_st_png, dpi = 300, bbox_inches="tight")
 
     # disabled because it doesn't run on my laptop, but works fine on colab
     #fn_st_jpg = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.jpg'%self.dt_now)
     #plt.savefig(fn_st_jpg, dpi = 300, bbox_inches="tight")
+
+############################################################
+
+from bokeh.layouts import gridplot
+from bokeh.models import CDSView, ColumnDataSource, GroupFilter
+from bokeh.models import CustomJS
+from bokeh.plotting import figure, show
+import pandas as pd
+from bokeh.plotting import output_file
+from bokeh.layouts import column
+from bokeh.plotting import save
+
+
+class PostprocessingDashboard:
+  """Notebook t16a"""
+
+  def read_csv(self, dir_gitrepo):
+    dir_l2_withConf = join(dir_gitrepo, "l2-withConfirmed")
+    df = pd.read_csv(join(dir_l2_withConf, "interpolated_by_transformation.csv"))
+    df["Date"] = pd.to_datetime(df.Date)
+    
+    # replace nans: https://github.com/bokeh/bokeh/issues/4472#issuecomment-225676759
+    for key in df:
+        df[key] = ['NaN' if pd.isnull(value) else value for value in df[key]]
+
+    self.df = df
+        
+
+  def to_html(self, dir_plot_destination):
+    output_file(join(dir_plot_destination, "t16a-postprocessing_dashboard.html"))
+    
+    source = ColumnDataSource(self.df)
+    
+    init_group = 'Lebanon'
+    gf = GroupFilter(column_name='CountryProv', group=init_group)
+    view1 = CDSView(source=source, filters=[gf])
+    
+    plot_size_and_tools = {'plot_height': 300, 'plot_width': 300,
+                            'tools':['box_select', 'reset', 'help', 'box_zoom'],
+                          'x_axis_type': 'datetime'}
+    
+    p_cc = figure(title="Confirmed cases", **plot_size_and_tools)
+    c_cc = p_cc.circle(x='Date', y='ConfirmedCases', source=source, color='black', view=view1)
+    
+    p_cto = figure(title="Cumulative Tests: original", **plot_size_and_tools)
+    c_cto = p_cto.circle(x='Date', y='total_cumul.all', source=source, color='black', view=view1)
+    
+    p_ci = figure(title="Cumulative Tests: interpolated", **plot_size_and_tools)
+    c_ci = p_ci.circle(x='Date', y='tests_cumulInterpolated', source=source, view=view1, color='red')
+    
+    p_cns = figure(title="Cumulative Tests: eased", **plot_size_and_tools)
+    c_cns = p_cns.circle(x='Date', y='tests_cumulNoSpike', source=source, view=view1, color='red')
+    
+    g = gridplot([[p_cc], [p_cto, p_ci, p_cns]])
+    
+    # from https://docs.bokeh.org/en/latest/docs/user_guide/interaction/widgets.html#select
+    callback = CustomJS(args=dict(vf=c_cc.view.filters[0], source=source), code="""
+    console.log(vf.group);
+    console.log(cb_obj.value);
+        vf.group = cb_obj.value;
+        source.change.emit();
+    """)
+    from bokeh.models import Select
+    select = Select(title="Country/State:", value=init_group, options=list(self.df.CountryProv.unique()))
+    select.js_on_change('value', callback)
+    
+    layout = column(select, g)
+    save(layout)
