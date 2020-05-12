@@ -629,7 +629,7 @@ class L2MergeTogether:
     # drop spikes (from notebook t15b)
     # Update 2020-05-11: changed from cap_peaks before interpolation to ease_peaks after interpolation (also from notebook t15b)
     def ease_peaks(g1):
-        vec_d = g1["total_cumul.all"]
+        vec_d = g1["tests_cumulInterpolated"]
         height_1 = (vec_d.max() - vec_d.min()) / (pd.notnull(vec_d).sum())
         height_2 = 3*height_1
     
@@ -656,19 +656,19 @@ class L2MergeTogether:
         #s_all = s_all.astype(int)
         s3 = s_all
     
-        g3 = g1["total_cumul.all"].reset_index(drop=True)
+        g3 = g1["tests_cumulInterpolated"].reset_index(drop=True)
         v1 = g3 + s3
         return v1
     
     print("Easing spikes")
-    df["tests_daily"] = df.groupby("CountryProv")["total_cumul.all"].apply(lambda g: g.interpolate().diff().fillna(0)).astype(int)
+    df["tests_daily"] = df.groupby("CountryProv")["tests_cumulInterpolated"].apply(lambda g: g.interpolate().diff().fillna(0)).astype(int)
     tests_cumulClean = df.groupby("CountryProv").apply(ease_peaks)
     #tests_cumulClean = tests_cumulClean.values
     tests_cumulClean = np.floor(tests_cumulClean).to_numpy().reshape([-1,1])
-    df["total_cumul.all"] = tests_cumulClean
+    df["tests_cumulNoSpike"] = tests_cumulClean
 
     # subset columns and save
-    df = df[["CountryProv", "Date", "ConfirmedCases", "total_cumul.all", "tests_cumulInterpolated"]]
+    df = df[["CountryProv", "Date", "ConfirmedCases", "total_cumul.all", "tests_cumulInterpolated", "tests_cumulNoSpike"]]
     save_fn = "interpolated_by_transformation.csv"
     df.to_csv(join(self.dir_l2_withConf, save_fn), index=False)
 
