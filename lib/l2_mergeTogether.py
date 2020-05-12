@@ -583,7 +583,7 @@ class L2MergeTogether:
 
 
   def to_csv_interpolated(self):
-    from .interpolateByTemplate import interpolate_by_translation_multigap
+    from .interpolateByTemplate import interpolate_by_translation_multigap, interpolate_by_translation
     df = self.conf_train.reset_index().copy()
 
     # perform interpolation by templating
@@ -678,7 +678,11 @@ class L2MergeTogether:
         # calculate date of first non-zero tests/cases
         # This is the location at which to start the interpolation of the spike smoothing
         iloc_zeros = (vec_d <= 0)
-    
+        if iloc_zeros.any():
+          iloc_lastzero = np.where(iloc_zeros)[0].tolist().pop()
+        else:
+          iloc_lastzero = 0
+   
         s1 = np.nan*g2
         s1.iloc[peaks] = g2.iloc[peaks]
     
@@ -689,8 +693,27 @@ class L2MergeTogether:
           # Update 2020-05-12: always spread a spike from t0
           #if i==0: s3.iloc[0] = 0
           #else: s3.iloc[peaks[i-1]] = 0
-          s3.loc[iloc_zeros] = 0
-          s3 = s3.interpolate(limit_area="inside")
+          if iloc_zeros.any():
+            s3.loc[iloc_zeros] = 0
+          else:
+            s3.iloc[0] = g2.iloc[0]
+
+          # update 2020-05-12: replace linear interpolation with interpolation from template
+          # This ensures that number of tests > number of confirmed cases
+          #s3 = s3.interpolate(limit_area="inside")
+          vec_with_na = s3.iloc[ iloc_lastzero : pk_i+1 ]
+          vec_template = vec_d.iloc[ iloc_lastzero : pk_i+1 ]
+          vec_interpolated = interpolate_by_translation(vec_with_na, vec_template.reset_index(drop=True))
+
+          # bug: when the vec_template is flat, vec_interpolated gets some dips
+          # workaround here is to replace with cummax
+          # FIXME test on US - Maine and figure out why [1919, nan, nan, nan, nan, 2722] with template [3549,3562,3605,3647,3669,6391] gives dips
+          vec_interpolated = vec_interpolated.cummax()
+          # (Pdb) pd.concat([vec_template.reset_index(drop=True), vec_interpolated.reset_index(drop=True), vec_interpolated2.reset_index(drop=True)], axis=1)
+
+          # save into vector
+          s3.iloc[ iloc_lastzero : pk_i+1 ] = vec_interpolated.values
+
           s_all.append(s3)
     
         s_all = pd.DataFrame(s_all)
@@ -702,6 +725,13 @@ class L2MergeTogether:
     
         g3 = g1[fx_cumul].reset_index(drop=True)
         v1 = g3 + s3
+
+        if (v1.diff()<0).any():
+          import click
+          click.secho("Case of interpolation+spike removal yielding dips in cumulative result. Skipping (as of 2020-05-12, was happening for US – Maine, mozambique, China – Zhejiang)", fg="red")
+          return vec_d
+
+        # if all good, return the result
         return v1
     
     # FIXME do I really need the "interpolate" call below after having moved the de-spiking till *after* the interpolate-by-template step?
