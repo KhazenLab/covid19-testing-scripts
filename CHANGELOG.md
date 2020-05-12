@@ -15,6 +15,7 @@ Version 0.8 (2020-05-??)
 - feat, www: create a new www folder that can be synced to s3 as our internal dashboard
 - feat, l4: add spike easing to confirmed cases, make spike easing more strict
   - bugfix: found that some cases were yielding dips, so I added a workaround for those, but it's not a full fix though
+- feat, l4: integrate chi-squared dashboard
 
 
 Version 0.7 (2020-05-06)
