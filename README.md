@@ -86,11 +86,9 @@ Casting the corresponding dataframe column to int doesnt work because it contain
 Step 4: generate plots
 
 ```
-NEWDIR=~/Documents/khazen-lab/2020-05-05_dataPlots/v_`date +%Y%m%dT%H%M%S`
-mkdir $NEWDIR
 python3 main.py l4-plots \
   ~/Development/gitlab.com/biominers/covid19-testing-data/ \
-  $NEWDIR
+  www/
 ```
 
 Upload plots to AWS S3 bucket as static html

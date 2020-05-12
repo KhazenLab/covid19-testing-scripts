@@ -182,22 +182,25 @@ class PostprocessingDashboard:
                             'tools':['box_select', 'reset', 'help', 'box_zoom'],
                           'x_axis_type': 'datetime'}
     
-    p_cc = figure(title="Confirmed cases", **plot_size_and_tools)
-    c_cc = p_cc.circle(x='Date', y='ConfirmedCases', source=source, color='black', view=view1)
+    p_cc_ori = figure(title="Confirmed cases: original", **plot_size_and_tools)
+    c_cc_ori = p_cc_ori.circle(x='Date', y='ConfirmedCases', source=source, color='black', view=view1)
     
+    p_cc_cl = figure(title="Confirmed cases: eased spikes", **plot_size_and_tools)
+    c_cc_cl = p_cc_cl.circle(x='Date', y='cases_cumulClean', source=source, color='red', view=view1)
+ 
     p_cto = figure(title="Cumulative Tests: original", **plot_size_and_tools)
     c_cto = p_cto.circle(x='Date', y='total_cumul.all', source=source, color='black', view=view1)
     
     p_ci = figure(title="Cumulative Tests: interpolated", **plot_size_and_tools)
     c_ci = p_ci.circle(x='Date', y='tests_cumulInterpolated', source=source, view=view1, color='red')
     
-    p_cns = figure(title="Cumulative Tests: eased", **plot_size_and_tools)
+    p_cns = figure(title="Cumulative Tests: eased spikes", **plot_size_and_tools)
     c_cns = p_cns.circle(x='Date', y='tests_cumulNoSpike', source=source, view=view1, color='red')
     
-    g = gridplot([[p_cc], [p_cto, p_ci, p_cns]])
+    g = gridplot([[p_cc_ori, p_cc_cl], [p_cto, p_ci, p_cns]])
     
     # from https://docs.bokeh.org/en/latest/docs/user_guide/interaction/widgets.html#select
-    callback = CustomJS(args=dict(vf=c_cc.view.filters[0], source=source), code="""
+    callback = CustomJS(args=dict(vf=c_cc_ori.view.filters[0], source=source), code="""
     console.log(vf.group);
     console.log(cb_obj.value);
         vf.group = cb_obj.value;

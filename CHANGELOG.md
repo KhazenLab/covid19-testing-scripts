@@ -13,6 +13,7 @@ Version 0.8 (2020-05-??)
 - enh, l0: add brazil
 - feat, l4: add static html dashboard built with bokeh for postprocessing data
 - feat, www: create a new www folder that can be synced to s3 as our internal dashboard
+- feat, l4: add spike easing to confirmed cases, make spike easing more strict
 
 
 Version 0.7 (2020-05-06)

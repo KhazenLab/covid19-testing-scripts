@@ -588,6 +588,10 @@ class L2MergeTogether:
 
     # perform interpolation by templating
     def interpol_df(g1):
+      # FIXME
+      #print("shortcut")
+      #return g1["total_cumul.all"]
+
       country_name = g1.CountryProv.unique()[0]
       print(f"interpolate template: {country_name}")
 
@@ -628,14 +632,52 @@ class L2MergeTogether:
 
     # drop spikes (from notebook t15b)
     # Update 2020-05-11: changed from cap_peaks before interpolation to ease_peaks after interpolation (also from notebook t15b)
-    def ease_peaks(g1):
-        vec_d = g1["tests_cumulInterpolated"]
-        height_1 = (vec_d.max() - vec_d.min()) / (pd.notnull(vec_d).sum())
-        height_2 = 3*height_1
+    def ease_peaks(g1, fx_cumul, fx_daily, only_n_peaks):
+        vec_d = g1[fx_cumul]
+        #height_1 = (vec_d.max() - vec_d.min()) / (pd.notnull(vec_d).sum())
+        country_name = g1.CountryProv.iloc[0]
+
+        # calculate slope of (maximum - 10% of max)/(ndays between these 2 points)
+        # This would be sort of immune to the long number of 0's at the beginning of each country's signal
+        # Doesn't work for China - Xinjiang, but will filter that out anyway according to the v_max threshold
+        v_max = vec_d.max()
+
+        if v_max < 1e3:
+          # no spike easing if not beyond the 1000 limit. This removes lots of edge cases.
+          if only_n_peaks:
+            return 0
+          else:
+            return vec_d
+
+        v_min = 0.1*v_max
+        d_max = g1.Date.max()
+        d_min = g1[g1[fx_cumul]<=v_min].Date.max()
+        ndays = (d_max - d_min).days
+        height_1 = (v_max - v_min) / ndays
+        height_2 = 5*height_1 # increase factor from 3 to 5
     
-        g2=g1["tests_daily"].reset_index(drop=True)
+        g2=g1[fx_daily].reset_index(drop=True)
     
-        peaks, _ = find_peaks(g2, height=height_2)
+        # assume a minimum of 5 days between peaks. Allow only 1 peak at a time
+        peaks, _ = find_peaks(g2, height=height_2, distance=5, width=[1,2])
+
+        if only_n_peaks:
+          # just give back the number for stats
+          return len(peaks)
+
+        if len(peaks)==0:
+          # no spikes to ease
+          return vec_d
+
+        max_npeak=8 # at height=5*global and distance=5, max_npeak=8 is honored
+        print("n peaks: %i, Country: %s, v_max: %i, field: %s"%(len(peaks), country_name, v_max, fx_cumul))
+        #FIXME
+        #if len(peaks)>max_npeak:
+        #  raise Exception("Country: %s. Got %i peaks, which is > allowed maximum = %i. Aborting"%(country_name, len(peaks), max_npeak))
+
+        # calculate date of first non-zero tests/cases
+        # This is the location at which to start the interpolation of the spike smoothing
+        iloc_zeros = (vec_d <= 0)
     
         s1 = np.nan*g2
         s1.iloc[peaks] = g2.iloc[peaks]
@@ -644,8 +686,10 @@ class L2MergeTogether:
         for i, pk_i in enumerate(peaks):
           s3 = np.nan*g2
           s3.iloc[pk_i] = g2.iloc[pk_i]
-          if i==0: s3.iloc[0] = 0
-          else: s3.iloc[peaks[i-1]] = 0
+          # Update 2020-05-12: always spread a spike from t0
+          #if i==0: s3.iloc[0] = 0
+          #else: s3.iloc[peaks[i-1]] = 0
+          s3.loc[iloc_zeros] = 0
           s3 = s3.interpolate(limit_area="inside")
           s_all.append(s3)
     
@@ -656,19 +700,31 @@ class L2MergeTogether:
         #s_all = s_all.astype(int)
         s3 = s_all
     
-        g3 = g1["tests_cumulInterpolated"].reset_index(drop=True)
+        g3 = g1[fx_cumul].reset_index(drop=True)
         v1 = g3 + s3
         return v1
     
-    print("Easing spikes")
+    # FIXME do I really need the "interpolate" call below after having moved the de-spiking till *after* the interpolate-by-template step?
+    print("Easing spikes in tests")
     df["tests_daily"] = df.groupby("CountryProv")["tests_cumulInterpolated"].apply(lambda g: g.interpolate().diff().fillna(0)).astype(int)
-    tests_cumulClean = df.groupby("CountryProv").apply(ease_peaks)
+    tests_cumulClean = df.groupby("CountryProv").apply(ease_peaks, fx_cumul="tests_cumulInterpolated", fx_daily="tests_daily", only_n_peaks=False)
+    peakStats_tests = df.groupby("CountryProv").apply(ease_peaks, fx_cumul="tests_cumulInterpolated", fx_daily="tests_daily", only_n_peaks=True)
     #tests_cumulClean = tests_cumulClean.values
     tests_cumulClean = np.floor(tests_cumulClean).to_numpy().reshape([-1,1])
     df["tests_cumulNoSpike"] = tests_cumulClean
 
+    print("Easing spikes in confirmed cases")
+    df["cases_daily"] = df.groupby("CountryProv")["ConfirmedCases"].apply(lambda g: g.interpolate().diff().fillna(0)).astype(int)
+    cases_cumulClean = df.groupby("CountryProv").apply(ease_peaks, fx_cumul="ConfirmedCases", fx_daily="cases_daily", only_n_peaks=False)
+    peakStats_conf = df.groupby("CountryProv").apply(ease_peaks, fx_cumul="ConfirmedCases", fx_daily="cases_daily", only_n_peaks=True)
+    cases_cumulClean = np.floor(cases_cumulClean).to_numpy().reshape([-1,1])
+    df["cases_cumulClean"] = cases_cumulClean
+
     # subset columns and save
-    df = df[["CountryProv", "Date", "ConfirmedCases", "total_cumul.all", "tests_cumulInterpolated", "tests_cumulNoSpike"]]
+    df = df[["CountryProv", "Date", "ConfirmedCases", "cases_cumulClean", "total_cumul.all", "tests_cumulInterpolated", "tests_cumulNoSpike"]]
     save_fn = "interpolated_by_transformation.csv"
     df.to_csv(join(self.dir_l2_withConf, save_fn), index=False)
 
+    # save peak stats
+    peakStats_both = pd.concat([peakStats_tests, peakStats_conf], axis=1).rename(columns={0:"tests", 1:"confirmed"})
+    peakStats_both.to_csv(join(self.dir_l2_withConf, "interpolated_peakstats.csv"), index=True)
