@@ -290,11 +290,11 @@ class ChisquaredDashboard:
     c_a2a = p_a2.circle(x='Date', y='daily_tests', source=source, color='black', view=view1)
     c_a2b = p_a2.varea(x='Date', y1='tests_ma07', y2="tests_ma07_eps", source=source, color='red', view=view1)
 
-    p_b1 = figure(title="Confirmed cases with thresholds (7-day sum, below threshold is good, above is bad, within is ok)", **plot_size_and_tools)
+    p_b1 = figure(title="Confirmed and thresholds (7 vs 14-day sum, below threshold: good, above: bad, within: ok)", **plot_size_and_tools)
     c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1)
     c_b1a = p_b1.circle(x='Date', y='case_mvsum07', source=source, color='red', view=view1)
 
-    p_b2 = figure(title="Detrended cases (7-day ma, cases-thresholds, negative is good, positive is bad)", **plot_size_and_tools)
+    p_b2 = figure(title="Detrended cases (7-day ma, cases minus thresholds, negative: good, positive: bad)", **plot_size_and_tools)
     c_b2a = p_b2.circle(x='Date', y='case_detrended', source=source, color='green', view=view1)
 
     p_c1 = figure(title="Ratio case/total (daily)", **plot_size_and_tools)
