@@ -245,7 +245,7 @@ class ChisquaredDashboard:
     df["threshold_max_eps"] = df.threshold_max*1.03
     df["ratio_daily"] = df.daily_conf / df.daily_tests * 100
     df["ratio_ma07"] = df.case_ma07 / df.tests_ma07 * 100
-    df["case_detrended"] = df.case_ma07 - (df.threshold_min+df.threshold_max)/2
+    df["case_detrended"] = df.case_mvsum07 - (df.threshold_min+df.threshold_max)/2
 
     # columns subset
     df = df[["CountryProv","Date",
