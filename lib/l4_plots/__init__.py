@@ -232,7 +232,7 @@ class SlopesChisquaredDashboard:
     self.df_chisq = read_csv_chisq(dir_gitrepo)
 
     from .p4_slopes import read_csv as read_csv_slopes
-    self.df_slopes = read_csv_slopes(dir_gitrepo)
+    self.df_slopes, self.df_pop = read_csv_slopes(dir_gitrepo)
 
 
   def to_html(self, dir_plot_destination):
@@ -241,7 +241,7 @@ class SlopesChisquaredDashboard:
     source_chisq, c_a1a, grid_chisq = figures_chisq(init_group, self.df_chisq)
 
     from .p4_slopes import figures_slopes
-    title_slopes, fig_slopes = figures_slopes(self.df_slopes)
+    title_slopes, fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
 
     fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard.html")
     output_file(fn_dest)

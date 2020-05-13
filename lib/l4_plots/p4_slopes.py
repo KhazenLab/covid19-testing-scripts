@@ -19,10 +19,7 @@ from bokeh.models import RangeSlider, Slider
 
 
 
-def determineSlope(dataset, nbDays, nbDaysEnd, rollingAvg):
-  # df_pop
-  
-
+def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
   mask = (dataset['Date'] > max(dataset['Date'])- pd.DateOffset(nbDays+1)) & (dataset['Date'] <= max(dataset['Date'] - pd.DateOffset(nbDaysEnd)))
   countries=  dataset["CountryProv"].unique()
   df_lastHist=dataset[mask]
@@ -33,17 +30,17 @@ def determineSlope(dataset, nbDays, nbDaysEnd, rollingAvg):
   arr_slopePvalTests=[]
   for country in countries:
     df_countryData= df_lastHist[df_lastHist["CountryProv"]==country]
-    #population= df_pop.loc[df_pop["CountryProv"]==country,"Population"]
+    population= int(df_pop.loc[df_pop["CountryProv"]==country,"Population"])
     dailyPositives= df_countryData["ConfirmedCases"].diff().rolling(rollingAvg, min_periods=1).mean().dropna()
     dailyTests= df_countryData["tests_cumulNoSpike"].diff().rolling(rollingAvg, min_periods=1).mean().dropna()
     if(len(dailyTests)>1):
-      slopeTests, interceptTests, r_valueTests, p_valueTests, std_errTests = stats.linregress(dailyTests.index-dailyTests.index[0],dailyTests) # /population
+      slopeTests, interceptTests, r_valueTests, p_valueTests, std_errTests = stats.linregress(dailyTests.index-dailyTests.index[0],dailyTests/population) 
 
     else:
       slopeTests=np.nan
       p_valueTests=np.nan
     
-    slopeCases, interceptCases, r_valueCases, p_valueCases, std_errCases = stats.linregress(dailyPositives.index-dailyPositives.index[0],dailyPositives) # /population
+    slopeCases, interceptCases, r_valueCases, p_valueCases, std_errCases = stats.linregress(dailyPositives.index-dailyPositives.index[0],dailyPositives/population)
    
     arr_country.append(country)
     arr_slopeCases.append(slopeCases)
@@ -82,6 +79,7 @@ def extend(tests_var):
 
 def read_csv(dir_gitrepo):
   df_hist= pd.read_csv(join(dir_gitrepo, "l2-withConfirmed", "interpolated_by_transformation.csv"))
+  df_pop= pd.read_csv(join(dir_gitrepo, "l0-notion_tables","t11c-country_metadata.csv"))
   df_hist["Date"]=pd.to_datetime(df_hist["Date"])
 
   
@@ -91,18 +89,20 @@ def read_csv(dir_gitrepo):
       continue
     df_hist["tests_cumulNoSpike"].update(extend(df_hist.loc[df_hist["CountryProv"]==country,"tests_cumulNoSpike"]))
       
-  return df_hist
+  return df_hist, df_pop
 
 
-def figures_slopes(df_slopes):
+def figures_slopes(df_slopes,df_pop):
   nbStart=14
   nbEnd=0
   rolling=7
-  df_countrySlopes=determineSlope(df_slopes, nbStart, nbEnd, rolling)
+  df_countrySlopes=determineSlope(df_slopes,df_pop, nbStart, nbEnd, rolling)
   df_countrySlopes=df_countrySlopes.dropna()
   df_countrySlopes=df_countrySlopes[df_countrySlopes.casesSlopePval<0.05]
   df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
-  
+  df_countrySlopes["color"]="#ff7f7f"
+  df_countrySlopes.loc[df_countrySlopes.testsSlope>=df_countrySlopes.casesSlope, ['color']] = "#73b2ff"
+
   df_countrySlopes=ColumnDataSource(data=df_countrySlopes.copy().dropna())
   
   TOOLTIPS = [
@@ -111,15 +111,13 @@ def figures_slopes(df_slopes):
       ("Country/Region", "@CountryProv"),
   ]
   
-  title = Div(text="<h1>Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average</h1>",width=1000)
+  title = Div(text="<h3>Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average</h3>",width=1000)
   
   p1=figure(plot_width=400,plot_height=400,tooltips=TOOLTIPS)
-  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12)
+  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='color')
   p1.xaxis.axis_label = 'Daily Cases Slope'
   p1.yaxis.axis_label =  'Daily Tests Slope'
   
-  p1.ray([0], [0], length=0, angle=np.pi/4,color = 'white')
-  p1.ray([0], [0], length=0, angle=5*np.pi/4,color = 'white')
   
   p1.ray([0], [0], length=0, angle=np.pi,color = 'white')
   p1.ray([0], [0], length=0, angle=0,color = 'white')
