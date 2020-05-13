@@ -1,7 +1,12 @@
 All entries in reverse chronological order.
 
 
-Version 0.8 (2020-05-??)
+Version 0.9 (2020-05-??)
+
+- feat, l4: distinguish p3 slopes fig from p4 chi-squared plots and merge together
+
+
+Version 0.8 (2020-05-13)
 
 - feat, l4: add command l4-plots to generate plots from publication 1
 - feat, l2: interpolation in tests by translate + scale from the number of confirmed cases
