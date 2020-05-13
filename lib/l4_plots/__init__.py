@@ -222,7 +222,7 @@ class PostprocessingDashboard:
 
 ######################################
 
-class SlopesChisquaredDashboard:
+class SlopesChisquaredDashboardDetailed:
   """
   Combines p3 slopes scatter plot with p4 chi-squared threshold plots
   """
@@ -236,14 +236,14 @@ class SlopesChisquaredDashboard:
 
 
   def to_html(self, dir_plot_destination):
-    from .p3_chisquared import figures_chisq
+    from .p3_chisquared import figures_chisq_detailed
     init_group = 'Lebanon'
-    source_chisq, c_a1a, grid_chisq = figures_chisq(init_group, self.df_chisq)
+    source_chisq, c_a1a, grid_chisq = figures_chisq_detailed(init_group, self.df_chisq)
 
     from .p4_slopes import figures_slopes
     title_slopes, fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
 
-    fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard.html")
+    fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard-detailed.html")
     output_file(fn_dest)
 
     # link dropdown to filter data
@@ -267,3 +267,55 @@ class SlopesChisquaredDashboard:
     layout = column(title_slopes, fig_slopes, select, grid_chisq)
     save(layout)
     print(f"Saved to {fn_dest}")
+
+
+##################################
+
+class SlopesChisquaredDashboardSimple:
+  """
+  Combines p3 slopes scatter plot with p4 chi-squared threshold plots
+  """
+
+  def read_csv(self, dir_gitrepo):
+    from .p3_chisquared import read_csv as read_csv_chisq
+    self.df_chisq = read_csv_chisq(dir_gitrepo)
+
+    from .p4_slopes import read_csv as read_csv_slopes
+    self.df_slopes, self.df_pop = read_csv_slopes(dir_gitrepo)
+
+
+  def to_html(self, dir_plot_destination):
+    from .p3_chisquared import figures_chisq_simple
+    init_group = 'Lebanon'
+    source_chisq, c_b1b, grid_chisq = figures_chisq_simple(init_group, self.df_chisq)
+
+    from .p4_slopes import figures_slopes
+    title_slopes, fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
+
+    fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard-simple.html")
+    output_file(fn_dest)
+
+    # link dropdown to filter data
+    # from https://docs.bokeh.org/en/latest/docs/user_guide/interaction/widgets.html#select
+    callback = CustomJS(
+      args=dict( vf=c_b1b.view.filters[0],
+                 source_chisq=source_chisq
+               ),
+      code="""
+        console.log(vf.group);
+        console.log(cb_obj.value);
+        vf.group = cb_obj.value;
+        source_chisq.change.emit();
+        """
+      )
+    from bokeh.models import Select
+    select = Select(title="Country/State:", value=init_group, options=list(self.df_chisq.CountryProv.unique()))
+    select.js_on_change('value', callback)
+    
+    # create layout of everything
+    layout = column(title_slopes, fig_slopes, select, grid_chisq)
+    save(layout)
+    print(f"Saved to {fn_dest}")
+
+
+

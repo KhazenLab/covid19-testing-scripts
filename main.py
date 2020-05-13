@@ -5,7 +5,7 @@ from lib.l0_importBiominers import L0ImportBiominers
 from lib.l1_importOthers import L1ImportOthers
 from lib.l2_mergeTogether import L2MergeTogether
 from lib.l3_generateArcData import L3GenerateArcData
-from lib.l4_plots import L4Plots, PostprocessingDashboard, SlopesChisquaredDashboard
+from lib.l4_plots import L4Plots, PostprocessingDashboard, SlopesChisquaredDashboardDetailed, SlopesChisquaredDashboardSimple
 
 
 # Enable debug level messages
@@ -143,9 +143,13 @@ def l4_plots(dir_gitrepo, dir_plot_destination):
   Generate plots, eg figure of stacked number of countries/states per day per source
   """
 
-  f3 = SlopesChisquaredDashboard()
-  f3.read_csv(dir_gitrepo)
-  f3.to_html(dir_plot_destination)
+  f3d = SlopesChisquaredDashboardDetailed()
+  f3d.read_csv(dir_gitrepo)
+  f3d.to_html(dir_plot_destination)
+
+  f3s = SlopesChisquaredDashboardSimple()
+  f3s.read_csv(dir_gitrepo)
+  f3s.to_html(dir_plot_destination)
 
   f2 = PostprocessingDashboard()
   f2.read_csv(dir_gitrepo)

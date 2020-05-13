@@ -63,7 +63,7 @@ def read_csv(dir_gitrepo):
     return df
 
 
-def figures_chisq(init_group, df_chisq):
+def figures_chisq_detailed(init_group, df_chisq):
     source = ColumnDataSource(df_chisq)
     
     gf = GroupFilter(column_name='CountryProv', group=init_group)
@@ -99,5 +99,29 @@ def figures_chisq(init_group, df_chisq):
     g = gridplot([[p_a1, p_a2], [p_b1, p_b2], [p_c1, p_c2]])
 
     return source, c_a1a, g
+
+
+def figures_chisq_simple(init_group, df_chisq):
+    source = ColumnDataSource(df_chisq)
+    
+    gf = GroupFilter(column_name='CountryProv', group=init_group)
+    view1 = CDSView(source=source, filters=[gf])
+    
+    plot_size_and_tools = {'plot_height': 300, 'plot_width': 600,
+                           'tools':['box_select', 'reset', 'help', 'box_zoom'],
+                           'x_axis_type': 'datetime'
+                          }
+    
+    # FIXME couldnt do p_a1.line below, so using hack of varea
+    p_b1 = figure(title="Confirmed and thresholds (7 vs 14-day sum, below threshold: good, above: bad, within: ok)", **plot_size_and_tools)
+    c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1)
+    c_b1a = p_b1.circle(x='Date', y='case_mvsum07', source=source, color='red', view=view1)
+
+    p_b2 = figure(title="Detrended cases (7-day ma, cases minus thresholds, negative: good, positive: bad)", **plot_size_and_tools)
+    c_b2a = p_b2.circle(x='Date', y='case_detrended', source=source, color='green', view=view1)
+
+    g = gridplot([[p_b1, p_b2]])
+
+    return source, c_b1b, g
 
 
