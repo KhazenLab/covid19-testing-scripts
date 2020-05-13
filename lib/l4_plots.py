@@ -228,6 +228,8 @@ class ChisquaredDashboard:
   """
 
   def read_csv(self, dir_gitrepo):
+    import click
+    click.secho("As of 2020-05-13, remember that the l4/chi-squared dashboard requires running notebook t11d and downloading the resultant csv", fg="yellow")
     dir_l4 = join(dir_gitrepo, "l4-analysis")
     df = pd.read_csv(join(dir_l4, "t11d-chisquared-history-v20200512.csv"))
     df.rename(columns={"case_d2": "case_mvsum07", "control_d2": "control_mvsum07"}, inplace=True)
