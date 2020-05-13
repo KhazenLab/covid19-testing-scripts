@@ -233,6 +233,10 @@ def postprocess_table(country_name, df_single):
     df_single["total_cumul"] = df_single[["confirmed_cumul", "negative_cumul"]].apply(sum, axis=1)
     return df_single
 
+  if country_name=="San Marino":
+    df_single["total_cumul"] = df_single[["total_cumul_serological", "total_cumul_swabs", "total_cumul_people"]].apply(sum, axis=1)
+    return df_single
+
   if country_name=="Vietnam":
     df_single["total_cumul"] = df_single[["total positive", "total negative"]].apply(sum, axis=1)
     return df_single
@@ -256,6 +260,8 @@ class L0ImportBiominers:
     print("fetching all tables")
     df_global = []
     for country_name in sorted(list(notion_map.keys())):
+      #if country_name<"San Marino": continue
+
       print(f"Getting table for {country_name}")
       df_single = get_table(self.client, country_name)
       print("%s .. %s"%(country_name, df_single.shape))
