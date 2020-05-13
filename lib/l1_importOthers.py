@@ -453,6 +453,11 @@ class L1ImportOthers:
     fn_wiki = "multiple-Wikipedia_covid19_TotalTests_Table-gitrepo.csv"
     df_wiki = pd.read_csv(join(self.dir_l1a_others, fn_wiki))
 
+    # check if numeric fields are actually numeric
+    if df_wiki["Cumulative Test Nb"].dtypes != float:
+      # try to cast to float. This will throw an exception if it fails, eg "ValueError: could not convert string to float: '2,12,350'"
+      df_wiki["Cumulative Test Nb"] = df_wiki["Cumulative Test Nb"].astype(float)
+
     # As of 2020-04-09, this is %Y-%m-%d
     # df_wiki["As of Date"] = pd.to_datetime(df_wiki["As of Date"], format="%d-%m-%y")
     df_wiki["As of Date"] = pd.to_datetime(df_wiki["As of Date"], format="%Y-%m-%d")
@@ -470,8 +475,6 @@ class L1ImportOthers:
     # Update 2020-04-09: should no longer be needed
     idx_cz = (df_wiki["Country"]=="Czech") & (df_wiki["Region"]=="Czechia")
     df_wiki = df_wiki.loc[~idx_cz, ]
-
-
 
     # raise an exception if there are still duplicates
     if df_wiki[["Country","Region","As of Date"]].duplicated().any():
@@ -1016,14 +1019,14 @@ class L1ImportOthers:
     import click
     if no_work_required:
       msg = """
-      WARNING: added new entries to drop in l1b/dropped_outlaws_l1.csv,
+      WARNING: added new entries to drop in l1b-altogether/dropped_outlaws_l1.csv ,
                but all were marked as approved automatically because it is all from worldometers data.
                Just re-run l1.
       """
       click.secho(msg, fg="yellow")
     else:
       msg = """
-      WARNING: Please mark approved (or fix) in l1b/dropped_outlaws_l1.csv then re-run l1 to re-calculate selected source per country/state/date triplet
+      WARNING: Please mark approved (or fix) in l1b-altogether/dropped_outlaws_l1.csv then re-run l1 to re-calculate selected source per country/state/date triplet
       Hint: by default, we mark worldometers drops as approved
       """
       click.secho(msg, fg="red")

@@ -53,6 +53,7 @@ Step 1: import non-biominer tables and merge with biominer
 (This includes ourworldindata.org, wikipedia, and worldometers)
 
 ```
+rm demo_cache.sqlite
 python3 main.py l1-importothers \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```

@@ -97,8 +97,9 @@ class L4Plots:
     
     #fn_line = join(dir_plot_destination, 't12b-plotSourcesOverTime-lines-v%s.png'%self.dt_now)
     fn_line = join(dir_plot_destination, 't12b-plotSourcesOverTime-lines.png')
-    plt.savefig(fn_line, dpi = 300, bbox_inches="tight")
-    print(f"Saved to {fn_line}")
+    #plt.savefig(fn_line, dpi = 300, bbox_inches="tight")
+    plt.savefig(fn_line, dpi = 100, bbox_inches="tight")
+    print(f"Saved to {fn_line} (at 100 dpi)")
 
 
   def plot_stacked(self, dir_plot_destination):
@@ -132,13 +133,15 @@ class L4Plots:
     
     plt.grid(alpha=.2)
     
-    plt.xlim(right=dt.date(2020,5,1))
+    # FIXME set an xlim on 2020-05-01 for lancet correspondence, but that got rejected
+    #plt.xlim(right=dt.date(2020,5,1))
     
     # png for doc, and jpg for attachment to submission
     #fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.png'%self.dt_now)
     fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked.png')
-    plt.savefig(fn_st_png, dpi = 300, bbox_inches="tight")
-    print(f"Saved to {fn_st_png}")
+    #plt.savefig(fn_st_png, dpi = 300, bbox_inches="tight")
+    plt.savefig(fn_st_png, dpi = 100, bbox_inches="tight")
+    print(f"Saved to {fn_st_png} (at 100 dpi)")
 
     # disabled because it doesn't run on my laptop, but works fine on colab
     #fn_st_jpg = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.jpg'%self.dt_now)

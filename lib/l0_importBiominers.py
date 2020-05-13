@@ -234,7 +234,7 @@ def postprocess_table(country_name, df_single):
     return df_single
 
   if country_name=="San Marino":
-    df_single["total_cumul"] = df_single[["total_cumul_serological", "total_cumul_swabs", "total_cumul_people"]].apply(sum, axis=1)
+    df_single["total_cumul"] = df_single[pd.notnull(df_single.total_cumul_serological)][["total_cumul_serological", "total_cumul_swabs"]].fillna(0).apply(sum, axis=1)
     return df_single
 
   if country_name=="Vietnam":

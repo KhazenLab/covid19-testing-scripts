@@ -142,7 +142,7 @@ class L2MergeTogether:
     click.secho("""
     Error: Detected confirmed cases that decrease in the cumulative values.
            Top rows shown above. Consider re-running notebook t15 (or integrate it here)
-           to edit the l2/t15.csv file, then re-run l1.
+           to edit the l2-withConfirmed/t15-drop_dipsInConfirmedCumulative.csv file, then re-run l2.
            Aborting for now.
     """, fg="red")
     import sys

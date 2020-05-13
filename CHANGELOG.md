@@ -17,6 +17,8 @@ Version 0.8 (2020-05-??)
   - bugfix: found that some cases were yielding dips, so I added a workaround for those, but it's not a full fix though
 - feat, l4: integrate chi-squared dashboard
 - bug, l0: san marino needs summation of total cumul fields
+- enh, l1: add warning if wiki floats are strings
+- enh, l4: plots down to 100 dpi for sharing on the internal dashboard (from 300 dpi for print)
 
 
 Version 0.7 (2020-05-06)
