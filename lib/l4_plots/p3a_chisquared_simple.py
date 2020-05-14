@@ -53,10 +53,8 @@ def figures_chisq_simple(init_group, df_chisq):
     p_formatters={
         '@Date'      : 'datetime'
     }
-    plot_size_and_tools = {'plot_height': 300, 'plot_width': 500,
-                           'tools':['box_select', 'reset', 'help', 'box_zoom'],
-                           'x_axis_type': 'datetime'
-                           ,'sizing_mode' : 'scale_both'}
+    plot_size_and_tools = {'tools':['box_select', 'reset', 'help', 'box_zoom'],
+                           'x_axis_type': 'datetime'}
     
     # FIXME couldnt do p_a1.line below, so using hack of varea
     p_b1 = figure(title="Confirmed and Thresholds (7 vs 14-day Sum)", **plot_size_and_tools)

@@ -113,7 +113,7 @@ def figures_slopes(df_slopes,df_pop):
   ]
   
   
-  p1=figure(plot_width=550,plot_height=600,tooltips=TOOLTIPS,tools="tap",title="Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average",sizing_mode = 'scale_both')
+  p1=figure(tooltips=TOOLTIPS,tools="tap",title="Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average")
   r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='color')
   p1.xaxis.axis_label = 'Daily Cases Slope'
   p1.yaxis.axis_label =  'Daily Tests Slope'
