@@ -62,9 +62,10 @@ def editplotcolors(p1):
   p1.xaxis.major_tick_line_color=p1.xaxis.minor_tick_line_color=p1.xaxis.axis_line_color="whitesmoke"
   p1.yaxis.major_tick_line_color=p1.yaxis.minor_tick_line_color=p1.yaxis.axis_line_color ="whitesmoke"
   p1.xaxis.major_label_text_color=p1.yaxis.major_label_text_color="whitesmoke"
-  p1.xgrid.visible = False
-  p1.ygrid.visible = False
+  p1.ygrid.grid_line_alpha = 0.3
+  p1.xgrid.grid_line_alpha = 0.3
   p1.xaxis.major_label_orientation=np.pi/4
+  p1.title.text_color="whitesmoke"
 
 
 def extend(tests_var):
@@ -111,9 +112,8 @@ def figures_slopes(df_slopes,df_pop):
       ("Country/Region", "@CountryProv"),
   ]
   
-  title = Div(text="<h3>Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average</h3>",width=1000)
   
-  p1=figure(plot_width=500,plot_height=500,tooltips=TOOLTIPS)
+  p1=figure(plot_width=550,plot_height=550,tooltips=TOOLTIPS,title="Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average")
   r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='color')
   p1.xaxis.axis_label = 'Daily Cases Slope'
   p1.yaxis.axis_label =  'Daily Tests Slope'
@@ -133,14 +133,14 @@ def figures_slopes(df_slopes,df_pop):
   legend = Legend(items=[
     LegendItem(label="Tests Slope < Cases Slope", renderers=[r1], index=0),
     LegendItem(label="Tests Slope > Cases Slope", renderers=[r1], index=1),
-
   ])
 
-  legend.background_fill_alpha=0
+  legend.background_fill_alpha=0.8
+  legend.background_fill_color="#262626"
   legend.border_line_alpha=0
   legend.label_text_color="whitesmoke"
-  p1.add_layout(legend, 'above')
+  p1.add_layout(legend)
+  p1.legend.location = 'bottom_right'
   p1.toolbar_location="right"
-  
   from bokeh.layouts import row, column, widgetbox
-  return widgetbox(title), p1
+  return p1

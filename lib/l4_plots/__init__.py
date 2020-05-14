@@ -155,7 +155,7 @@ from bokeh.models import CustomJS
 from bokeh.plotting import figure, show
 import pandas as pd
 from bokeh.plotting import output_file
-from bokeh.layouts import column
+from bokeh.layouts import column, row
 from bokeh.plotting import save
 
 
@@ -281,10 +281,10 @@ class SlopesChisquaredDashboardSimple:
   def to_html(self, dir_plot_destination):
     from .p3_chisquared import figures_chisq_simple
     init_group = 'Lebanon'
-    source_chisq, c_b1b, grid_chisq = figures_chisq_simple(init_group, self.df_chisq)
+    source_chisq, c_b1b, fig_chisq1,fig_chisq2 = figures_chisq_simple(init_group, self.df_chisq)
 
     from .p4_slopes import figures_slopes
-    title_slopes, fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
+    fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
 
     fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard-simple.html")
     output_file(fn_dest)
@@ -302,12 +302,16 @@ class SlopesChisquaredDashboardSimple:
         source_chisq.change.emit();
         """
       )
-    from bokeh.models import Select
-    select = Select(title="Country/State:", value=init_group, options=list(self.df_chisq.CountryProv.unique()))
+    from bokeh.models import Select, Div
+    select = Select(title="Country/State:", value=init_group, options=list(self.df_chisq.CountryProv.unique()),width=200)
     select.js_on_change('value', callback)
     
+    
+    fn_css=("t11d-layout.css")
+    header = Div(text="<link rel='stylesheet' type='text/css' href='"+fn_css+"'>")
     # create layout of everything
-    layout = column(title_slopes, fig_slopes, select, grid_chisq)
+    layout = row(column(select,fig_slopes,width=700),column(fig_chisq1,fig_chisq2,header))
+    #layout = row(header,select,fig_slopes,column(  fig_chisq1,fig_chisq2))
     save(layout)
     print(f"Saved to {fn_dest}")
 
