@@ -87,6 +87,31 @@ def read_csv(dir_gitrepo):
     df["region"] = df.region.fillna(df.CountryProv)
     # df.set_index("CountryProv").loc["US – Alabama"].head()
 
+    df["Continent"] = df.CountryProv.apply(lambda g: "US" if g.startswith("US") else np.nan).fillna(df.region)
+
+    # add aggregated data for globe
+    print("sum for world")
+    df_world = df.groupby("Date").sum().reset_index()
+    df_world["CountryProv"] = "agg - World"
+    df_world["Country"] = "agg - World"
+    df_world["region"] = "Aggregates"
+    df_world["cp_code"] = "World"
+    df_world["Continent"] = "Aggregates"
+    print("done")
+
+    # add aggregated data per region
+    print("sum per region")
+    df_reg = df.sort_values(["Continent", "Date"]).groupby(["Continent", "Date"]).sum().reset_index() # apply(sum) is slow
+    df_reg["CountryProv"] = "agg - " + df_reg["Continent"]
+    df_reg["Country"] = "agg - " + df_reg["Continent"]
+    df_reg["region"] = "Aggregates"
+    df_reg["cp_code"] = df_reg["Continent"]
+    df_reg["Continent"] = "Aggregates"
+    print("done")
+
+    df = pd.concat([df, df_world], axis=0)
+    df = pd.concat([df, df_reg], axis=0)
+
     # replace nans: https://github.com/bokeh/bokeh/issues/4472#issuecomment-225676759
     #df = df.fillna("NaN")
     #for key in df:
@@ -97,7 +122,6 @@ def read_csv(dir_gitrepo):
 
 
 def figures_chisq_detailed(init_group, df_chisq):
-    df_chisq["Continent"] = df_chisq.CountryProv.apply(lambda g: "US" if g.startswith("US") else np.nan).fillna(df_chisq.region)
     df_latest = df_chisq.groupby("CountryProv").apply(lambda g: g.tail(1)).reset_index(drop=True)
     df_latest["color"] = "#73b2ff"
 
