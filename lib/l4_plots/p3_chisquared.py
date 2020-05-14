@@ -235,7 +235,8 @@ def figures_chisq_simple(init_group, df_chisq):
     }
     plot_size_and_tools = {'plot_height': 300, 'plot_width': 500,
                            'tools':['box_select', 'reset', 'help', 'box_zoom'],
-                           'x_axis_type': 'datetime'}
+                           'x_axis_type': 'datetime'
+                           ,'sizing_mode' : 'scale_both'}
     
     # FIXME couldnt do p_a1.line below, so using hack of varea
     p_b1 = figure(title="Confirmed and Thresholds (7 vs 14-day Sum)", **plot_size_and_tools)
@@ -266,7 +267,7 @@ def figures_chisq_simple(init_group, df_chisq):
     p_b1.legend.location = 'top_left'
     
     legend = Legend(items=[
-    LegendItem(label="Detrended <0 ", renderers=[c_b2a],index=0),
+    LegendItem(label="Detrended < 0 ", renderers=[c_b2a],index=0),
     LegendItem(label="Detrended > 0", renderers=[c_b2a],index=1),
     ])
     legend.background_fill_alpha=0.8

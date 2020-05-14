@@ -306,11 +306,14 @@ class SlopesChisquaredDashboardSimple:
     select = Select(title="Country/State:", value=init_group, options=sorted(list(self.df_chisq.CountryProv.unique())), width=200)
     select.js_on_change('value', callback)
     
-    
     fn_css=("t11d-layout.css")
     header = Div(text="<link rel='stylesheet' type='text/css' href='"+fn_css+"'>")
     # create layout of everything
-    layout = row(column(select,fig_slopes,width=700),column(fig_chisq1,fig_chisq2,header))
+    column1=column([select,fig_slopes],sizing_mode = 'scale_width')
+    column2=column([fig_chisq1,fig_chisq2],sizing_mode = 'scale_width')
+    rowMain= row([header,column1,column2],sizing_mode = 'scale_height')
+    
+    layout = rowMain
     #layout = row(header,select,fig_slopes,column(  fig_chisq1,fig_chisq2))
     save(layout)
     print(f"Saved to {fn_dest}")
