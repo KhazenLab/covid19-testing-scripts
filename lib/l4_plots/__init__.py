@@ -298,11 +298,18 @@ class SlopesChisquaredDashboardSimple:
     # from https://docs.bokeh.org/en/latest/docs/user_guide/interaction/widgets.html#select
     callback = CustomJS(
       args=dict( vf=c_b1b.view.filters[0],
-                 source_chisq=source_chisq
+                 source_chisq=source_chisq,
+                 source_slopes=source_slopes
                ),
       code="""
         console.log(vf.group);
         console.log(cb_obj.value);
+        console.log(source_slopes.data['CountryProv'].indexOf(cb_obj.value))
+        if(source_slopes.data['CountryProv'].indexOf(cb_obj.value)!=-1)
+        source_slopes.selected.indices[0]=source_slopes.data['CountryProv'].indexOf(cb_obj.value)
+        else
+        source_slopes.selected.indices=[];
+        source_slopes.change.emit();
         vf.group = cb_obj.value;
         source_chisq.change.emit();
         """
@@ -311,11 +318,12 @@ class SlopesChisquaredDashboardSimple:
     select = Select(title="Country/State:", value=init_group, options=sorted(list(self.df_chisq.CountryProv.unique())), width=200)
     select.js_on_change('value', callback)
     
-    callback2 = CustomJS(args=dict(source=source_slopes,select=select), code="""
-    var selectedIndex = source.selected.indices;
-      console.log("x:", source.data['CountryProv'][selectedIndex[0]]);
+    callback2 = CustomJS(args=dict(source_slopes=source_slopes,select=select), code="""
+      console.log(source_slopes.selected)
+      var selectedIndex = source_slopes.selected.indices;
+      console.log("x:", source_slopes.data['CountryProv'][selectedIndex[0]]);
       if(selectedIndex>0)
-      select.value=source.data['CountryProv'][selectedIndex[0]];
+      select.value=source_slopes.data['CountryProv'][selectedIndex[0]];
     
     """)
 
