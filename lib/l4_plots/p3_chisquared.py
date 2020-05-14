@@ -55,7 +55,7 @@ def read_csv(dir_gitrepo):
     df = df.merge(us_info[["state","name"]].rename(columns={"state":"us_code", "name":"CountryProv"}), how="left")
 
     # get international country code
-    int_info = pd.read_csv(join(dir_gitrepo, "l1a-non-biominer_data", "country_codes.csv"))
+    int_info = pd.read_csv(join(dir_gitrepo, "l1a-non-biominer_data", "github-lukes-countrycodes.csv"))
     country_renames = {
       "United Kingdom of Great Britain and Northern Ireland": "United Kingdom",
       "Iran \(Islamic Republic of\)": "Iran",
