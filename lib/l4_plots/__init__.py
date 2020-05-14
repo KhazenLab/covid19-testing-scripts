@@ -234,7 +234,7 @@ class SlopesChisquaredDashboardDetailed:
 
   def to_html(self, dir_plot_destination):
     from .p3_chisquared import figures_chisq_detailed
-    init_group = 'Lebanon'
+    init_group = '0 - World' # 'Lebanon'
     source_chisq, c_a1a, grid_chisq = figures_chisq_detailed(init_group, self.df_chisq)
 
     fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard-detailed.html")
@@ -254,7 +254,7 @@ class SlopesChisquaredDashboardDetailed:
         """
       )
     from bokeh.models import Select
-    select = Select(title="Country/State:", value=init_group, options=list(self.df_chisq.CountryProv.unique()))
+    select = Select(title="Country/State:", value=init_group, options=sorted(list(self.df_chisq.CountryProv.unique())))
     select.js_on_change('value', callback)
     
     # create layout of everything
@@ -280,7 +280,7 @@ class SlopesChisquaredDashboardSimple:
 
   def to_html(self, dir_plot_destination):
     from .p3_chisquared import figures_chisq_simple
-    init_group = 'Lebanon'
+    init_group = '0 - World' # 'Lebanon'
     source_chisq, c_b1b, fig_chisq1,fig_chisq2 = figures_chisq_simple(init_group, self.df_chisq)
 
     from .p4_slopes import figures_slopes
@@ -303,7 +303,7 @@ class SlopesChisquaredDashboardSimple:
         """
       )
     from bokeh.models import Select, Div
-    select = Select(title="Country/State:", value=init_group, options=list(self.df_chisq.CountryProv.unique()),width=200)
+    select = Select(title="Country/State:", value=init_group, options=sorted(list(self.df_chisq.CountryProv.unique())), width=200)
     select.js_on_change('value', callback)
     
     

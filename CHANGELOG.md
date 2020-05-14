@@ -5,6 +5,8 @@ Version 0.9 (2020-05-??)
 
 - feat, l4: distinguish p3 slopes fig from p4 chi-squared plots and merge together
 - enh, l4: chisquared detail plots to have region
+- enh, l4: chisquared + scatter of slopes improved aesthetics
+- enh, l4: chisquared added aggregates by world, continents
 
 
 Version 0.8 (2020-05-13)

@@ -89,25 +89,24 @@ def read_csv(dir_gitrepo):
 
     df["Continent"] = df.CountryProv.apply(lambda g: "US" if g.startswith("US") else np.nan).fillna(df.region)
 
+    # prep for agg
+    df_ffill = df.groupby("CountryProv").apply(lambda g: g.fillna(method="ffill"))
+
     # add aggregated data for globe
-    print("sum for world")
-    df_world = df.groupby("Date").sum().reset_index()
-    df_world["CountryProv"] = "agg - World"
-    df_world["Country"] = "agg - World"
+    df_world = df_ffill.groupby("Date").sum().reset_index()
+    df_world["CountryProv"] = "0 - World"
+    df_world["Country"] = "0 - World"
     df_world["region"] = "Aggregates"
     df_world["cp_code"] = "World"
     df_world["Continent"] = "Aggregates"
-    print("done")
 
     # add aggregated data per region
-    print("sum per region")
-    df_reg = df.sort_values(["Continent", "Date"]).groupby(["Continent", "Date"]).sum().reset_index() # apply(sum) is slow
-    df_reg["CountryProv"] = "agg - " + df_reg["Continent"]
-    df_reg["Country"] = "agg - " + df_reg["Continent"]
+    df_reg = df_ffill.sort_values(["Continent", "Date"]).groupby(["Continent","Date"]).sum().reset_index() # apply(sum(g)) is slow. apply(g.sum()) requires reset_index(drop=True)
+    df_reg["CountryProv"] = "0 - " + df_reg["Continent"]
+    df_reg["Country"] = "0 - " + df_reg["Continent"]
     df_reg["region"] = "Aggregates"
     df_reg["cp_code"] = df_reg["Continent"]
     df_reg["Continent"] = "Aggregates"
-    print("done")
 
     df = pd.concat([df, df_world], axis=0)
     df = pd.concat([df, df_reg], axis=0)
