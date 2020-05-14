@@ -14,7 +14,7 @@ from bokeh.io import push_notebook, show, output_notebook
 from bokeh.layouts import row, column, widgetbox
 from bokeh.plotting import figure, ColumnDataSource, output_file
 from bokeh.models.widgets import Div
-from bokeh.models import RangeSlider, Slider
+from bokeh.models import RangeSlider, Slider, Slope, Legend, LegendItem
 
 
 
@@ -113,7 +113,7 @@ def figures_slopes(df_slopes,df_pop):
   
   title = Div(text="<h3>Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average</h3>",width=1000)
   
-  p1=figure(plot_width=400,plot_height=400,tooltips=TOOLTIPS)
+  p1=figure(plot_width=500,plot_height=500,tooltips=TOOLTIPS)
   r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='color')
   p1.xaxis.axis_label = 'Daily Cases Slope'
   p1.yaxis.axis_label =  'Daily Tests Slope'
@@ -125,6 +125,22 @@ def figures_slopes(df_slopes,df_pop):
   p1.ray([0], [0], length=0, angle=3*np.pi/2,color = 'white')
 
   editplotcolors(p1)
+  slope = Slope(gradient=1, y_intercept=0,
+              line_color='white', line_dash='dashed', line_width=2)
 
+  p1.add_layout(slope)
+
+  legend = Legend(items=[
+    LegendItem(label="Tests Slope < Cases Slope", renderers=[r1], index=0),
+    LegendItem(label="Tests Slope > Cases Slope", renderers=[r1], index=1),
+
+  ])
+
+  legend.background_fill_alpha=0
+  legend.border_line_alpha=0
+  legend.label_text_color="whitesmoke"
+  p1.add_layout(legend, 'above')
+  p1.toolbar_location="right"
+  
   from bokeh.layouts import row, column, widgetbox
   return widgetbox(title), p1
