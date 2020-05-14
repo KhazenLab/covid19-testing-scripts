@@ -231,17 +231,11 @@ class SlopesChisquaredDashboardDetailed:
     from .p3_chisquared import read_csv as read_csv_chisq
     self.df_chisq = read_csv_chisq(dir_gitrepo)
 
-    from .p4_slopes import read_csv as read_csv_slopes
-    self.df_slopes, self.df_pop = read_csv_slopes(dir_gitrepo)
-
 
   def to_html(self, dir_plot_destination):
     from .p3_chisquared import figures_chisq_detailed
     init_group = 'Lebanon'
     source_chisq, c_a1a, grid_chisq = figures_chisq_detailed(init_group, self.df_chisq)
-
-    from .p4_slopes import figures_slopes
-    title_slopes, fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
 
     fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard-detailed.html")
     output_file(fn_dest)
@@ -264,7 +258,7 @@ class SlopesChisquaredDashboardDetailed:
     select.js_on_change('value', callback)
     
     # create layout of everything
-    layout = column(title_slopes, fig_slopes, select, grid_chisq)
+    layout = column(select, grid_chisq)
     save(layout)
     print(f"Saved to {fn_dest}")
 
