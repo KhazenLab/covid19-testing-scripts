@@ -228,12 +228,12 @@ class SlopesChisquaredDashboardDetailed:
   """
 
   def read_csv(self, dir_gitrepo):
-    from .p3_chisquared import read_csv as read_csv_chisq
+    from .p3b_chisquared_detailed import read_csv as read_csv_chisq
     self.df_chisq = read_csv_chisq(dir_gitrepo)
 
 
   def to_html(self, dir_plot_destination):
-    from .p3_chisquared import figures_chisq_detailed
+    from .p3b_chisquared_detailed import figures_chisq_detailed
     init_group = '0 - World' # 'Lebanon'
     source_chisq, c_a1a, grid_chisq = figures_chisq_detailed(init_group, self.df_chisq)
 
@@ -271,7 +271,7 @@ class SlopesChisquaredDashboardSimple:
   """
 
   def read_csv(self, dir_gitrepo):
-    from .p3_chisquared import read_csv as read_csv_chisq
+    from .p3b_chisquared_detailed import read_csv as read_csv_chisq
     self.df_chisq = read_csv_chisq(dir_gitrepo)
 
     from .p4_slopes import read_csv as read_csv_slopes
@@ -279,7 +279,7 @@ class SlopesChisquaredDashboardSimple:
 
 
   def to_html(self, dir_plot_destination):
-    from .p3_chisquared import figures_chisq_simple
+    from .p3a_chisquared_simple import figures_chisq_simple
     init_group = '0 - World' # 'Lebanon'
     source_chisq, c_b1b, fig_chisq1,fig_chisq2 = figures_chisq_simple(init_group, self.df_chisq)
 
