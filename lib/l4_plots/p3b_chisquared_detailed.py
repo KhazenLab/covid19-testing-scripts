@@ -21,6 +21,11 @@ def read_csv(dir_gitrepo):
     df = pd.read_csv(join(dir_l4, "t11d-chisquared-history-v20200512.csv"))
     df.rename(columns={"case_d2": "case_mvsum07", "control_d2": "control_mvsum07"}, inplace=True)
     df["Date"] = pd.to_datetime(df.Date)
+    return df
+
+
+def postprocess(df, dir_gitrepo):
+    df = df.copy()
     df["case_ma07"] = df["case_mvsum07"]/7
     df["control_ma07"] = df["control_mvsum07"]/7
     df["tests_ma07"] = df.case_ma07 + df.control_ma07
@@ -33,6 +38,8 @@ def read_csv(dir_gitrepo):
     df["ratio_daily"] = df.daily_conf / df.daily_tests * 100
     df["ratio_ma07"] = df.case_ma07 / df.tests_ma07 * 100
     df["case_detrended"] = df.case_mvsum07 - (df.threshold_min+df.threshold_max)/2
+
+    # FIXME is this redundant with diff2_07_excess field?
     df["case_det_diff07"] = df.case_detrended.diff(periods=7)
 
     # columns subset

@@ -9,6 +9,7 @@ Version 0.9 (2020-05-??)
 - enh, l4: chisquared added aggregates by world, continents
 - enh, l4: p3a chisquared+trends: html responsive
 - enh, l4: spin off p3a (simplified) and p3b (detailed) out of p3
+- enh, l4: chisquared step now saves the postprocessed csv into the data repository
 
 
 Version 0.8 (2020-05-13)
