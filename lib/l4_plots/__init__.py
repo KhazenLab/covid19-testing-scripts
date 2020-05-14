@@ -150,7 +150,7 @@ class L4Plots:
 ############################################################
 
 from bokeh.layouts import gridplot
-from bokeh.models import CDSView, ColumnDataSource, GroupFilter
+from bokeh.models import CDSView, ColumnDataSource, GroupFilter, TapTool
 from bokeh.models import CustomJS
 from bokeh.plotting import figure, show
 import pandas as pd
@@ -284,7 +284,7 @@ class SlopesChisquaredDashboardSimple:
     source_chisq, c_b1b, fig_chisq1,fig_chisq2 = figures_chisq_simple(init_group, self.df_chisq)
 
     from .p4_slopes import figures_slopes
-    fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
+    source_slopes, fig_slopes = figures_slopes(self.df_slopes,self.df_pop)
 
     fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard-simple.html")
     output_file(fn_dest)
@@ -305,6 +305,17 @@ class SlopesChisquaredDashboardSimple:
     from bokeh.models import Select, Div
     select = Select(title="Country/State:", value=init_group, options=sorted(list(self.df_chisq.CountryProv.unique())), width=200)
     select.js_on_change('value', callback)
+    
+    callback2 = CustomJS(args=dict(source=source_slopes,select=select), code="""
+    var selectedIndex = source.selected.indices;
+      console.log("x:", source.data['CountryProv'][selectedIndex[0]]);
+      if(selectedIndex>0)
+      select.value=source.data['CountryProv'][selectedIndex[0]];
+    
+    """)
+
+    taptool = fig_slopes.select(type=TapTool)
+    source_slopes.selected.js_on_change('indices', callback2)
     
     fn_css=("t11d-layout.css")
     header = Div(text="<link rel='stylesheet' type='text/css' href='"+fn_css+"'>")
