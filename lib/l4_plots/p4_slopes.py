@@ -122,6 +122,11 @@ def figures_slopes(df_slopes,df_pop):
   r2=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='#ff7f7f',legend_label='Tests Slope < Cases Slope',view=view2)
   p1.xaxis.axis_label = 'Daily Cases Slope'
   p1.yaxis.axis_label =  'Daily Tests Slope'
+
+  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color=index_cmap,legend='legend')
+  p1.xaxis.axis_label = 'Daily (Cases/Population) Slope'
+  p1.yaxis.axis_label =  'Daily (Tests/Population) Slope'
+
   
   
   p1.ray([0], [0], length=0, angle=np.pi,color = 'white')
