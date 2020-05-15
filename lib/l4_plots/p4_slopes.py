@@ -14,7 +14,7 @@ from bokeh.io import push_notebook, show, output_notebook
 from bokeh.layouts import row, column, widgetbox
 from bokeh.plotting import figure, ColumnDataSource, output_file
 from bokeh.models.widgets import Div
-from bokeh.models import RangeSlider, Slider, Slope, Legend, LegendItem
+from bokeh.models import RangeSlider, Slider, Slope, Legend, LegendItem, CDSView, GroupFilter
 from bokeh.transform import factor_cmap
 
 
@@ -101,11 +101,14 @@ def figures_slopes(df_slopes,df_pop):
   df_countrySlopes=df_countrySlopes.dropna()
   df_countrySlopes=df_countrySlopes[df_countrySlopes.casesSlopePval<0.05]
   df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
-  df_countrySlopes["legend"]="Tests Slope < Cases Slope"
-  df_countrySlopes.loc[df_countrySlopes.testsSlope>=df_countrySlopes.casesSlope, ['legend']] = "Tests Slope > Cases Slope"
-  index_cmap = factor_cmap('legend', palette=['#73b2ff','#ff7f7f'], 
-                         factors=sorted(df_countrySlopes.legend.unique(),reverse=True))
+  df_countrySlopes["temp"]="0"
+  df_countrySlopes.loc[df_countrySlopes.testsSlope>=df_countrySlopes.casesSlope, ['temp']] = "1"
   df_countrySlopes=ColumnDataSource(data=df_countrySlopes.copy().dropna())
+  gf = GroupFilter(column_name='temp', group="1")
+  view1 = CDSView(source=df_countrySlopes, filters=[gf])
+  gf = GroupFilter(column_name='temp', group="0")
+  view2 = CDSView(source=df_countrySlopes, filters=[gf])
+  
   
   TOOLTIPS = [
       ("Cases Slope","@casesSlope"),
@@ -115,7 +118,8 @@ def figures_slopes(df_slopes,df_pop):
   
                          
   p1=figure(tooltips=TOOLTIPS,tools=",pan,tap,box_zoom,reset",title="Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average")
-  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color=index_cmap,legend='legend')
+  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='#73b2ff',legend_label='Tests Slope > Cases Slope',view=view1)
+  r2=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='#ff7f7f',legend_label='Tests Slope < Cases Slope',view=view2)
   p1.xaxis.axis_label = 'Daily Cases Slope'
   p1.yaxis.axis_label =  'Daily Tests Slope'
   

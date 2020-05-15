@@ -9,9 +9,8 @@ import pandas as pd
 import numpy as np
 
 from bokeh.layouts import gridplot, column
-from bokeh.models import CDSView, ColumnDataSource, GroupFilter, CustomJS, LabelSet, Slope, Legend, LegendItem, HoverTool
+from bokeh.models import CDSView, ColumnDataSource, GroupFilter, CustomJS, LabelSet, Slope, Legend, LegendItem, HoverTool, BooleanFilter
 from bokeh.plotting import figure, save, output_file
-from bokeh.transform import factor_cmap
 
 
 
@@ -32,15 +31,16 @@ def editplotcolors(p1):
 
 def figures_chisq_simple(init_group, df_chisq):
     
-    df_chisq["legend"]="Detrended > 0"
-    df_chisq.loc[df_chisq.case_detrended>=0, ['legend']] = "Detrended < 0"
-    index_cmap = factor_cmap('legend', palette=['#73b2ff','#ff7f7f'], 
-                         factors=sorted(df_chisq.legend.unique()))
-    
     source = ColumnDataSource(df_chisq)
     
     gf = GroupFilter(column_name='CountryProv', group=init_group)
     view1 = CDSView(source=source, filters=[gf])
+    
+    booleans = [True if float(case_detrended) >= 0 else False for case_detrended in source.data['case_detrended']]
+    t1_view = CDSView(source=source, filters=[gf , BooleanFilter(booleans)])
+    
+    booleans = [True if float(case_detrended) < 0 else False for case_detrended in source.data['case_detrended']]
+    t2_view = CDSView(source=source, filters=[gf , BooleanFilter(booleans)])
     
     p_b1_tooltip = [
       ("Date","@Date{%F}"),
@@ -65,7 +65,8 @@ def figures_chisq_simple(init_group, df_chisq):
     c_b1a = p_b1.circle(x='Date', y='case_mvsum07', source=source, color='red', view=view1)
 
     p_b2 = figure(title="Detrended Cases (7-day Moving Average, Cases Minus Thresholds)",**plot_size_and_tools)
-    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color=index_cmap,legend='legend', view=view1)
+    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#73b2ff',legend_label="Detrended > 0", view=t1_view)
+    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#ff7f7f',legend_label="Detrended < 0", view=t2_view)
     editplotcolors(p_b1)
     editplotcolors(p_b2)
     p_b1.xaxis.axis_label = 'Date'
@@ -87,8 +88,7 @@ def figures_chisq_simple(init_group, df_chisq):
     p_b1.add_layout(legend)
     p_b1.legend.location = 'top_left'
     
-    
-    
+   
     p_b2.legend.background_fill_alpha=0.8
     p_b2.legend.background_fill_color="#262626"
     p_b2.legend.border_line_alpha=0
