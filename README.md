@@ -96,6 +96,9 @@ Upload plots to AWS S3 bucket as static html
 
 ```
 AWS_PROFILE=shadi_shadi aws s3 sync www/ s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+
+# or for uploading a single file
+AWS_PROFILE=shadi_shadi aws s3 cp www/t11d-chisquared_dashboard-simple.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
 ```
 
 If the `--acl` doesn't work (it works as of 2020-05-12), then make the folder public manually in aws web console.

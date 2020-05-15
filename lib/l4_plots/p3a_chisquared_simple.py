@@ -77,8 +77,8 @@ def figures_chisq_simple(init_group, df_chisq):
     p_b2.add_tools(HoverTool(tooltips=p_b2_tooltip,formatters=p_formatters))
     
     legend = Legend(items=[
-    LegendItem(label="asd", renderers=[c_b1b]),
-    LegendItem(label="asdd", renderers=[c_b1a]),
+    LegendItem(label="Thresholds for consistence with 14-day sum", renderers=[c_b1b]),
+    LegendItem(label="7-day sum of cases", renderers=[c_b1a]),
     ])
     legend.background_fill_alpha=0.8
     legend.background_fill_color="#262626"
