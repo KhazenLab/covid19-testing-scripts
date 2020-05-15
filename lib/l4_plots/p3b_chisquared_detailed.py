@@ -11,6 +11,7 @@ import numpy as np
 from bokeh.layouts import gridplot, column
 from bokeh.models import CDSView, ColumnDataSource, GroupFilter, CustomJS, LabelSet, Slope, Legend, LegendItem, HoverTool
 from bokeh.plotting import figure, save, output_file
+from bokeh.transform import factor_cmap
 
 
 

@@ -15,7 +15,7 @@ from bokeh.layouts import row, column, widgetbox
 from bokeh.plotting import figure, ColumnDataSource, output_file
 from bokeh.models.widgets import Div
 from bokeh.models import RangeSlider, Slider, Slope, Legend, LegendItem
-
+from bokeh.transform import factor_cmap
 
 
 
@@ -101,9 +101,10 @@ def figures_slopes(df_slopes,df_pop):
   df_countrySlopes=df_countrySlopes.dropna()
   df_countrySlopes=df_countrySlopes[df_countrySlopes.casesSlopePval<0.05]
   df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
-  df_countrySlopes["color"]="#ff7f7f"
-  df_countrySlopes.loc[df_countrySlopes.testsSlope>=df_countrySlopes.casesSlope, ['color']] = "#73b2ff"
-
+  df_countrySlopes["legend"]="Tests Slope < Cases Slope"
+  df_countrySlopes.loc[df_countrySlopes.testsSlope>=df_countrySlopes.casesSlope, ['legend']] = "Tests Slope > Cases Slope"
+  index_cmap = factor_cmap('legend', palette=['#73b2ff','#ff7f7f'], 
+                         factors=sorted(df_countrySlopes.legend.unique(),reverse=True))
   df_countrySlopes=ColumnDataSource(data=df_countrySlopes.copy().dropna())
   
   TOOLTIPS = [
@@ -112,9 +113,9 @@ def figures_slopes(df_slopes,df_pop):
       ("Country/Region", "@CountryProv"),
   ]
   
-  
+                         
   p1=figure(tooltips=TOOLTIPS,tools=",pan,tap,box_zoom,reset",title="Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average")
-  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='color')
+  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color=index_cmap,legend='legend')
   p1.xaxis.axis_label = 'Daily Cases Slope'
   p1.yaxis.axis_label =  'Daily Tests Slope'
   
@@ -129,18 +130,11 @@ def figures_slopes(df_slopes,df_pop):
               line_color='white', line_dash='dashed', line_width=2)
 
   p1.add_layout(slope)
-
-  legend = Legend(items=[
-    LegendItem(label="Tests Slope < Cases Slope", renderers=[r1], index=0),
-    LegendItem(label="Tests Slope > Cases Slope", renderers=[r1], index=1),
-  ])
   
-
-  legend.background_fill_alpha=0.8
-  legend.background_fill_color="#262626"
-  legend.border_line_alpha=0
-  legend.label_text_color="whitesmoke"
-  p1.add_layout(legend)
+  p1.legend.background_fill_alpha=0.8
+  p1.legend.background_fill_color="#262626"
+  p1.legend.border_line_alpha=0
+  p1.legend.label_text_color="whitesmoke"
   p1.legend.location = 'bottom_right'
   p1.toolbar_location="right"
   from bokeh.layouts import row, column, widgetbox

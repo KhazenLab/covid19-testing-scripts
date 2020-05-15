@@ -11,7 +11,7 @@ import numpy as np
 from bokeh.layouts import gridplot, column
 from bokeh.models import CDSView, ColumnDataSource, GroupFilter, CustomJS, LabelSet, Slope, Legend, LegendItem, HoverTool
 from bokeh.plotting import figure, save, output_file
-
+from bokeh.transform import factor_cmap
 
 
 
@@ -32,8 +32,11 @@ def editplotcolors(p1):
 
 def figures_chisq_simple(init_group, df_chisq):
     
-    df_chisq["color"]="#ff7f7f"
-    df_chisq.loc[df_chisq.case_detrended>=0, ['color']] = "#73b2ff"
+    df_chisq["legend"]="Detrended > 0"
+    df_chisq.loc[df_chisq.case_detrended>=0, ['legend']] = "Detrended < 0"
+    index_cmap = factor_cmap('legend', palette=['#73b2ff','#ff7f7f'], 
+                         factors=sorted(df_chisq.legend.unique()))
+    
     source = ColumnDataSource(df_chisq)
     
     gf = GroupFilter(column_name='CountryProv', group=init_group)
@@ -62,7 +65,7 @@ def figures_chisq_simple(init_group, df_chisq):
     c_b1a = p_b1.circle(x='Date', y='case_mvsum07', source=source, color='red', view=view1)
 
     p_b2 = figure(title="Detrended Cases (7-day Moving Average, Cases Minus Thresholds)",**plot_size_and_tools)
-    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source, color='color', view=view1)
+    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color=index_cmap,legend='legend', view=view1)
     editplotcolors(p_b1)
     editplotcolors(p_b2)
     p_b1.xaxis.axis_label = 'Date'
@@ -84,15 +87,12 @@ def figures_chisq_simple(init_group, df_chisq):
     p_b1.add_layout(legend)
     p_b1.legend.location = 'top_left'
     
-    legend = Legend(items=[
-    LegendItem(label="Detrended < 0 ", renderers=[c_b2a],index=0),
-    LegendItem(label="Detrended > 0", renderers=[c_b2a],index=1),
-    ])
-    legend.background_fill_alpha=0.8
-    legend.background_fill_color="#262626"
-    legend.border_line_alpha=0
-    legend.label_text_color="whitesmoke"
-    p_b2.add_layout(legend)
+    
+    
+    p_b2.legend.background_fill_alpha=0.8
+    p_b2.legend.background_fill_color="#262626"
+    p_b2.legend.border_line_alpha=0
+    p_b2.legend.label_text_color="whitesmoke"
     p_b2.legend.location = 'bottom_left'
     
     return source, c_b1b, p_b1,p_b2

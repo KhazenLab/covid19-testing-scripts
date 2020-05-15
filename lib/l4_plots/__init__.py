@@ -333,7 +333,7 @@ class SlopesChisquaredDashboardSimple:
     fn_css=("t11d-layout.css")
     header = Div(text="<link rel='stylesheet' type='text/css' href='"+fn_css+"'>")
     # create layout of everything
-    column1=column([row(select),row(fig_slopes,sizing_mode="stretch_both")])
+    column1=column([row(select),row(fig_slopes,sizing_mode="stretch_both")],sizing_mode="stretch_width")
     column2=column([fig_chisq1,fig_chisq2],sizing_mode = 'stretch_both')
     rowMain= row([header,column1,column2],sizing_mode = 'stretch_height')
     
