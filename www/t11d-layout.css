@@ -1,0 +1,16 @@
+body {
+	background-color:#464646 !important;
+	overflow:hidden
+}
+
+select option {
+    background: rgb(50, 50, 50);
+    color: white;
+}
+.bk-input{
+    background-color: rgb(50, 50, 50) !important; 
+    color: white;
+}
+label.bk{
+	color: white;
+}
