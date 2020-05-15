@@ -322,7 +322,7 @@ class SlopesChisquaredDashboardSimple:
       console.log(source_slopes.selected)
       var selectedIndex = source_slopes.selected.indices;
       console.log("x:", source_slopes.data['CountryProv'][selectedIndex[0]]);
-      if(selectedIndex>=0)
+      if(selectedIndex[0]>=0)
       select.value=source_slopes.data['CountryProv'][selectedIndex[0]];
     
     """)
