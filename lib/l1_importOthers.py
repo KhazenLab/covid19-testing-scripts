@@ -295,12 +295,15 @@ class L1ImportOthers:
     #df_owid_roser["Cumulative total"] = df_owid_roser["Cumulative total"].astype(int)
 
     # drop some dupes data, with: India - samples tested, United States - specimens tested (CDC), japan - tests performed, etc
+    # Ghana - people tested, Ghana - samples tested, Thailand - people tested, Thailand - samples tested
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "India - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United States - inconsistent units (COVID Tracking Project)"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Japan - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Singapore - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Italy - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United Kingdom - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Ghana - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Thailand - people tested"]
     
     # Split the name and comment for simplicity
     ent_uniq = df_owid_roser.Entity.unique()

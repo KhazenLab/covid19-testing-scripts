@@ -141,8 +141,10 @@ def get_table(client, country_name):
     rows = page.collection.get_rows()
     df_all = []
     for i,r in enumerate(rows):
+      #print(f"row {i}")
       df_new = {}
       for c in colnames:
+        #print(f"column {c}")
         v = getattr(r,c)
         if type(v)==NotionDate: v = v.start
         df_new[c] = v
@@ -237,14 +239,14 @@ def postprocess_table(country_name, df_single):
     return df_single
 
   if country_name=="San Marino":
-    df_single["total_cumul"] = df_single[pd.notnull(df_single.total_cumul_serological)][["total_cumul_serological", "total_cumul_swabs"]].fillna(0).apply(sum, axis=1)
+    df_single["total_cumul"] = df_single[pd.notnull(df_single.total_cumul_swabs)][["total_cumul_serological", "total_cumul_swabs"]].fillna(0).apply(sum, axis=1)
     return df_single
 
   if country_name=="Vietnam":
     df_single["total_cumul"] = df_single[["total positive", "total negative"]].apply(sum, axis=1)
     return df_single
 
-  print(f"no postprocessing for country {country_name}")
+  #print(f"no postprocessing for country {country_name}")
   return df_single
 
 
@@ -263,7 +265,7 @@ class L0ImportBiominers:
     print("fetching all tables")
     df_global = []
     for country_name in sorted(list(notion_map.keys())):
-      #if country_name<"San Marino": continue
+      #if country_name<"Liechtenstein": continue # FIXME
 
       print(f"Getting table for {country_name}")
       df_single = get_table(self.client, country_name)
