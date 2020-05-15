@@ -117,6 +117,9 @@ notion_map = {
     # 2020-05-11
     "Brazil": "https://www.notion.so/086536d4083d41d1af1ddb4af92ed08f?v=9b9987e7c1ab4bd39fb6e48877224e8f",
     
+    #2020-05-15
+    "Liechtenstein":"https://www.notion.so/dfe83dcaee8f43e7a7c7a46257bfe0f3?v=aa2d86952bf54d3da24c9368a0d613e7",
+    
 }
 
 
