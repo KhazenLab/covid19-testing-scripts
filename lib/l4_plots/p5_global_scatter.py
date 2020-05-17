@@ -6,19 +6,48 @@ import numpy as np
 from os.path import join
 
 
-
 def figure_scatter_values(df_chisq):
-    df_chisq["casema07_diff07"] = df_chisq.case_ma07.diff(periods=7)
-    df_chisq["testsma07_diff07"] = df_chisq.tests_ma07.diff(periods=7)
+    df_chisq["casema07_diff07"] = df_chisq.case_ma07.diff(periods=1)
+    df_chisq["testsma07_diff07"] = df_chisq.tests_ma07.diff(periods=1)
+    df_chisq["angle"] = df_chisq.testsma07_diff07 / df_chisq.casema07_diff07 * 3.14
+    df_chisq["casema07_start"] = df_chisq.case_ma07 - df_chisq.casema07_diff07
+    df_chisq["testsma07_start"] = df_chisq.tests_ma07 - df_chisq.testsma07_diff07
 
-    df_latest = df_chisq.groupby("CountryProv").apply(lambda g: g.tail(1)).reset_index(drop=True)
-    df_latest["color"] = "#73b2ff"
+    # df_chisq.set_index(["CountryProv","Date"]).tail()[['case_ma07', 'tests_ma07',  'casema07_diff07', 'testsma07_diff07', 'casema07_start', 'testsma07_start']]
 
-    source_hist = ColumnDataSource(df_chisq)
-    source_latest = ColumnDataSource(df_latest)
+    print("gathering moving 14-day windows")
+    #df_sub = df_chisq[df_chisq.Date >= "2020-04-28"]
+    df_sub = df_chisq
+    df_latest = []
+    dtmax_n = df_sub.Date.unique().max()
+    dtmin_n = df_sub.Date.unique().min()
+    import datetime as dt
+    #dt_range = df_sub.Date.unique()
+    dt_range = np.arange(dtmax_n, dtmin_n, dt.timedelta(days=-14))
+    #dtmax_s = str(dtmax_n)[:10] # http://stackoverflow.com/questions/28327101/ddg#28327650
+    for dt_i in dt_range:
+      dt_delta = (dt_i - dtmin_n).astype('timedelta64[D]').astype(int)
+      if dt_delta < 14: continue
+      print(dt_i, dt_delta)
+
+      df_i = df_sub[df_sub.Date <= dt_i]
+      df_i = df_i.groupby("CountryProv").apply(lambda g: g.tail(14)).reset_index(drop=True)
+      df_i["color"] = "#73b2ff"
+      df_i["dtLast"] = dt_i
+      df_latest.append(df_i)
+
+    if len(df_latest)==0: raise Exception("No data in moving window")
+    df_latest = pd.concat(df_latest, axis=0)
+    df_latest["display_cpcode"] = df_latest.apply(lambda g: "" if g.dtLast!=g.Date else g.cp_code, axis=1)
+    print("done")
+
+    #source_hist = ColumnDataSource(df_chisq)
+    #source_latest = ColumnDataSource(df_latest)
 
     # since cannot use View iwth LabelSet, creating a different source per continent
-    srcLatest_continent = df_latest.groupby("Continent").apply(lambda g: ColumnDataSource(g))
+    # Couldn't figure out how to filter the datasource in add_layout or Arrow,
+    # so just grouping on both continent and dtLast
+    srcLatest_continent = df_latest.groupby(["Continent","dtLast"]).apply(lambda g: ColumnDataSource(g))
     srcLatest_continent = srcLatest_continent.reset_index().rename(columns={0:"src"})
     
     plot_size_and_tools = {'plot_height': 300, 'plot_width': 600,
@@ -37,20 +66,44 @@ def figure_scatter_values(df_chisq):
     ]
     # first set for case vs tests, then second set for case diff vs test diff
     params = (
-      ('values', 'case_ma07', 'tests_ma07', 'ma07(Cases)', 'ma07(Tests)'),
-      ('diffs', 'casema07_diff07', 'testsma07_diff07', 'diff07(ma07(Cases))', 'diff07(ma07(Tests))'),
+      ('values', 'tests_ma07', 'case_ma07', 'testsma07_start',  'casema07_start', 'ma07(Tests)', 'ma07(Cases)'),
+      #('diffs', 'casema07_diff07', 'testsma07_diff07', 'diff07(ma07(Cases))', 'diff07(ma07(Tests))'),
     )
     p_all = {'values': [], 'diffs': []}
-    for k, fdx, fdy, labx, laby in params:
+    from bokeh.models import Arrow, NormalHead, OpenHead, VeeHead
+    for k, fdxv, fdyv, fdxs, fdys, labx, laby in params:
       p_cont = []
       for srcCont_i in srcLatest_continent.iterrows():
           srcCont_i = srcCont_i[1]
-          p_d1=figure(plot_width=600,plot_height=400,tooltips=TOOLTIPS,title=srcCont_i.Continent)
-          p_d1.scatter(fdx, fdy,source=srcCont_i.src, size=12,color='color')
+          print("Adding plot for %s, %s"%(srcCont_i.Continent, srcCont_i.dtLast))
+
+          #init_group=dtmax_s
+          #gf = GroupFilter(column_name='dtLast', group=init_group)
+          #view1 = CDSView(source=srcCont_i.src, filters=[gf])
+
+          p_d1=figure(plot_width=600,plot_height=400,tooltips=TOOLTIPS,title="%s %s"%(srcCont_i.Continent, srcCont_i.dtLast))
+
+          #p_d1.triangle(fdxv, fdyv, source=srcCont_i.src, size=12, color='blue', angle="angle")
+          p_d1.scatter(fdxs, fdys, source=srcCont_i.src, size=3, color='red') #, view=view1)
+          p_d1.scatter(fdxv, fdyv, source=srcCont_i.src, size=3, color='red')
+          p_d1.add_layout(
+            Arrow(
+              end=VeeHead(size=6),
+              x_start="testsma07_start",
+              y_start="casema07_start",
+              x_end="tests_ma07",
+              y_end="case_ma07",
+              line_color='blue',
+              source=srcCont_i.src
+              #view=view1 # srcCont_i.src
+            )#,
+            #view=view1 # not supported
+          )
+
           p_d1.xaxis.axis_label = labx
           p_d1.yaxis.axis_label =  laby
           from bokeh.models import LabelSet
-          labels = LabelSet(x=fdx, y=fdy, text='cp_code', level='glyph',
+          labels = LabelSet(x=fdxv, y=fdyv, text='display_cpcode', level='glyph',
                    x_offset=5, y_offset=5, source=srcCont_i.src, render_mode='canvas')
           p_d1.add_layout(labels)
           p_d1.add_layout(slope_y0)
@@ -87,5 +140,9 @@ class GlobalScatterplots:
   def to_html(self, dir_plot_destination):
     fn_dest = join(dir_plot_destination, "p5_global_scatter.html")
     output_file(fn_dest)
+
+    # https://stackoverflow.com/a/46786272/4126114
+    # from bokeh.io import curdoc
+    # curdoc().title = "COVID-19 Scatter Plots of Cases vs Tests" # FIXME doesnt work
     save(self.layout)
     print(f"Saved to {fn_dest}")
