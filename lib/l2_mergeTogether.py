@@ -677,7 +677,8 @@ class L2MergeTogether:
 
         # calculate date of first non-zero tests/cases
         # This is the location at which to start the interpolation of the spike smoothing
-        iloc_zeros = (vec_d <= 0)
+        # The "<=" may as well simply be "==" but I thought I'd just use "<=" to be safe
+        iloc_zeros = (vec_d <= 0).values
         if iloc_zeros.any():
           iloc_lastzero = np.where(iloc_zeros)[0].tolist().pop()
         else:
@@ -698,11 +699,20 @@ class L2MergeTogether:
           else:
             s3.iloc[0] = g2.iloc[0]
 
+          # if this is confirmed cases, we need to set more points to 0, up till x days before the spike.
+          # This is necessary because a spike in confirmed cases makes sense to be eased to at most x days
+          # Update: actually, this would make sense if I were easing smaller spikes like a Monday spike because people postpone going to ER on weekends,
+          # but it doesn't work for large spikes where a new lab's data is added
+          #if fx_cumul=="ConfirmedCases":
+          #  if iloc_lastzero < pk_i-5:
+          #    s3.iloc[ iloc_lastzero : pk_i-5 ] = 0
+
           # update 2020-05-12: replace linear interpolation with interpolation from template
           # This ensures that number of tests > number of confirmed cases
           #s3 = s3.interpolate(limit_area="inside")
-          vec_with_na = s3.iloc[ iloc_lastzero : pk_i+1 ]
-          vec_template = vec_d.iloc[ iloc_lastzero : pk_i+1 ]
+          first_na = np.where(pd.isnull(s3))[0][0]
+          vec_with_na = s3.iloc[ first_na - 1 : pk_i+1 ]
+          vec_template = vec_d.iloc[ first_na - 1 : pk_i+1 ]
           vec_interpolated = interpolate_by_translation(vec_with_na, vec_template.reset_index(drop=True))
 
           # bug: when the vec_template is flat, vec_interpolated gets some dips
@@ -712,7 +722,7 @@ class L2MergeTogether:
           # (Pdb) pd.concat([vec_template.reset_index(drop=True), vec_interpolated.reset_index(drop=True), vec_interpolated2.reset_index(drop=True)], axis=1)
 
           # save into vector
-          s3.iloc[ iloc_lastzero : pk_i+1 ] = vec_interpolated.values
+          s3.iloc[ first_na-1 : pk_i+1 ] = vec_interpolated.values
 
           s_all.append(s3)
     
