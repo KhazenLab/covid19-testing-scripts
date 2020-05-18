@@ -24,7 +24,6 @@ def editplotcolors(p1):
   p1.xaxis.major_label_text_color=p1.yaxis.major_label_text_color="whitesmoke"
   p1.ygrid.grid_line_alpha = 0.3
   p1.xgrid.grid_line_alpha = 0.3
-  p1.xaxis.major_label_orientation=np.pi/4
   p1.title.text_color="whitesmoke"
   
 
@@ -65,8 +64,8 @@ def figures_chisq_simple(init_group, df_chisq):
     c_b1a = p_b1.circle(x='Date', y='case_mvsum07', source=source, color='red', view=view1)
 
     p_b2 = figure(title="Detrended Cases (7-day Moving Average, Cases Minus Thresholds)",**plot_size_and_tools)
-    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#73b2ff',legend_label="Detrended < 0", view=t2_view)
-    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#ff7f7f',legend_label="Detrended > 0", view=t1_view)
+    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#73b2ff',legend_label="Above Threshold", view=t2_view)
+    c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#ff7f7f',legend_label="Below Threshold", view=t1_view)
     editplotcolors(p_b1)
     editplotcolors(p_b2)
     p_b1.xaxis.axis_label = 'Date'

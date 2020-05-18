@@ -99,8 +99,8 @@ def figures_slopes(df_slopes,df_pop):
   rolling=7
   df_countrySlopes=determineSlope(df_slopes,df_pop, nbStart, nbEnd, rolling)
   df_countrySlopes=df_countrySlopes.dropna()
-  df_countrySlopes=df_countrySlopes[df_countrySlopes.casesSlopePval<0.05]
-  df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
+  #df_countrySlopes=df_countrySlopes[df_countrySlopes.casesSlopePval<0.05]
+  #df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
   df_countrySlopes["temp"]="0"
   df_countrySlopes.loc[df_countrySlopes.testsSlope>=df_countrySlopes.casesSlope, ['temp']] = "1"
   df_countrySlopes=ColumnDataSource(data=df_countrySlopes.copy().dropna())
