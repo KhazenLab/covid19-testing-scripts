@@ -9,9 +9,15 @@ from os.path import join
 def figure_scatter_values(df_chisq):
     df_chisq["casema07_diff07"] = df_chisq.case_ma07.diff(periods=1)
     df_chisq["testsma07_diff07"] = df_chisq.tests_ma07.diff(periods=1)
+    df_chisq["casedet_diff07"] = df_chisq.case_detrended.diff(periods=1)
     df_chisq["angle"] = df_chisq.testsma07_diff07 / df_chisq.casema07_diff07 * 3.14
     df_chisq["casema07_start"] = df_chisq.case_ma07 - df_chisq.casema07_diff07
     df_chisq["testsma07_start"] = df_chisq.tests_ma07 - df_chisq.testsma07_diff07
+    df_chisq["casedet_start"] = df_chisq.case_detrended - df_chisq.casedet_diff07
+    df_chisq["dt_str"] = df_chisq.Date.dt.strftime("%Y-%m-%d")
+
+    # FIXME
+
 
     # df_chisq.set_index(["CountryProv","Date"]).tail()[['case_ma07', 'tests_ma07',  'casema07_diff07', 'testsma07_diff07', 'casema07_start', 'testsma07_start']]
 
@@ -63,10 +69,12 @@ def figure_scatter_values(df_chisq):
     # scatter plot
     TOOLTIPS = [
         ("Country/Region", "@CountryProv"),
+        ("Date", "@dt_str"),
     ]
     # first set for case vs tests, then second set for case diff vs test diff
     params = (
-      ('values', 'tests_ma07', 'case_ma07', 'testsma07_start',  'casema07_start', 'ma07(Tests)', 'ma07(Cases)'),
+      #('values', 'tests_ma07', 'case_ma07', 'testsma07_start',  'casema07_start', 'ma07(Tests)', 'ma07(Cases)'),
+      ('values', 'case_detrended', 'case_ma07', 'casedet_start',  'casema07_start', 'detrended(cases)', 'ma07(Cases)'),
       #('diffs', 'casema07_diff07', 'testsma07_diff07', 'diff07(ma07(Cases))', 'diff07(ma07(Tests))'),
     )
     p_all = {'values': [], 'diffs': []}
@@ -84,15 +92,15 @@ def figure_scatter_values(df_chisq):
           p_d1=figure(plot_width=600,plot_height=400,tooltips=TOOLTIPS,title="%s %s"%(srcCont_i.Continent, srcCont_i.dtLast))
 
           #p_d1.triangle(fdxv, fdyv, source=srcCont_i.src, size=12, color='blue', angle="angle")
-          p_d1.scatter(fdxs, fdys, source=srcCont_i.src, size=3, color='red') #, view=view1)
+          #p_d1.scatter(fdxs, fdys, source=srcCont_i.src, size=3, color='red') #, view=view1)
           p_d1.scatter(fdxv, fdyv, source=srcCont_i.src, size=3, color='red')
           p_d1.add_layout(
             Arrow(
               end=VeeHead(size=6),
-              x_start="testsma07_start",
-              y_start="casema07_start",
-              x_end="tests_ma07",
-              y_end="case_ma07",
+              x_start=fdxs,
+              y_start=fdys,
+              x_end=fdxv,
+              y_end=fdyv,
               line_color='blue',
               source=srcCont_i.src
               #view=view1 # srcCont_i.src
