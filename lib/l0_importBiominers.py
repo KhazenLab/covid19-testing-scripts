@@ -176,11 +176,6 @@ def postprocess_table(country_name, df_single):
     df_single["total_cumul"] = df_single["total_cumul_persons"]
     return df_single
 
-  if country_name=="Denmark – Faroe Islands":
-    df_single=df_single.sort_values("Date")
-    df_single["total_cumul"] = df_single["dailyTests"].cumsum()
-    return df_single
-
   if country_name=="United Kingdom – Channel Islands":
     df_single["total_cumul"] = df_single[["total_cumul_guernsey", "total_negative_jersey","total_positive_jersey"]].apply(sum, axis=1)
     return df_single
