@@ -20,28 +20,41 @@ from bokeh.transform import factor_cmap
 
 
 def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
-  mask = (dataset['Date'] > max(dataset['Date'])- pd.DateOffset(nbDays+1)) & (dataset['Date'] <= max(dataset['Date'] - pd.DateOffset(nbDaysEnd)))
+  df_lastHist=dataset
   countries=  dataset["CountryProv"].unique()
-  df_lastHist=dataset[mask]
+  
   arr_country=[]
   arr_slopeCases=[]
   arr_slopePvalCases=[]
   arr_slopeTests=[]
   arr_slopePvalTests=[]
+  arr_weeklyTestsPerc=[]
+  arr_weeklyCasesPerc=[]
+  countTests=0
+  countSpikes=0
   for country in countries:
     df_countryData= df_lastHist[df_lastHist["CountryProv"]==country]
-    population= int(df_pop.loc[df_pop["CountryProv"]==country,"Population"])
-    dailyPositives= df_countryData["ConfirmedCases"].diff().rolling(rollingAvg, min_periods=1).mean().dropna()
-    dailyTests= df_countryData["tests_cumulNoSpike"].diff().rolling(rollingAvg, min_periods=1).mean().dropna()
+    dailyPositives= df_countryData["ConfirmedCases"]
+    dailyTests= df_countryData["tests_cumulNoSpike"]
+    dailyPositives= dailyPositives.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
+    dailyTests= dailyTests.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
+    
+    if(len(dailyTests)<=1 | len(dailyPositives)<=1):
+      continue
+    if((dailyPositives.sum()==0) | (dailyTests.sum()==0) ):
+      continue 
+    
     if(len(dailyTests)>1):
-      slopeTests, interceptTests, r_valueTests, p_valueTests, std_errTests = stats.linregress(dailyTests.index-dailyTests.index[0],dailyTests/population) 
+      slopeTests, interceptTests, r_valueTests, p_valueTests, std_errTests = stats.linregress(dailyTests.index-dailyTests.index[0],dailyTests)
 
     else:
       slopeTests=np.nan
       p_valueTests=np.nan
     
-    slopeCases, interceptCases, r_valueCases, p_valueCases, std_errCases = stats.linregress(dailyPositives.index-dailyPositives.index[0],dailyPositives/population)
-   
+    slopeCases, interceptCases, r_valueCases, p_valueCases, std_errCases = stats.linregress(dailyPositives.index-dailyPositives.index[0],dailyPositives)
+
+    arr_weeklyCasesPerc.append(100*(dailyPositives.iloc[-1]-dailyPositives.iloc[0])/(dailyPositives.iloc[-1]))
+    arr_weeklyTestsPerc.append(100*(dailyTests.iloc[-1]-dailyTests.iloc[0])/(dailyTests.iloc[-1]))
     arr_country.append(country)
     arr_slopeCases.append(slopeCases)
     arr_slopePvalCases.append(p_valueCases)
@@ -50,7 +63,7 @@ def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
 
   arr_slopePvalCases=multipletests(arr_slopePvalCases, method='bonferroni')[1]
   arr_slopePvalTests=multipletests(arr_slopePvalTests, method='bonferroni')[1]
-  df_countryAvg=pd.DataFrame({"CountryProv":arr_country,"casesSlope":arr_slopeCases,"casesSlopePval":arr_slopePvalCases,"testsSlope":arr_slopeTests,"testsSlopePval":arr_slopePvalTests})
+  df_countryAvg=pd.DataFrame({"CountryProv":arr_country,"casesSlope":arr_slopeCases,"casesSlopePval":arr_slopePvalCases,"testsSlope":arr_slopeTests,"testsSlopePval":arr_slopePvalTests,'testsWeeklyPerc':arr_weeklyTestsPerc,'casesWeeklyPerc':arr_weeklyCasesPerc})
   return df_countryAvg
 
     
@@ -94,7 +107,7 @@ def read_csv(dir_gitrepo):
 
 
 def figures_slopes(df_slopes,df_pop):
-  nbStart=14
+  nbStart=7
   nbEnd=0
   rolling=7
   df_countrySlopes=determineSlope(df_slopes,df_pop, nbStart, nbEnd, rolling)
@@ -111,17 +124,17 @@ def figures_slopes(df_slopes,df_pop):
   
   
   TOOLTIPS = [
-      ("Cases Slope","@casesSlope"),
-      ("Tests Slope","@testsSlope"),
-      ("Country/Region", "@CountryProv"),
+        ("Country/Region", "@CountryProv"),
+        ("Cases Rate (%)","@casesWeeklyPerc"),
+        ("Tests Rate (%)","@testsWeeklyPerc"),
   ]
   
                          
-  p1=figure(tooltips=TOOLTIPS,tools=",pan,tap,box_zoom,reset",title="Generated from T-"+str(nbStart)+" to T-"+str(nbEnd)+" on the basis of "+str(rolling)+" day moving average")
-  r1=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='#73b2ff',legend_label='Tests Slope > Cases Slope',view=view1)
-  r2=p1.scatter('casesSlope','testsSlope',source=df_countrySlopes, size=12,color='#ff7f7f',legend_label='Tests Slope < Cases Slope',view=view2)
-  p1.xaxis.axis_label = 'Daily (Cases/Population) Slope'
-  p1.yaxis.axis_label =  'Daily (Tests/Population) Slope'
+  p1=figure(tooltips=TOOLTIPS,tools=",pan,tap,box_zoom,reset",title="Generated on the basis of "+str(rolling)+" day moving average")
+  r1=p1.scatter('casesWeeklyPerc','testsWeeklyPerc',source=df_countrySlopes, size=12,color='#73b2ff',legend_label='Tests Rate > Cases Rate',view=view1)
+  r2=p1.scatter('casesWeeklyPerc','testsWeeklyPerc',source=df_countrySlopes, size=12,color='#ff7f7f',legend_label='Tests Rate < Cases Rate',view=view2)
+  p1.xaxis.axis_label = 'Weekly Rate of Change for Positive Cases(%)'
+  p1.yaxis.axis_label =  'Weekly Rate of Change for Nb. Tests(%)'
 
   
   
