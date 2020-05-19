@@ -314,7 +314,7 @@ class SlopesChisquaredDashboardSimple:
         source_chisq.change.emit();
         """
       )
-    from bokeh.models import Select, Div
+    from bokeh.models import Select, Div, Paragraph
     select = Select(title="Country/State:", value=init_group, options=sorted(list(self.df_chisq.CountryProv.unique())), width=200)
     select.js_on_change('value', callback)
     
@@ -332,8 +332,9 @@ class SlopesChisquaredDashboardSimple:
     
     fn_css=("t11d-layout.css")
     header = Div(text="<link rel='stylesheet' type='text/css' href='"+fn_css+"'>")
+    desc = Paragraph(style={ 'color': 'whitesmoke'},text="Scatterplot shows the rate of change in daily number of tests and daily positive cases in the last week.\nThe cases minus thresholds graph indicates the change in the last 7 days vs the last 14 days. Negative values indicate lower numbers of cases while positive values indicate higher numbers of cases.")
     # create layout of everything
-    column1=column([row(select),row(fig_slopes,sizing_mode="stretch_both")],sizing_mode="stretch_width")
+    column1=column([row(select),row(fig_slopes,sizing_mode="stretch_both"),desc],sizing_mode="stretch_width")
     column2=column([fig_chisq1,fig_chisq2],sizing_mode = 'stretch_both')
     rowMain= row([header,column1,column2],sizing_mode = 'stretch_height')
     
