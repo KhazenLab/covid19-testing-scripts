@@ -74,6 +74,8 @@ def figures_chisq_simple(init_group, df_chisq):
     p_b1.yaxis.axis_label =  'Positive Cases'
     p_b2.xaxis.axis_label = 'Date'
     p_b2.yaxis.axis_label =  'Detrended Number of Cases'
+
+    p_b2.x_range = p_b1.x_range
     
     p_b1.add_tools(HoverTool(tooltips=p_b1_tooltip,formatters=p_formatters))
     p_b2.add_tools(HoverTool(tooltips=p_b2_tooltip,formatters=p_formatters))
