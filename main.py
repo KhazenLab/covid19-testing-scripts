@@ -149,11 +149,18 @@ def l4_plots(dir_gitrepo, dir_plot_destination):
   f5.create_layout()
   f5.to_html(dir_plot_destination)
 
+  #----------
+
   f3d = SlopesChisquaredDashboardDetailed()
   f3d.read_csv(dir_gitrepo)
+
+  from os.path import join
   print("Saving l4/chisquared-postprocessed.csv")
   f3d.df_chisq.to_csv(join(dir_gitrepo, "l4-analysis", "chisquared-postprocessed.csv"), index=False)
+
   f3d.to_html(dir_plot_destination)
+
+  #----------
 
   f3s = SlopesChisquaredDashboardSimple()
   f3s.read_csv(dir_gitrepo)
