@@ -60,7 +60,7 @@ def figures_chisq_simple(init_group, df_chisq):
     
     # FIXME couldnt do p_a1.line below, so using hack of varea
     p_b1 = figure(title="Confirmed cases", **plot_size_and_tools)
-    c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1, legend_label="Range of expected values based on past 14 days")
+    c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1, legend_label="Range of 14-day expectation")
     c_b1a = p_b1.circle(x='Date', y='case_ma07', source=source, color='red', view=view1, legend_label="7-day average")
 
     p_b2 = figure(title="Detrended Cases (7-day Moving Average of cases minus their expected value)",**plot_size_and_tools)
