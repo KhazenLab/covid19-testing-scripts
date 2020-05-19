@@ -115,7 +115,7 @@ def figures_slopes(df_slopes,df_pop):
   #df_countrySlopes=df_countrySlopes[df_countrySlopes.casesSlopePval<0.05]
   #df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
   df_countrySlopes["temp"]="0"
-  df_countrySlopes.loc[df_countrySlopes.testsSlope>=df_countrySlopes.casesSlope, ['temp']] = "1"
+  df_countrySlopes.loc[df_countrySlopes.testsWeeklyPerc>=df_countrySlopes.casesWeeklyPerc, ['temp']] = "1"
   df_countrySlopes=ColumnDataSource(data=df_countrySlopes.copy().dropna())
   gf = GroupFilter(column_name='temp', group="1")
   view1 = CDSView(source=df_countrySlopes, filters=[gf])
