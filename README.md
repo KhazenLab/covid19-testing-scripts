@@ -84,9 +84,21 @@ After running step 3, we currently need to open all the `ArcGIS/v2/*csv` files m
 Casting the corresponding dataframe column to int doesnt work because it contains NAs, which cannot coexist in int column in pandas
 
 
-Step 4: generate plots
+Step 4a: Notebook t11d: R, chisquared thresholds.
+
+- input: `l2/interpolated.csv`
+- outputs:
+  - `l4/t11d-chisquared-history-v20200512.csv`
+  - deprecated: `l2/t11d-chisquared-ranks.csv`
+
+
+Step 4b: perform analysis and generate plots
+
+- input: `l4/t11d-chisquared-history-v20200512.csv`
+- output: `l4/chisquared-postprocessed.csv` and other l4 html files
 
 ```
+
 python3 main.py l4-plots \
   ~/Development/gitlab.com/biominers/covid19-testing-data/ \
   www/
