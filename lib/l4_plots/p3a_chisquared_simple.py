@@ -59,11 +59,11 @@ def figures_chisq_simple(init_group, df_chisq):
                            'x_axis_type': 'datetime'}
     
     # FIXME couldnt do p_a1.line below, so using hack of varea
-    p_b1 = figure(title="Confirmed and Thresholds (7 vs 14-day Sum)", **plot_size_and_tools)
-    c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1)
-    c_b1a = p_b1.circle(x='Date', y='case_mvsum07', source=source, color='red', view=view1)
+    p_b1 = figure(title="Confirmed cases", **plot_size_and_tools)
+    c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1, legend_label="Range of expected values based on past 14 days")
+    c_b1a = p_b1.circle(x='Date', y='case_ma07', source=source, color='red', view=view1, legend_label="7-day average")
 
-    p_b2 = figure(title="Detrended Cases (7-day Moving Average, Cases Minus Thresholds)",**plot_size_and_tools)
+    p_b2 = figure(title="Detrended Cases (7-day Moving Average of cases minus their expected value)",**plot_size_and_tools)
     c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#73b2ff',legend_label="Above Threshold", view=t2_view)
     c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#ff7f7f',legend_label="Below Threshold", view=t1_view)
     editplotcolors(p_b1)
@@ -76,17 +76,12 @@ def figures_chisq_simple(init_group, df_chisq):
     p_b1.add_tools(HoverTool(tooltips=p_b1_tooltip,formatters=p_formatters))
     p_b2.add_tools(HoverTool(tooltips=p_b2_tooltip,formatters=p_formatters))
     
-    legend = Legend(items=[
-    LegendItem(label="Thresholds for consistence with 14-day sum", renderers=[c_b1b]),
-    LegendItem(label="7-day sum of cases", renderers=[c_b1a]),
-    ])
-    legend.background_fill_alpha=0.8
-    legend.background_fill_color="#262626"
-    legend.border_line_alpha=0
-    legend.label_text_color="whitesmoke"
-    p_b1.add_layout(legend)
     p_b1.legend.location = 'top_left'
-    
+    p_b1.legend.background_fill_alpha=0.8
+    p_b1.legend.background_fill_color="#262626"
+    p_b1.legend.border_line_alpha=0
+    p_b1.legend.label_text_color="whitesmoke"
+   
    
     p_b2.legend.background_fill_alpha=0.8
     p_b2.legend.background_fill_color="#262626"
