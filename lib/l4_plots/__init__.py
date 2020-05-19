@@ -232,6 +232,7 @@ class SlopesChisquaredDashboardDetailed:
     from .p3b_chisquared_detailed import postprocess as postprocess_chisq
     self.df_chisq = read_csv_chisq(dir_gitrepo)
     self.df_chisq = postprocess_chisq(self.df_chisq, dir_gitrepo)
+    self.df_chisq.to_csv(join(dir_gitrepo, "l4-analysis", "chisquared-postprocessed.csv"), index=False)
 
 
   def to_html(self, dir_plot_destination):
@@ -331,9 +332,10 @@ class SlopesChisquaredDashboardSimple:
     
     fn_css=("t11d-layout.css")
     header = Div(text="<link rel='stylesheet' type='text/css' href='"+fn_css+"'>")
-    desc = Div(style={ 'color': 'whitesmoke'},text="Scatterplot shows the rate of change in daily number of tests and daily positive cases in the last week.\nThe cases minus thresholds graph indicates the change in the last 7 days vs the last 14 days. Negative values indicate lower numbers of cases while positive values indicate higher numbers of cases.")
+    desc = Div(height_policy="min",sizing_mode="stretch_width",style={ 'color': 'whitesmoke'},text="<p><b>Plots Descrition </b><br/> The scatterplot shows the rate of change in daily number of tests and daily positive cases in the last week. <br/>The excess cases are calculated from the 7-day average of actual cases minus expected values based on previous 14 days. Negative values indicate that actual cases are lower than expected, while positive values indicate that actual cases are more than expected.</p>")
+    
     # create layout of everything
-    column1=column([row(select),row([fig_slopes],sizing_mode="stretch_both"),desc],sizing_mode="stretch_width")
+    column1=column([row(select),row([fig_slopes],sizing_mode="stretch_both")],sizing_mode="stretch_width")
     column2=column([fig_chisq1,fig_chisq2],sizing_mode = 'stretch_both')
     rowMain= row([header,column1,column2],sizing_mode = 'stretch_height')
     

@@ -63,9 +63,7 @@ def figures_chisq_simple(init_group, df_chisq):
     c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1, legend_label="Range of 14-day expectation")
     c_b1a = p_b1.circle(x='Date', y='case_ma07', source=source, color='red', view=view1, legend_label="7-day average")
 
-    p_b2 = figure(title="Detrended Cases (7-day Moving Average of cases minus their expected value)",**plot_size_and_tools)
-    p_b2 = figure(title="7-day Moving Average Cases Minus Thresholds",**plot_size_and_tools)
-
+    p_b2 = figure(title="7-day moving average cases minus thresholds  ->   Excess cases",**plot_size_and_tools)
     c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#73b2ff',legend_label="Above Threshold", view=t2_view)
     c_b2a = p_b2.scatter(x='Date', y='case_detrended', source=source,color='#ff7f7f',legend_label="Below Threshold", view=t1_view)
     editplotcolors(p_b1)
