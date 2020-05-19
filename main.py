@@ -151,6 +151,7 @@ def l4_plots(dir_gitrepo, dir_plot_destination):
 
   f3d = SlopesChisquaredDashboardDetailed()
   f3d.read_csv(dir_gitrepo)
+  f3d.df_chisq.to_csv(join(dir_gitrepo, "l4-analysis", "chisquared-postprocessed.csv"), index=False)
   f3d.to_html(dir_plot_destination)
 
   f3s = SlopesChisquaredDashboardSimple()

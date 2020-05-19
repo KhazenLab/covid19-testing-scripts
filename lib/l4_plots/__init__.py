@@ -232,7 +232,6 @@ class SlopesChisquaredDashboardDetailed:
     from .p3b_chisquared_detailed import postprocess as postprocess_chisq
     self.df_chisq = read_csv_chisq(dir_gitrepo)
     self.df_chisq = postprocess_chisq(self.df_chisq, dir_gitrepo)
-    self.df_chisq.to_csv(join(dir_gitrepo, "l4-analysis", "chisquared-postprocessed.csv"), index=False)
 
 
   def to_html(self, dir_plot_destination):
