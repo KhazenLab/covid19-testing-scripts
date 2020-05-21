@@ -10,10 +10,12 @@ def figure_scatter_values(df_chisq):
     df_chisq["casema07_diff07"] = df_chisq.case_ma07.diff(periods=1)
     df_chisq["testsma07_diff07"] = df_chisq.tests_ma07.diff(periods=1)
     df_chisq["casedet_diff07"] = df_chisq.case_detrended.diff(periods=1)
+    df_chisq["casedetpct_diff07"] = df_chisq.caseDet_pct.diff(periods=1)
     df_chisq["angle"] = df_chisq.testsma07_diff07 / df_chisq.casema07_diff07 * 3.14
     df_chisq["casema07_start"] = df_chisq.case_ma07 - df_chisq.casema07_diff07
     df_chisq["testsma07_start"] = df_chisq.tests_ma07 - df_chisq.testsma07_diff07
     df_chisq["casedet_start"] = df_chisq.case_detrended - df_chisq.casedet_diff07
+    df_chisq["casedetpct_start"] = df_chisq.caseDet_pct - df_chisq.case_detpct_diff07
     df_chisq["dt_str"] = df_chisq.Date.dt.strftime("%Y-%m-%d")
 
     # FIXME
@@ -74,8 +76,9 @@ def figure_scatter_values(df_chisq):
     # first set for case vs tests, then second set for case diff vs test diff
     params = (
       #('values', 'tests_ma07', 'case_ma07', 'testsma07_start',  'casema07_start', 'ma07(Tests)', 'ma07(Cases)'),
-      ('values', 'case_detrended', 'case_ma07', 'casedet_start',  'casema07_start', 'detrended(cases)', 'ma07(Cases)'),
       #('diffs', 'casema07_diff07', 'testsma07_diff07', 'diff07(ma07(Cases))', 'diff07(ma07(Tests))'),
+      ('values', 'case_detrended', 'case_ma07', 'casedet_start',  'casema07_start', 'detrended(cases)', 'ma07(Cases)'),
+      #('values', 'caseDet_pct', 'case_ma07', 'casedetpct_start',  'casema07_start', 'detrended(ma07(cases))/cases*100', 'ma07(Cases)'),
     )
     p_all = {'values': [], 'diffs': []}
     from bokeh.models import Arrow, NormalHead, OpenHead, VeeHead

@@ -49,6 +49,7 @@ def postprocess(df, dir_gitrepo):
     df["thres_mid"] = (df.threshold_min + df.threshold_max)/2
     df["case_detrended"] = df.case_ma07 - df.thres_mid
     df["caseDet_eps"] = df.case_detrended*1.05
+    df["caseDet_pct"] = df.case_detrended / df.case_ma07 * 100
 
     df["case_mvsd07"] = df.groupby("CountryProv").daily_conf.apply(lambda g: g.rolling(window=7).std())
     df["tests_mvsd07"] = df.groupby("CountryProv").daily_tests.apply(lambda g: g.rolling(window=7).std())
@@ -214,20 +215,18 @@ def figures_chisq_detailed(init_group, df_chisq):
     p_a2.circle(x='Date', y='daily_tests', source=source_hist, color='black', view=view1)
     p_a2.x_range = p_a1.x_range # lock in the x axis so that zoom works simultaneously on all
 
-    #p_b1 = figure(title="canceled: Confirmed and thresholds (7-day sum cases vs 14-day thresholds. Below threshold: good, above: bad, within: ok)", **plot_size_and_tools)
-    #p_b1.varea(x='Date', y1='case_mvsum07_lower', y2='case_mvsum07_upper', source=source_hist, color='pink', view=view1)
-    #p_b1.varea(x='Date', y1='case_mvsum07', y2='case_mvsum07_eps', source=source_hist, color='red', view=view1)
-    #p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source_hist, color='grey', view=view1)
-    #p_b1.circle(x='Date', y='case_mvsum07', source=source_hist, color='red', view=view1, size=1)
+    p_b1 = figure(title="Detrended cases. Negative: good, positive: bad", **plot_size_and_tools)
+    p_b1.varea(x='Date', y1='thresMinMinusMid', y2='thresMaxMinusMid', source=source_hist, color='green', view=view1, legend_label="thresholds band", fill_alpha=0.7)
+    p_b1.varea(x='Date', y1='caseMa07Lower_minusMid', y2='caseMa07Upper_minusMid', source=source_hist, color='pink', view=view1, legend_label="cases ma7 - threshold mid +/- std", fill_alpha=0.7)
+    p_b1.varea(x='Date', y1='case_detrended', y2='caseDet_eps', source=source_hist, color='red', view=view1, legend_label="cases detrended")
+    p_b1.circle(x='Date', y='case_detrended', source=source_hist, color='red', view=view1)
+    p_b1.x_range = p_a1.x_range
+    p_b1.legend.label_text_font_size = '6pt'
+    p_b1.legend.location = "top_left"
 
-    p_b2 = figure(title="Detrended cases. Negative: good, positive: bad", **plot_size_and_tools)
-    p_b2.varea(x='Date', y1='thresMinMinusMid', y2='thresMaxMinusMid', source=source_hist, color='green', view=view1, legend_label="thresholds band", fill_alpha=0.7)
-    p_b2.varea(x='Date', y1='caseMa07Lower_minusMid', y2='caseMa07Upper_minusMid', source=source_hist, color='pink', view=view1, legend_label="cases ma7 - threshold mid +/- std", fill_alpha=0.7)
-    p_b2.varea(x='Date', y1='case_detrended', y2='caseDet_eps', source=source_hist, color='red', view=view1, legend_label="cases detrended")
-    p_b2.circle(x='Date', y='case_detrended', source=source_hist, color='red', view=view1)
+    p_b2 = figure(title="Detrended cases percentage of raw cases", **plot_size_and_tools)
+    p_b2.circle(x='Date', y='caseDet_pct', source=source_hist, color='red', view=view1)
     p_b2.x_range = p_a1.x_range
-    p_b2.legend.label_text_font_size = '6pt'
-    p_b2.legend.location = "top_left"
 
     p_c1 = figure(title="Ratio case/total (daily)", **plot_size_and_tools)
     c_c1a = p_c1.circle(x='Date', y='ratio_daily', source=source_hist, color='blue', view=view1)
@@ -267,8 +266,7 @@ def figures_chisq_detailed(init_group, df_chisq):
     p_cont = list(zip_longest(*(iter(p_cont),) * 3))
     p_cont = [[e for e in t if e != None] for t in p_cont]
 
-    # p_b1, 
-    g = gridplot([[p_a1, p_a2], [p_b2], [p_c1, p_c2]] + p_cont)
+    g = gridplot([[p_a1, p_a2], [p_b1, p_b2], [p_c1, p_c2]] + p_cont)
 
     return source_hist, c_a1a, g
 
