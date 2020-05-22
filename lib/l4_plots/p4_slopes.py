@@ -38,7 +38,6 @@ def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
     dailyTests= df_countryData["tests_cumulNoSpike"]
     dailyPositives= dailyPositives.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
     dailyTests= dailyTests.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
-    
     if(len(dailyTests)<=1 | len(dailyPositives)<=1):
       continue
     if((dailyPositives.sum()==0) | (dailyTests.sum()==0) ):
@@ -53,8 +52,8 @@ def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
     
     slopeCases, interceptCases, r_valueCases, p_valueCases, std_errCases = stats.linregress(dailyPositives.index-dailyPositives.index[0],dailyPositives)
 
-    arr_weeklyCasesPerc.append(100*(dailyPositives.iloc[-1]-dailyPositives.iloc[0])/(dailyPositives.iloc[-1]))
-    arr_weeklyTestsPerc.append(100*(dailyTests.iloc[-1]-dailyTests.iloc[0])/(dailyTests.iloc[-1]))
+    arr_weeklyCasesPerc.append(100*(dailyPositives.iloc[-1]-dailyPositives.iloc[0])/(dailyPositives.iloc[0]))
+    arr_weeklyTestsPerc.append(100*(dailyTests.iloc[-1]-dailyTests.iloc[0])/(dailyTests.iloc[0]))
     arr_country.append(country)
     arr_slopeCases.append(slopeCases)
     arr_slopePvalCases.append(p_valueCases)
@@ -111,12 +110,14 @@ def figures_slopes(df_slopes,df_pop):
   nbEnd=0
   rolling=7
   df_countrySlopes=determineSlope(df_slopes,df_pop, nbStart, nbEnd, rolling)
+  df_countrySlopes=df_countrySlopes.replace([np.inf, -np.inf], np.nan)
   df_countrySlopes=df_countrySlopes.dropna()
   #df_countrySlopes=df_countrySlopes[df_countrySlopes.casesSlopePval<0.05]
   #df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
   df_countrySlopes["temp"]="0"
   df_countrySlopes.loc[df_countrySlopes.testsWeeklyPerc>=df_countrySlopes.casesWeeklyPerc, ['temp']] = "1"
-  df_countrySlopes=ColumnDataSource(data=df_countrySlopes.copy().dropna())
+  df_countrySlopes = ColumnDataSource(df_countrySlopes)
+    
   gf = GroupFilter(column_name='temp', group="1")
   view1 = CDSView(source=df_countrySlopes, filters=[gf])
   gf = GroupFilter(column_name='temp', group="0")
