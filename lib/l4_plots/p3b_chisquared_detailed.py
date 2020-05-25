@@ -138,16 +138,16 @@ def postprocess(df, dir_gitrepo):
 
     # add aggregated data for globe
     df_world = df_ffill.groupby("Date").sum().reset_index()
-    df_world["CountryProv"] = "0 - World"
-    df_world["Country"] = "0 - World"
+    df_world["CountryProv"] = "- World"
+    df_world["Country"] = "- World"
     df_world["region"] = "Aggregates"
     df_world["cp_code"] = "World"
     df_world["Continent"] = "Agg/World" # used in p5 for each plot
 
     # add aggregated data per region
     df_reg = df_ffill.sort_values(["Continent", "Date"]).groupby(["Continent","Date"]).sum().reset_index() # apply(sum(g)) is slow. apply(g.sum()) requires reset_index(drop=True)
-    df_reg["CountryProv"] = "0 - " + df_reg["Continent"]
-    df_reg["Country"] = "0 - " + df_reg["Continent"]
+    df_reg["CountryProv"] = "- " + df_reg["Continent"]
+    df_reg["Country"] = "- " + df_reg["Continent"]
     df_reg["region"] = "Aggregates"
     df_reg["cp_code"] = df_reg["Continent"]
     df_reg["Continent"] = "Aggregates"

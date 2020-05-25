@@ -237,7 +237,7 @@ class SlopesChisquaredDashboardDetailed:
 
   def to_html(self, dir_plot_destination):
     from .p3b_chisquared_detailed import figures_chisq_detailed
-    init_group = '0 - World' # 'Lebanon'
+    init_group = '- World' # 'Lebanon'
     source_chisq, c_a1a, grid_chisq = figures_chisq_detailed(init_group, self.df_chisq)
 
     fn_dest = join(dir_plot_destination, "t11d-chisquared_dashboard-detailed.html")
@@ -285,7 +285,7 @@ class SlopesChisquaredDashboardSimple:
 
   def to_html(self, dir_plot_destination):
     from .p3a_chisquared_simple import figures_chisq_simple
-    init_group = '0 - World' # 'Lebanon'
+    init_group = '- World' # 'Lebanon'
     source_chisq, c_b1b, fig_chisq1,fig_chisq2 = figures_chisq_simple(init_group, self.df_chisq)
 
     from .p4_slopes import figures_slopes
