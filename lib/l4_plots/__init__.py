@@ -326,7 +326,6 @@ class SlopesChisquaredDashboardSimple:
       select.value=source_slopes.data['CountryProv'][selectedIndex[0]];
     
     """)
-
     taptool = fig_slopes.select(type=TapTool)
     source_slopes.selected.js_on_change('indices', callback2)
     
@@ -339,7 +338,7 @@ class SlopesChisquaredDashboardSimple:
     column2=column([fig_chisq1,fig_chisq2],sizing_mode = 'stretch_both')
     rowMain= row([header,column1,column2],sizing_mode = 'stretch_height')
     
-    layout = rowMain
+    layout = column([rowMain,Div(style={ 'color': 'whitesmoke'},text="Last Updated on "+str(pd.to_datetime(source_chisq.data['Date']).max()).split(" ")[0])],sizing_mode='stretch_width')
     #layout = row(header,select,fig_slopes,column(  fig_chisq1,fig_chisq2))
     save(layout)
     print(f"Saved to {fn_dest}")
