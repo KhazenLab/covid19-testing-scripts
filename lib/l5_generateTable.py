@@ -5,7 +5,8 @@ import pandas as pd
 import numpy as np
 from bokeh.io import show, output_notebook
 from bokeh.plotting import  ColumnDataSource, output_file
-from bokeh.models.widgets import  DataTable, DateFormatter, TableColumn
+from bokeh.models.widgets import  DataTable, NumberFormatter, TableColumn,Div
+from bokeh.layouts import column
 
 class L5GenerateTable:
     """
@@ -27,17 +28,17 @@ class L5GenerateTable:
     def to_html(self, dir_plot_destination):
         fn_dest = join(dir_plot_destination, "t11c-country_latest_table.html")
         output_file(fn_dest)
-        
+        self.df_latest=self.df_latest.fillna(-1)
         source = ColumnDataSource(self.df_latest)
         columns = [
         TableColumn(field="Country/State", title="Country/State"),
-        TableColumn(field="Cumulative ConfirmedCases", title="Cumulative ConfirmedCases"),
-        TableColumn(field="Cumulative Fatalities", title="Cumulative Fatalities"),
-        TableColumn(field="Cumulative Total Tests", title="Cumulative Total Tests"),
-        TableColumn(field="Cumulative Negative Cases", title="Cumulative Negative Cases"),
-        TableColumn(field="Cumulative Tests per Million", title="Cumulative Tests per Million"),
-        TableColumn(field="Cumulative Confirmed/Tests (%)", title="Cumulative Confirmed/Tests (%)"),
-        TableColumn(field="Population", title="Population")
+        TableColumn(field="Cumulative ConfirmedCases", title="Cumulative ConfirmedCases",formatter=NumberFormatter()),
+        TableColumn(field="Cumulative Fatalities", title="Cumulative Fatalities",formatter=NumberFormatter()),
+        TableColumn(field="Cumulative Total Tests", title="Cumulative Total Tests",formatter=NumberFormatter()),
+        TableColumn(field="Cumulative Negative Cases", title="Cumulative Negative Cases",formatter=NumberFormatter()),
+        TableColumn(field="Cumulative Tests per Million", title="Cumulative Tests per Million",formatter=NumberFormatter()),
+        TableColumn(field="Cumulative Confirmed/Tests (%)", title="Cumulative Confirmed/Tests (%)",formatter=NumberFormatter()),
+        TableColumn(field="Population", title="Population",formatter=NumberFormatter())
         ]
         data_table = DataTable(source=source, columns=columns,sizing_mode="stretch_both",index_position=None)
-        show(data_table)
+        show(column([data_table,Div(text="Cells with -1 represent missing values",style={'color':'whitesmoke'})],sizing_mode="stretch_width",background='rgb(70,70,70)'))
