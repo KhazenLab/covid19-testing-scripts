@@ -38,8 +38,12 @@ class L3GenerateArcData:
         indexfin=np.amax(np.where((tests.notna()))) + 1
         isUpdated = (indexfin==len(tests)) or (indexfin==(len(tests)-1))
     
+        import pdb
+        pdb.set_trace()
         # forward-fill the last NA for the sake of visualization
-        countryData.iloc[indexfin-1:, 'total_cumul.all'==countryData.columns] = tests.iloc[indexfin-1:].fillna(method="ffill")
+        dailyConfirmed=countryData["ConfirmedCases"].diff()
+        tests.iloc[indexfin-1:] = tests.iloc[indexfin-1:].fillna(method="ffill")
+        countryData.iloc[indexfin:, 'total_cumul.all'==countryData.columns] = tests.iloc[indexfin:]+dailyConfirmed[indexfin:]
         
         
         #countryData['total_cumul.all']=countryData['total_cumul.all'].interpolate()
