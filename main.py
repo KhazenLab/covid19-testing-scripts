@@ -7,6 +7,7 @@ from lib.l2_mergeTogether import L2MergeTogether
 from lib.l3_generateArcData import L3GenerateArcData
 from lib.l4_plots import L4Plots, PostprocessingDashboard, SlopesChisquaredDashboardDetailed, SlopesChisquaredDashboardSimple
 from lib.l4_plots.p5_global_scatter import GlobalScatterplots
+from lib.l5_generateTable import L5GenerateTable
 
 
 # Enable debug level messages
@@ -176,6 +177,17 @@ def l4_plots(dir_gitrepo, dir_plot_destination):
   factory.plot_line(dir_plot_destination)
   factory.plot_stacked(dir_plot_destination)
 
+
+@cli.command()
+@click.argument('dir_gitrepo')
+@click.argument('dir_plot_destination')
+def l5_generateTable(dir_gitrepo, dir_plot_destination):
+  
+  factory = L5GenerateTable()
+  factory.read_csv(dir_gitrepo)
+  factory.to_html(dir_plot_destination)
+  print("Saved html")
+  
 
 if __name__ == '__main__':
     cli()
