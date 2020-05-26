@@ -185,3 +185,18 @@ Procedure
 Data from notion table `Artificial biominers data` (Link: https://www.notion.so/Artificial-biominers-data-dabae264d80b4c8fb9f7751730c05632 )
 
 Check also the section `Data cleaning` (link: https://www.notion.so/Testing-Statistics-Data-Collection-c9ee53ecacfc4eee950fcc466b8dfb72#1ae3ae9a07d04bb891084702d1bbae9a )
+
+
+Step 5: generate latest country table
+
+- input: `/ArcGIS/v2/t11c-confirmedtotalTests-latestOnly.csv`
+- output: `www/t11c-country_latest_table.html`
+
+```
+
+python3 main.py l5-generatetable \
+  ~/Development/gitlab.com/biominers/covid19-testing-data/ \
+  www/
+```
+
+Upload plots to AWS S3 bucket as static html
