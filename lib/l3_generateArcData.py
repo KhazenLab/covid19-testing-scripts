@@ -38,8 +38,6 @@ class L3GenerateArcData:
         indexfin=np.amax(np.where((tests.notna()))) + 1
         isUpdated = (indexfin==len(tests)) or (indexfin==(len(tests)-1))
     
-        import pdb
-        pdb.set_trace()
         # forward-fill the last NA for the sake of visualization
         dailyConfirmed=countryData["ConfirmedCases"].diff()
         tests.iloc[indexfin-1:] = tests.iloc[indexfin-1:].fillna(method="ffill")
