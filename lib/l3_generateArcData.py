@@ -184,8 +184,9 @@ class L3GenerateArcData:
     
     historicalData["daily_tests_per_positive"]=np.round(dailyTests/dailyConfirmed,2);
     historicalData["tests_per_positive"]=np.round(historicalData["total_cumul.all"]/historicalData["ConfirmedCases"],2);
-    
-    historicalData= historicalData[["CountryProv","Date","total_cumul.all","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive","Interpolated"]]
+    historicalData["dailyTests"]=dailyTests;
+    historicalData["dailyPositives"]=dailyConfirmed;
+    historicalData= historicalData[["CountryProv","Date","total_cumul.all","dailyTests","ConfirmedCases","dailyPositives","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive","Interpolated"]]
     historicalData.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
 
   def write_chisquared(self):
