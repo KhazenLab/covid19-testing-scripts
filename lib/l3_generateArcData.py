@@ -40,8 +40,9 @@ class L3GenerateArcData:
     
         # forward-fill the last NA for the sake of visualization
         dailyConfirmed=countryData["ConfirmedCases"].diff()
+        cumConfirmed=dailyConfirmed[indexfin:].cumsum()
         tests.iloc[indexfin-1:] = tests.iloc[indexfin-1:].fillna(method="ffill")
-        countryData.iloc[indexfin:, 'total_cumul.all'==countryData.columns] = tests.iloc[indexfin:]+dailyConfirmed[indexfin:]
+        countryData.iloc[indexfin:, 'total_cumul.all'==countryData.columns] = tests.iloc[indexfin:]+cumConfirmed
         countryData.iloc[indexfin:, 'Interpolated'==countryData.columns]="Yes"
         
         #countryData['total_cumul.all']=countryData['total_cumul.all'].interpolate()
