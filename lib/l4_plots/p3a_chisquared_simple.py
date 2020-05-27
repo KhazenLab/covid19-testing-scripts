@@ -45,7 +45,7 @@ def figures_chisq_simple(init_group, df_chisq):
       ("Date","@Date{%F}"),
       ("Thresholds Min","@threshold_min_eps"),
       ("Thresholds Max", "@threshold_max_eps"),
-      ("Positive Cases", "@case_mvsum07"),
+      ("Positive Cases", "@case_ma07"),
     ]
     
     p_b2_tooltip = [
@@ -59,7 +59,7 @@ def figures_chisq_simple(init_group, df_chisq):
                            'x_axis_type': 'datetime'}
     
     # FIXME couldnt do p_a1.line below, so using hack of varea
-    p_b1 = figure(title="Confirmed cases", **plot_size_and_tools)
+    p_b1 = figure(title="Positive cases", **plot_size_and_tools)
     c_b1b = p_b1.varea(x='Date', y1='threshold_min_eps', y2='threshold_max_eps', source=source, color='grey', view=view1, legend_label="Range of 14-day expectation")
     c_b1a = p_b1.circle(x='Date', y='case_ma07', source=source, color='red', view=view1, legend_label="7-day average")
 

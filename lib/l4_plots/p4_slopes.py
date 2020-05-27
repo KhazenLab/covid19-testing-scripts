@@ -154,7 +154,7 @@ def figures_slopes(df_slopes,df_pop):
   p1.legend.background_fill_color="#262626"
   p1.legend.border_line_alpha=0
   p1.legend.label_text_color="whitesmoke"
-  p1.legend.location = 'bottom_right'
+  p1.legend.location = 'top_right'
   p1.toolbar_location="right"
   from bokeh.layouts import row, column, widgetbox
   return df_countrySlopes, p1
