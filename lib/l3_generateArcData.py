@@ -16,7 +16,7 @@ class L3GenerateArcData:
     historicalData['CountryProv']=historicalData['CountryProv'].str.replace("[*]","")
 
     historicalData['Updated']=""
-
+    historicalData['Interpolated']="No"
     self.historicalData = historicalData
 
 
@@ -42,13 +42,14 @@ class L3GenerateArcData:
         dailyConfirmed=countryData["ConfirmedCases"].diff()
         tests.iloc[indexfin-1:] = tests.iloc[indexfin-1:].fillna(method="ffill")
         countryData.iloc[indexfin:, 'total_cumul.all'==countryData.columns] = tests.iloc[indexfin:]+dailyConfirmed[indexfin:]
-        
+        countryData.iloc[indexfin:, 'Interpolated'==countryData.columns]="Yes"
         
         #countryData['total_cumul.all']=countryData['total_cumul.all'].interpolate()
         
         #interpolate using method7
         tests=countryData["total_cumul.all"].copy()
         tests2=countryData["total_cumul.all"].copy()
+        interpolated=countryData["Interpolated"].copy()
         confirmed=countryData["ConfirmedCases"].copy()
         indexMinNonNA= tests.iloc[(np.where((tests.notna())))[0]].index.min()
         indexNAafterFirstNb = tests.iloc[np.where((tests.isna() & (tests.index>indexMinNonNA)))[0]].index
@@ -66,11 +67,12 @@ class L3GenerateArcData:
                 raise Exception("This function is only for increasing cumulative vec_with_na, check country:"+country +", testNbAfter:"+str(tests[indexNbAfter])+", testNbBefore"+str(tests[indexNbBefore]))
               translateFirst=tests[indexNbBefore]-confirmed[indexNbBefore]
               scaleLast=(tests[indexNbAfter]-(confirmed[indexNbAfter]+translateFirst))/(confirmed[indexNbAfter]+translateFirst)
-            
+              interpolated[indexCurrent]="Yes"
               tests2[indexCurrent]=(confirmed[indexCurrent]+translateFirst)*(1+scaleLast*((indexCurrent-indexNbBefore)/(indexNbAfter-indexNbBefore)))
               tests2[indexCurrent]=np.floor(tests2[indexCurrent])
         
         countryData["total_cumul.all"].update(tests2)
+        countryData["Interpolated"].update(interpolated)
         countryData['Updated']="*" if isUpdated else ""
     
         historicalData.update(countryData)
@@ -90,7 +92,7 @@ class L3GenerateArcData:
     historicalData = self.historicalData
 
     indexLatest=np.where(historicalData.Date==max(historicalData.Date))
-    selectColumns=historicalData[['CountryProv','Lat','Long','ConfirmedCases','Fatalities','total_cumul.all','negative_cases','tests_per_mil','ratio_confirmed_total_pct','Population','Updated']]
+    selectColumns=historicalData[['CountryProv','Lat','Long','ConfirmedCases','Fatalities','total_cumul.all','negative_cases','tests_per_mil','ratio_confirmed_total_pct','Population','Updated','Interpolated']]
     
     latest=selectColumns.iloc[indexLatest]
     latest = latest.rename(columns={
@@ -107,7 +109,7 @@ class L3GenerateArcData:
     colorder = ["CountryProv", "Lat", "Long",
                 "Max - ConfirmedCases", "Max - Fatalities", "Max - total_cumul.all",
                 "Max - Population", "Max - tests_per_mil", "Max - ratio_confirmed_total_pct",
-                "Max - negative_cases", "Updated"]
+                "Max - negative_cases", "Updated","Interpolated"]
     latest = latest[colorder]
 
     #save latest to csv
@@ -182,7 +184,7 @@ class L3GenerateArcData:
     historicalData["daily_tests_per_positive"]=np.round(dailyTests/dailyConfirmed,2);
     historicalData["tests_per_positive"]=np.round(historicalData["total_cumul.all"]/historicalData["ConfirmedCases"],2);
     
-    historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive"]]
+    historicalData= historicalData[["CountryProv","Date","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive","Interpolated"]]
     historicalData.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
 
   def write_chisquared(self):

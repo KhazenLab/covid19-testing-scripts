@@ -30,6 +30,10 @@ def editplotcolors(p1):
 
 def figures_chisq_simple(init_group, df_chisq):
     
+    df_chisq["case_ma07"]=df_chisq["case_ma07"]/1000;
+    df_chisq["threshold_min_eps"]=df_chisq["threshold_min_eps"]/1000;
+    df_chisq["threshold_max_eps"]=df_chisq["threshold_max_eps"]/1000;
+
     source = ColumnDataSource(df_chisq)
     
     gf = GroupFilter(column_name='CountryProv', group=init_group)
@@ -69,7 +73,7 @@ def figures_chisq_simple(init_group, df_chisq):
     editplotcolors(p_b1)
     editplotcolors(p_b2)
     p_b1.xaxis.axis_label = 'Date'
-    p_b1.yaxis.axis_label =  'Positive Cases'
+    p_b1.yaxis.axis_label =  'Positive Cases (in thousands)'
     p_b2.xaxis.axis_label = 'Date'
     p_b2.yaxis.axis_label =  'Detrended Number of Cases'
 

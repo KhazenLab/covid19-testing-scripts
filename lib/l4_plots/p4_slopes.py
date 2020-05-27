@@ -76,7 +76,6 @@ def editplotcolors(p1):
   p1.xaxis.major_label_text_color=p1.yaxis.major_label_text_color="whitesmoke"
   p1.ygrid.grid_line_alpha = 0.3
   p1.xgrid.grid_line_alpha = 0.3
-  p1.xaxis.major_label_orientation=np.pi/4
   p1.title.text_color="whitesmoke"
 
 
