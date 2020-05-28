@@ -15,7 +15,7 @@ def figure_scatter_values(df_chisq):
     df_chisq["casema07_start"] = df_chisq.case_ma07 - df_chisq.casema07_diff07
     df_chisq["testsma07_start"] = df_chisq.tests_ma07 - df_chisq.testsma07_diff07
     df_chisq["casedet_start"] = df_chisq.case_detrended - df_chisq.casedet_diff07
-    df_chisq["casedetpct_start"] = df_chisq.caseDet_pct - df_chisq.case_detpct_diff07
+    df_chisq["casedetpct_start"] = df_chisq.caseDet_pct - df_chisq.casedetpct_diff07
     df_chisq["dt_str"] = df_chisq.Date.dt.strftime("%Y-%m-%d")
 
     # FIXME

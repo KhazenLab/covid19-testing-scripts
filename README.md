@@ -120,6 +120,22 @@ If the `--acl` doesn't work (it works as of 2020-05-12), then make the folder pu
 (https://github.com/aws/aws-cli/issues/1560)
 
 
+Step 5: generate latest country table
+
+- input: `/ArcGIS/v2/t11c-confirmedtotalTests-latestOnly.csv`
+- output: `www/t11c-country_latest_table.html`
+
+```
+
+python3 main.py l5-generatetable \
+  ~/Development/gitlab.com/biominers/covid19-testing-data/ \
+  www/
+```
+
+Upload html table to AWS S3 bucket as static html
+
+
+
 
 ## Shiny apps
 
@@ -188,20 +204,6 @@ Data from notion table `Artificial biominers data` (Link: https://www.notion.so/
 
 Check also the section `Data cleaning` (link: https://www.notion.so/Testing-Statistics-Data-Collection-c9ee53ecacfc4eee950fcc466b8dfb72#1ae3ae9a07d04bb891084702d1bbae9a )
 
-
-Step 5: generate latest country table
-
-- input: `/ArcGIS/v2/t11c-confirmedtotalTests-latestOnly.csv`
-- output: `www/t11c-country_latest_table.html`
-
-```
-
-python3 main.py l5-generatetable \
-  ~/Development/gitlab.com/biominers/covid19-testing-data/ \
-  www/
-```
-
-Upload plots to AWS S3 bucket as static html
 
 
 ## Troubleshooting
