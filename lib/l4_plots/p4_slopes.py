@@ -30,12 +30,10 @@ def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
   arr_slopePvalTests=[]
   arr_weeklyTestsPerc=[]
   arr_weeklyCasesPerc=[]
-  countTests=0
-  countSpikes=0
   for country in countries:
     df_countryData= df_lastHist[df_lastHist["CountryProv"]==country]
     dailyPositives= df_countryData["ConfirmedCases"]
-    dailyTests= df_countryData["tests_cumulNoSpike"]
+    dailyTests= df_countryData["total_cumul.all"]
     dailyPositives= dailyPositives.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
     dailyTests= dailyTests.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
     if(len(dailyTests)<=1 | len(dailyPositives)<=1):
@@ -90,16 +88,16 @@ def extend(tests_var):
 
 
 def read_csv(dir_gitrepo):
-  df_hist= pd.read_csv(join(dir_gitrepo, "l2-withConfirmed", "interpolated_by_transformation.csv"))
+  df_hist= pd.read_csv(join(dir_gitrepo, "ArcGIS/v2", "t11c-confirmedtotalTests-historical.csv"))
   df_pop= pd.read_csv(join(dir_gitrepo, "l0-notion_tables","t11c-country_metadata.csv"))
   df_hist["Date"]=pd.to_datetime(df_hist["Date"])
 
   
-  countries=df_hist["CountryProv"].unique()
-  for country in countries:
-    if df_hist.loc[df_hist["CountryProv"]==country,"tests_cumulNoSpike"].isnull().all():
-      continue
-    df_hist["tests_cumulNoSpike"].update(extend(df_hist.loc[df_hist["CountryProv"]==country,"tests_cumulNoSpike"]))
+  #countries=df_hist["CountryProv"].unique()
+  #for country in countries:
+  #  if df_hist.loc[df_hist["CountryProv"]==country,"tests_cumulNoSpike"].isnull().all():
+  #    continue
+  #  df_hist["tests_cumulNoSpike"].update(extend(df_hist.loc[df_hist["CountryProv"]==country,"tests_cumulNoSpike"]))
       
   return df_hist, df_pop
 

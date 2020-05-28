@@ -23,7 +23,8 @@ class L5GenerateTable:
                                     "Max - Population":"Population",
                                     "Max - tests_per_mil":"Cumulative Tests per Million",
                                     'Max - ratio_confirmed_total_pct':'Cumulative Confirmed/Tests (%)',
-                                    'Max - negative_cases':'Cumulative Negative Cases'})
+                                    'Max - negative_cases':'Cumulative Negative Cases',
+                                    'Interpolated':'Extended'})
         self.df_latest=df_latest
     def to_html(self, dir_plot_destination):
         fn_dest = join(dir_plot_destination, "t11c-country_latest_table.html")
@@ -38,7 +39,8 @@ class L5GenerateTable:
         TableColumn(field="Cumulative Negative Cases", title="Cumulative Negative Cases",formatter=NumberFormatter()),
         TableColumn(field="Cumulative Tests per Million", title="Cumulative Tests per Million",formatter=NumberFormatter()),
         TableColumn(field="Cumulative Confirmed/Tests (%)", title="Cumulative Confirmed/Tests (%)",formatter=NumberFormatter()),
-        TableColumn(field="Population", title="Population",formatter=NumberFormatter())
+        TableColumn(field="Population", title="Population",formatter=NumberFormatter()),
+        TableColumn(field="Extended",title=" Last Point Extended")
         ]
         data_table = DataTable(source=source, columns=columns,sizing_mode="stretch_both",index_position=None)
         show(column([data_table,Div(text="Cells with -1 represent missing values",style={'color':'whitesmoke'})],sizing_mode="stretch_width",background='rgb(70,70,70)'))
