@@ -126,16 +126,21 @@ class L2MergeTogether:
 
   def check_no_conf_dips(self):
     df = self.conf_train.copy()
-    df["diff_conf"] = df.groupby(["CountryProv","Province_State"])["ConfirmedCases"].diff()
+    df["diff_conf"] = df.groupby("CountryProv")["ConfirmedCases"].diff()
     df["is_neg"] = df.diff_conf < 0
     if not df.is_neg.any(): return
 
     print(df[df.is_neg].head(30))
     
     # add some context
-    # Update 2020-05-10: I think I have a bug somewhere about this because for is_neg on France/Reunion it shows context for France/Barthelemy
+    print("")
+    print("Update 2020-05-10: I think I have a bug somewhere about the below added context because for is_neg on France/Reunion it shows context for France/Barthelemy. Might want to use the next table instead")
     idx_ctx = add_context_to_bool_loc(df, "CountryProv", "is_neg", 6)
     print(df.iloc[idx_ctx].head(30))
+
+    print("")
+    print("Second implementation of adding context")
+    print(df[df.is_neg | df.is_neg.shift(1) | df.is_neg.shift(-1)])
 
     # display message and exit
     import click
