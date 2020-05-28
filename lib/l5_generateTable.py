@@ -14,7 +14,9 @@ class L5GenerateTable:
     """
     def read_csv(self, dir_gitrepo):
         csv_arc_latest = join(dir_gitrepo, "ArcGIS/v2", "t11c-confirmedtotalTests-latestOnly.csv")
+        csv_arc_historical = join(dir_gitrepo, "ArcGIS/v2", "t11c-confirmedtotalTests-historical.csv")
         df_latest = pd.read_csv(csv_arc_latest)
+        df_lastdate = pd.read_csv(csv_arc_historical)
         df_latest=df_latest.drop(['Lat', 'Long','Updated'], axis=1)
         df_latest=df_latest.rename(columns={"CountryProv": "Country/State", 
                                     "Max - ConfirmedCases":"Cumulative ConfirmedCases",
@@ -26,6 +28,7 @@ class L5GenerateTable:
                                     'Max - negative_cases':'Cumulative Negative Cases',
                                     'Interpolated':'Extended'})
         self.df_latest=df_latest
+        self.update_date=df_lastdate["Date"].max()
     def to_html(self, dir_plot_destination):
         fn_dest = join(dir_plot_destination, "t11c-country_latest_table.html")
         output_file(fn_dest)
@@ -43,4 +46,4 @@ class L5GenerateTable:
         TableColumn(field="Extended",title=" Last Point Extended")
         ]
         data_table = DataTable(source=source, columns=columns,sizing_mode="stretch_both",index_position=None)
-        show(column([data_table,Div(text="Cells with -1 represent missing values",style={'color':'whitesmoke'})],sizing_mode="stretch_width",background='rgb(70,70,70)'))
+        show(column([data_table,Div(text="<span>Last Updated on "+str(self.update_date)+"<br/>Cells with -1 represent missing values<span>",style={'color':'whitesmoke'})],sizing_mode="stretch_width",background='rgb(70,70,70)'))
