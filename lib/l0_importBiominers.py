@@ -141,16 +141,21 @@ def get_table(client, country_name):
     rows = page.collection.get_rows()
     df_all = []
     for i,r in enumerate(rows):
-      #print(f"row {i}")
       df_new = {}
       for c in colnames:
-        #print(f"column {c}")
-        v = getattr(r,c)
+        try:
+          v = getattr(r,c)
+        except Exception as e:
+          import click
+          click.secho(f"Error in country {country_name}, row {i}, column {c}", fg="red")
+          click.secho(str(e), fg="red")
+          import sys
+          sys.exit(1)
+
         if type(v)==NotionDate: v = v.start
         df_new[c] = v
 
       df_all.append(df_new)
-      #print(i, c, r[c])
 
     # actual dataframe
     df_all = pd.DataFrame(df_all)
@@ -260,7 +265,7 @@ class L0ImportBiominers:
     print("fetching all tables")
     df_global = []
     for country_name in sorted(list(notion_map.keys())):
-      #if country_name<"Liechtenstein": continue # FIXME
+      #if country_name<"Bulgaria": continue # FIXME
 
       print(f"Getting table for {country_name}")
       df_single = get_table(self.client, country_name)
