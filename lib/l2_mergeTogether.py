@@ -126,7 +126,7 @@ class L2MergeTogether:
 
   def check_no_conf_dips(self):
     df = self.conf_train.copy()
-    df["diff_conf"] = df.groupby("CountryProv")["ConfirmedCases"].diff()
+    df["diff_conf"] = df.groupby(["CountryProv","Province_State"])["ConfirmedCases"].diff()
     df["is_neg"] = df.diff_conf < 0
     if not df.is_neg.any(): return
 
