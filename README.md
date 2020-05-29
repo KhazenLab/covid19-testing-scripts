@@ -135,6 +135,14 @@ python3 main.py l5-generatetable \
 Upload html table to AWS S3 bucket as static html
 
 
+Step 6: Exporting to github
+
+We also mirror one file from this repository to github https://github.com/KhazenLab/covid19-data
+
+```
+cp ~/Development/gitlab.com/biominers/covid19-testing-data/l1b-altogether/multiple-aggregated_owid_wiki_worldometers_biominers-gitrepo.csv ~/Development/github.com/KhazenLab/covid19-data/covid19-testing-dataset.csv
+sed -i "s/biominers/lau/g" covid19-testing-dataset.csv
+```
 
 
 ## Shiny apps
@@ -144,6 +152,7 @@ The first shiny app was created for the comparison of different countries.
 It's committed in this repo at `shinyScripts/compareCountries/compareCountries.R`
 
 Follow instructions in the fil header there.
+
 
 
 ## Data cleaning
@@ -182,9 +191,9 @@ Then I needed to mark the row above the dupe with "d" since I need to delete the
 Finally I delete all the rows marked with "candel", drop the dupe column, and save to csv.
 
 
-## Part 2: daily tests less than daily confirmed
+### Part 2: daily tests less than daily confirmed
 
-### Part 2a: due to extended data
+#### Part 2a: due to extended data
 
 Saved in `l0/drop_tests_lessthan_confirmed.csv'
 
@@ -198,7 +207,7 @@ Procedure
 - drop everything that has empty in the context
 - drop unnecessary columns
 
-### Part 2b: due to linear interpolation mismatch with concave confirmed cases
+#### Part 2b: due to linear interpolation mismatch with concave confirmed cases
 
 Data from notion table `Artificial biominers data` (Link: https://www.notion.so/Artificial-biominers-data-dabae264d80b4c8fb9f7751730c05632 )
 
@@ -420,3 +429,6 @@ Eventhough the row marked as offending is the 05-25 one with 40k being a drop fr
 the cleaner solution in this case is to mark the 51k as skipped, that way only 05-23 and 05-24 are skipped,
 instead of having to skip 05-25, 05-26, 05-27, and possibly later dates.
 Note that we should also skip the 05-22 date, otherwise it is still offending wrt to 05-26.
+
+
+
