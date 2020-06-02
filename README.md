@@ -9,7 +9,7 @@ Scripts that process data from/into the git repo `covid19-testing-data`
 ```
 pip3 install pew
 pew new biominers_covid19
-pip3 install notion pandas Click requests_cache==0.5.2 seaborn==0.10.1 matplotlib==2.1.2 statsmodels==0.11.1
+pip3 install notion pandas Click requests_cache==0.5.2 seaborn==0.10.1 matplotlib==2.1.2 statsmodels==0.11.1 bokeh
 ```
 
 where `notion` is the "Unofficial Python API client for Notion.so" from https://github.com/jamalex/notion-py/
