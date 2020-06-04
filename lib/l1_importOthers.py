@@ -298,6 +298,7 @@ class L1ImportOthers:
     # Ghana - people tested, Ghana - samples tested, Thailand - people tested, Thailand - samples tested
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "India - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United States - inconsistent units (COVID Tracking Project)"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United States - units unclear"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Japan - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Singapore - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Italy - people tested"]
