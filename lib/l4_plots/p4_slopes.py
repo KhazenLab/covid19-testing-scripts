@@ -34,6 +34,11 @@ def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
     df_countryData= df_lastHist[df_lastHist["CountryProv"]==country]
     dailyPositives= df_countryData["ConfirmedCases"]
     dailyTests= df_countryData["total_cumul.all"]
+    if(dailyTests.max()<10000):
+        continue
+    testsNotInterpolated=df_lastHist["Interpolated"].tail(3)
+    if(testsNotInterpolated[testsNotInterpolated=="Yes"].count()>=testsNotInterpolated[testsNotInterpolated=="No"].count()):
+        continue
     dailyPositives= dailyPositives.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
     dailyTests= dailyTests.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
     if(len(dailyTests)<=1 | len(dailyPositives)<=1):
@@ -113,6 +118,7 @@ def figures_slopes(df_slopes,df_pop):
   #df_countrySlopes=df_countrySlopes[df_countrySlopes.testsSlopePval<0.05]
   df_countrySlopes["temp"]="0"
   df_countrySlopes.loc[df_countrySlopes.testsWeeklyPerc>=df_countrySlopes.casesWeeklyPerc, ['temp']] = "1"
+  #df_countrySlopes[["CountryProv","casesWeeklyPerc","testsWeeklyPerc"]].to_csv("df_countrySlopes.csv", index=False)
   df_countrySlopes = ColumnDataSource(df_countrySlopes)
     
   gf = GroupFilter(column_name='temp', group="1")
