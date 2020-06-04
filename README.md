@@ -58,7 +58,16 @@ python3 main.py l1-importothers \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
 
-or add `--skip-download` to avoid downloading JHU, OWID, etc
+After the first run of l1, there will most likely see an error showing country/date pairs on which there is a dip in cumulative tests.
+Some of these errors are automatically marked as "to be skipped" (check the `is_approved` flag in the displayed table).
+Others need manual attention. In any case, re-run the l1 step a few times until all the automatically skipped rows
+are no longer showing up in the table, as follows:
+
+```
+python3 main.py l1-importothers --skip-download ~/Development/gitlab.com/biominers/covid19-testing-data/
+```
+
+where we use `--skip-download` to avoid downloading JHU, OWID, etc
 
 Check the related section `Troubleshooting / How to deal with l1 error "Found 46 triplets with dips in their cumulative tests."`
 
@@ -72,6 +81,24 @@ python3 main.py l2-mergetogether \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
 
+At this stage, there could be either an error saying that the JHU confirmed cases are decreasing.
+These are resolved by identifying some rows with replacement values in the l2/t15.csv file.
+Usually the replacement value would be the lower value being copied backwards, as if the previous number
+was wrongly inflated. After this fix, a re-run of l2 is sufficient.
+
+Another error is that tests is less than cases. In that case, the program prompts the user
+to check l2/drop.csv.new and merge it with l2/drop.csv and mark some rows as skippable.
+After this fix, a re-run of l1 is necessary (no need to download), eg
+
+```
+python3 main.py l1-importothers --skip-download ~/Development/gitlab.com/biominers/covid19-testing-data/
+```
+
+followed by re-run of l2. This might need to be re-iterated a few times since at each iteration,
+the next-best source for each country/date pair is pushed forward and tested again.
+It's important to see the number of errors going down and converging towards 0 with each iteration.
+
+
 
 Step 3: interpolate and extrapolate
 
@@ -79,6 +106,8 @@ Step 3: interpolate and extrapolate
 python3 main.py l3-generatearcdata \
   ~/Development/gitlab.com/biominers/covid19-testing-data/
 ```
+
+Note: As of 2020-05-15(?), this step yields a warning `A value is trying to be set on a copy of a slice from a DataFrame` that needs to be fixed.
 
 
 After running step 3, we currently need to open all the `ArcGIS/v2/*csv` files manually in excel/libreoffice and resave the csv to drop the `.0` suffixes of decimals.
@@ -88,8 +117,10 @@ Casting the corresponding dataframe column to int doesnt work because it contain
 
 Step 4a: Notebook t11d: R, chisquared thresholds.
 
-- input: `l2/interpolated.csv`
-- outputs:
+- input:
+  - `l2/interpolated.csv`
+  - `gitlab/biominers/kaggle/shadi/ellipse_lib.R`
+- output:
   - `l4/t11d-chisquared-history-v20200512.csv`
   - deprecated: `l2/t11d-chisquared-ranks.csv`
 
@@ -112,7 +143,18 @@ Upload plots to AWS S3 bucket as static html
 AWS_PROFILE=shadi_shadi aws s3 sync www/ s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
 
 # or for uploading a single file
+## High priority
+AWS_PROFILE=shadi_shadi aws s3 cp www/index.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
 AWS_PROFILE=shadi_shadi aws s3 cp www/t11d-chisquared_dashboard-simple.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+AWS_PROFILE=shadi_shadi aws s3 cp www/t11d-layout.css s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+AWS_PROFILE=shadi_shadi aws s3 cp www/t11c-country_latest_table.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+AWS_PROFILE=shadi_shadi aws s3 cp www/t12b-plotSourcesOverTime-stacked.png s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+
+## Low priority
+AWS_PROFILE=shadi_shadi aws s3 cp www/p5_global_scatter.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+AWS_PROFILE=shadi_shadi aws s3 cp www/t11d-chisquared_dashboard-detailed.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+AWS_PROFILE=shadi_shadi aws s3 cp www/t12b-plotSourcesOverTime-lines.png s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
+AWS_PROFILE=shadi_shadi aws s3 cp www/t16a-postprocessing_dashboard.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
 ```
 
 If the `--acl` doesn't work (it works as of 2020-05-12), then make the folder public manually in aws web console.
