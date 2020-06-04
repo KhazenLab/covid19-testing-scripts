@@ -137,7 +137,21 @@ python3 main.py l4-plots \
   www/
 ```
 
-Upload plots to AWS S3 bucket as static html
+
+Step 5: generate latest country table
+
+- input: `/ArcGIS/v2/t11c-confirmedtotalTests-latestOnly.csv`
+- output: `www/t11c-country_latest_table.html`
+
+```
+
+python3 main.py l5-generatetable \
+  ~/Development/gitlab.com/biominers/covid19-testing-data/ \
+  www/
+```
+
+
+Step 6: Upload plots and table to AWS S3 bucket as static html
 
 ```
 AWS_PROFILE=shadi_shadi aws s3 sync www/ s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
@@ -162,22 +176,7 @@ If the `--acl` doesn't work (it works as of 2020-05-12), then make the folder pu
 (https://github.com/aws/aws-cli/issues/1560)
 
 
-Step 5: generate latest country table
-
-- input: `/ArcGIS/v2/t11c-confirmedtotalTests-latestOnly.csv`
-- output: `www/t11c-country_latest_table.html`
-
-```
-
-python3 main.py l5-generatetable \
-  ~/Development/gitlab.com/biominers/covid19-testing-data/ \
-  www/
-```
-
-Upload html table to AWS S3 bucket as static html
-
-
-Step 6: Exporting to github
+Step 7: Exporting to github
 
 We also mirror one file from this repository to github https://github.com/KhazenLab/covid19-data
 
