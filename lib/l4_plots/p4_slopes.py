@@ -36,7 +36,7 @@ def determineSlope(dataset,df_pop, nbDays, nbDaysEnd, rollingAvg):
     dailyTests= df_countryData["total_cumul.all"]
     if(dailyTests.max()<10000):
         continue
-    testsNotInterpolated=df_lastHist["Interpolated"].tail(3)
+    testsNotInterpolated=df_countryData["Interpolated"].tail(3)
     if(testsNotInterpolated[testsNotInterpolated=="Yes"].count()>=testsNotInterpolated[testsNotInterpolated=="No"].count()):
         continue
     dailyPositives= dailyPositives.diff().rolling(rollingAvg, min_periods=1).mean().tail(nbDays).dropna()
