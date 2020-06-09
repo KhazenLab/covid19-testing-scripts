@@ -1,5 +1,9 @@
 All entries in reverse chronological order.
 
+Version 1.0 (2020-06-??)
+
+- misc commits undocumented in the changelog (by Halim and Shadi)
+
 
 Version 0.9 (2020-05-??)
 

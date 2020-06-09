@@ -297,7 +297,12 @@ class L0ImportBiominers:
     df_global = df_global.sort_values(["country_t11", "Date"], ascending=True)
 
     if df_global[["country_t11","Date"]].duplicated().any():
-      raise Exception("Found %i duplicates in biominers data"%(df_global[["country_t11","Date"]].duplicated().sum()))
+      df_dupes = df_global[df_global[["country_t11","Date"]].duplicated()]
+      print(df_dupes[~df_dupes.duplicated()][["country_t11","Date"]])
+      import click
+      click.secho("Found %i duplicates in biominers data"%(df_global[["country_t11","Date"]].duplicated().sum()), fg="red")
+      import sys
+      sys.exit(3)
 
     self.df_global = df_global
 
