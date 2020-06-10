@@ -156,7 +156,7 @@ Step 6: Upload plots and table to AWS S3 bucket as static html
 ```
 AWS_PROFILE=shadi_shadi aws s3 sync www/ s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
 
-# or for uploading a single file
+# or for uploading a single file (also in `sync_aws.sh`)
 ## High priority
 AWS_PROFILE=shadi_shadi aws s3 cp www/index.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
 AWS_PROFILE=shadi_shadi aws s3 cp www/t11d-chisquared_dashboard-simple.html s3://biominers-b1/covid19-testing-data/ --acl bucket-owner-full-control --acl public-read
