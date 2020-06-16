@@ -144,11 +144,11 @@ def l4_plots(dir_gitrepo, dir_plot_destination):
   """
   Generate plots, eg figure of stacked number of countries/states per day per source
   """
-  #print("FIXME uncomment p5 GlobalScatterplots")
-  f5 = GlobalScatterplots()
-  f5.read_csv(dir_gitrepo)
-  f5.create_layout()
-  f5.to_html(dir_plot_destination)
+  # Deprecated as of 2020-06-16
+  #f5 = GlobalScatterplots()
+  #f5.read_csv(dir_gitrepo)
+  #f5.create_layout()
+  #f5.to_html(dir_plot_destination)
 
   #----------
 
