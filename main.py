@@ -151,7 +151,6 @@ def l4_plots(dir_gitrepo, dir_plot_destination):
   #f5.to_html(dir_plot_destination)
 
   #----------
-
   f3d = SlopesChisquaredDashboardDetailed()
   f3d.read_csv(dir_gitrepo)
 
@@ -174,7 +173,7 @@ def l4_plots(dir_gitrepo, dir_plot_destination):
   factory = L4Plots()
   factory.read_csv(dir_gitrepo)
   factory.prep_plots()
-  factory.plot_line(dir_plot_destination)
+  #factory.plot_line(dir_plot_destination)
   factory.plot_stacked(dir_plot_destination)
 
 

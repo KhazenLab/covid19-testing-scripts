@@ -84,16 +84,17 @@ class L4Plots:
     filled_markers = ('o', 'v', '^', '<', '>', 's', '8', 'p', '*', 'h', 'H', 'D', 'd', 'P', 'X')
     ax=sns.lineplot(data=df_agg3, markers=filled_markers)
     
+    # Force showing the last date
     # 737530 is for 2020-04-15
-    last_date = (df_agg3.index.max() - pd.to_datetime(dt.date(2020,4,15))).days
-    extraticks = [737530+last_date]
-    plt.xticks(list(plt.xticks()[0]) + extraticks)
+    #last_date = (df_agg3.index.max() - pd.to_datetime(dt.date(2020,4,15))).days
+    #extraticks = [737530+last_date]
+    #plt.xticks(list(plt.xticks()[0]) + extraticks)
     
     ax.set_ylabel("Number of daily country/state pairs")
     plt.xticks(rotation=45)
     plt.grid(alpha=.1)
     plt.ylim(0)
-    plt.xlim(right=df_agg3.index.max())
+    #plt.xlim(right=df_agg3.index.max())
     
     #fn_line = join(dir_plot_destination, 't12b-plotSourcesOverTime-lines-v%s.png'%self.dt_now)
     fn_line = join(dir_plot_destination, 't12b-plotSourcesOverTime-lines.png')
@@ -120,14 +121,15 @@ class L4Plots:
     plt.xlabel("Date")
     
     # Add extra tick for May 3 since the automatic ticks stop at May 1
-    #last_date = (df_agg3.index.max() - pd.to_datetime(dt.date(2020,4,15))).days
-    ## 737530 represents 04-15
-    #extraticks = [737530+last_date] # append last date
-    ##extraticks = []
-    #existingticks = list(plt.xticks()[0])
-    ## drop 2020-05-01 because it's too close to 05-03
+    # 737530 represents 04-15
+    dt_max = df_agg3.index.max() - pd.to_timedelta(3, unit='d')
+    last_date = (dt_max - pd.to_datetime(dt.date(2020,4,15))).days
+    extraticks = [737530+last_date] # append last date
+    #extraticks = []
+    existingticks = list(plt.xticks()[0])
+    # drop 2020-05-01 because it's too close to 05-03
     #existingticks = existingticks[0:(len(existingticks)-1)]
-    #plt.xticks(existingticks + extraticks)
+    plt.xticks(existingticks + extraticks)
     
     plt.xticks(rotation=45, ha="right")
     
@@ -135,13 +137,16 @@ class L4Plots:
     
     # FIXME set an xlim on 2020-05-01 for lancet correspondence, but that got rejected
     #plt.xlim(right=dt.date(2020,5,1))
+    plt.xlim(right=dt_max)
     
     # png for doc, and jpg for attachment to submission
     #fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.png'%self.dt_now)
-    fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked.png')
-    #plt.savefig(fn_st_png, dpi = 300, bbox_inches="tight")
-    plt.savefig(fn_st_png, dpi = 100, bbox_inches="tight")
-    print(f"Saved to {fn_st_png} (at 100 dpi)")
+    fn_st_png_350dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-350dpi.png')
+    plt.savefig(fn_st_png_350dpi, dpi = 350, bbox_inches="tight")
+
+    fn_st_png_100dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked.png')
+    plt.savefig(fn_st_png_100dpi, dpi = 100, bbox_inches="tight")
+    print(f"Saved to {fn_st_png_100dpi}, {fn_st_png_350dpi} (at 100 dpi and 350 dpi)")
 
     # disabled because it doesn't run on my laptop, but works fine on colab
     #fn_st_jpg = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.jpg'%self.dt_now)
