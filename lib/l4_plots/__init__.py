@@ -115,6 +115,11 @@ class L4Plots:
     # Plot
     plt.figure(figsize=(15,8))
     ax = plt.stackplot(x, y, labels=df_agg3.columns)
+
+    import matplotlib.ticker as ticker
+    ax = plt.gca()
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(14))
+
     plt.xlim(x.min(), x.max())
     plt.legend(loc='upper left')
     plt.ylabel("Countries/states with historical data")
@@ -141,7 +146,7 @@ class L4Plots:
     
     # png for doc, and jpg for attachment to submission
     #fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.png'%self.dt_now)
-    fn_st_png_400dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-400dpi.png')
+    fn_st_png_400dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-400dpi.jpg')
     plt.savefig(fn_st_png_400dpi, dpi = 400, bbox_inches="tight")
 
     fn_st_png_100dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked.png')
