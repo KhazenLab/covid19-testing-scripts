@@ -141,12 +141,12 @@ class L4Plots:
     
     # png for doc, and jpg for attachment to submission
     #fn_st_png = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.png'%self.dt_now)
-    fn_st_png_350dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-350dpi.png')
-    plt.savefig(fn_st_png_350dpi, dpi = 350, bbox_inches="tight")
+    fn_st_png_400dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-400dpi.png')
+    plt.savefig(fn_st_png_400dpi, dpi = 400, bbox_inches="tight")
 
     fn_st_png_100dpi = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked.png')
     plt.savefig(fn_st_png_100dpi, dpi = 100, bbox_inches="tight")
-    print(f"Saved to {fn_st_png_100dpi}, {fn_st_png_350dpi} (at 100 dpi and 350 dpi)")
+    print(f"Saved to {fn_st_png_100dpi}, {fn_st_png_400dpi} (at 100 dpi and 400 dpi)")
 
     # disabled because it doesn't run on my laptop, but works fine on colab
     #fn_st_jpg = join(dir_plot_destination, 't12b-plotSourcesOverTime-stacked-v%s.jpg'%self.dt_now)

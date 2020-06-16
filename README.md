@@ -467,4 +467,21 @@ instead of having to skip 05-25, 05-26, 05-27, and possibly later dates.
 Note that we should also skip the 05-22 date, otherwise it is still offending wrt to 05-26.
 
 
+### Calculate the number of dropped points for publication
 
+```
+# grep "d$" l0-notion_tables/drop_entries.csv |wc -l
+110
+
+# grep "x$" l0-notion_tables/drop_tests_lessthan_confirmed.csv |wc -l
+101
+
+# grep "x$" l1b-altogether/dropped_outlaws_l1.csv |wc -l
+694
+
+# grep "x$" l2-withConfirmed/dropped_outlaws_l2.csv |wc -l
+1045
+
+# cat l2-withConfirmed/t15-drop_dipsInConfirmedCumulative.csv|grep ",x,[0-9+]"|wc -l
+75
+```
