@@ -117,6 +117,19 @@ Casting the corresponding dataframe column to int doesnt work because it contain
 
 Step 4a: Notebook t11d: R, chisquared thresholds.
 
+This is a jupyter notebook stored in `/gdrive/biominers/shadi/`.
+
+Either run it in your web browser in Google colab,
+or run the script stored locally in this repository (exported from the notebook as of 2020-06-16) as follows:
+
+```
+# Install packages in R
+install.packages(c("data.table", "zoo"))# , "caret", "hexbin"))
+
+# Execute script from bash
+Rscript t11d_shadi_chisquared_testing_on_total_tests_r.R
+```
+
 - input:
   - `l2/interpolated.csv`
   - `gitlab/biominers/kaggle/shadi/ellipse_lib.R`
