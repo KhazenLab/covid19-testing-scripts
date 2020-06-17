@@ -12,3 +12,6 @@ py main.py l3-generatearcdata C:\Users\Halim\Documents\GitHub\Covid19_Testing\co
 py main.py l4-plots C:\Users\Halim\Documents\GitHub\Covid19_Testing\covid19-testing-data\ www
 
 py main.py l5-generatetable C:\Users\Halim\Documents\GitHub\Covid19_Testing\covid19-testing-data\ www
+
+cp C:\Users\Halim\Documents\GitHub\Covid19_Testing\covid19-testing-data\l1b-altogether\covid19-testing-dataset.csv C:\Users\Halim\Documents\GitHub\Covid19_Testing\covid19-data-public2\covid19-testing-dataset.csv
+cp C:\Users\Halim\Documents\GitHub\Covid19_Testing\covid19-testing-data\ArcGIS\v2\covid19-testing-dataset-postprocessed.csv C:\Users\Halim\Documents\GitHub\Covid19_Testing\covid19-data-public2\covid19-testing-dataset-postprocessed.csv
