@@ -1053,6 +1053,9 @@ class L1ImportOthers:
     
     df_save.to_csv(join(self.dir_l1b_altogether, fn_agg), index=False)
     
+    fn_agg2 = "covid19-testing-dataset.csv"
+    df_save[df_save["total_cumul.source"]=="biominers","total_cumul.source"]="lau"
+    df_save.to_csv(join(self.dir_l1b_altogether, fn_agg2), index=False)
 
   def to_csv_all(self):
     # save a 2nd, side-by-side version
