@@ -186,9 +186,10 @@ class L3GenerateArcData:
     historicalData["tests_per_positive"]=np.round(historicalData["total_cumul.all"]/historicalData["ConfirmedCases"],2);
     historicalData["dailyTests"]=dailyTests;
     historicalData["dailyPositives"]=dailyConfirmed;
-    historicalData= historicalData[["CountryProv","Date","total_cumul.all","dailyTests","ConfirmedCases","dailyPositives","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive","Interpolated"]]
-    historicalData.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
-
+    historicalDataSaved= historicalData[["CountryProv","Date","total_cumul.all","dailyTests","ConfirmedCases","dailyPositives","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive","Interpolated"]]
+    historicalDataSaved.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
+    historicalDataSaved2= historicalData[["CountryProv","Date","total_cumul.all","total_cumul.source","Interpolated"]]
+    historicalDataSaved2.to_csv(join(self.dir_l3_arcgis, 'v2', 'covid19-testing-dataset-postprocessed.csv'), index=False)
   def write_chisquared(self):
     historicalData = self.historicalData
 
