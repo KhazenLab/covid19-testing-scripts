@@ -154,7 +154,7 @@ def postprocess(df, dir_gitrepo):
 
     df = pd.concat([df, df_world], axis=0)
     df = pd.concat([df, df_reg], axis=0)
-
+    df["case_detrended"] = df.case_ma07 - df.thres_mid
     # replace nans: https://github.com/bokeh/bokeh/issues/4472#issuecomment-225676759
     #df = df.fillna("NaN")
     #for key in df:
