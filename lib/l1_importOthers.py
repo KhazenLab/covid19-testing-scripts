@@ -305,6 +305,7 @@ class L1ImportOthers:
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "United Kingdom - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Ghana - people tested"]
     df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Thailand - people tested"]
+    df_owid_roser = df_owid_roser[df_owid_roser.Entity != "Poland - people tested"]
     
     # Split the name and comment for simplicity
     ent_uniq = df_owid_roser.Entity.unique()
