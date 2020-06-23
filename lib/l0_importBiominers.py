@@ -239,7 +239,7 @@ def postprocess_table(country_name, df_single):
     return df_single
 
   if country_name=="Philippines":
-    df_single["total_cumul"] = df_single[["confirmed_cumul", "negative_cumul"]].apply(sum, axis=1)
+    df_single["total_cumul"] = df_single[["confirmed_cumul", "negative_cumul","total individuals tested"]].apply(sum, axis=1)
     return df_single
 
   if country_name=="San Marino":
