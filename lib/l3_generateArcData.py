@@ -80,7 +80,7 @@ class L3GenerateArcData:
 
     # round after the interpolation
     historicalData['total_cumul.all']=np.round(historicalData['total_cumul.all'],0)
- 
+    
     # more stats
     historicalData['tests_per_mil']=np.floor(historicalData['total_cumul.all']*1000000/historicalData['Population'])
     historicalData['ratio_confirmed_total_pct']=historicalData['ConfirmedCases']*100/historicalData['total_cumul.all']
@@ -186,12 +186,27 @@ class L3GenerateArcData:
     historicalData["tests_per_positive"]=np.round(historicalData["total_cumul.all"]/historicalData["ConfirmedCases"],2);
     historicalData["dailyTests"]=dailyTests;
     historicalData["dailyPositives"]=dailyConfirmed;
-    historicalDataSaved= historicalData[["CountryProv","Date","total_cumul.all","dailyTests","ConfirmedCases","dailyPositives","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive","Interpolated"]]
-    historicalDataSaved.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
     
+    
+    historicalDataSaved= historicalData[["CountryProv","Date","total_cumul.all","dailyTests","ConfirmedCases","dailyPositives","tests_per_mil","ratio_confirmed_total_pct","daily_ratio_confirmed_total_pct","daily_tests_per_mil","tests_per_positive","daily_tests_per_positive","Interpolated"]]
+    historicalDataSaved=historicalDataSaved.replace([np.inf, -np.inf], np.nan)
     historicalDataSaved2= historicalData[["CountryProv","Date","total_cumul.all","total_cumul.source","Interpolated"]]
     historicalDataSaved2.loc[historicalDataSaved2["total_cumul.source"]=="biominers","total_cumul.source"]="lau"
     historicalDataSaved2.to_csv(join(self.dir_l3_arcgis, 'v2', 'covid19-testing-dataset-postprocessed.csv'), index=False)
+    
+
+    temp=historicalDataSaved.groupby(['Date']).agg({'ConfirmedCases': "sum", 'total_cumul.all': "sum","dailyTests":"sum","dailyPositives":"sum","tests_per_mil":"mean","ratio_confirmed_total_pct":"mean","daily_ratio_confirmed_total_pct":"mean","daily_tests_per_mil":"mean","tests_per_positive":"mean","daily_tests_per_positive":"mean"})
+    temp['CountryProv']="Global"
+    temp['tests_per_mil']=np.floor(temp['tests_per_mil'])
+    temp.reset_index(level=0, inplace=True)
+    temp['Interpolated']="Yes"
+    temp=temp[historicalDataSaved.columns]
+    
+    historicalDataSaved=(pd.concat([historicalDataSaved, temp]))
+    
+    historicalDataSaved.to_csv(join(self.dir_l3_arcgis, 'v2', 't11c-confirmedtotalTests-historical.csv'), index=False)
+    
+    
   def write_chisquared(self):
     historicalData = self.historicalData
 
