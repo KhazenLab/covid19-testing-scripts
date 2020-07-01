@@ -176,8 +176,9 @@ Step 7: Exporting to github
 We also mirror one file from this repository to github https://github.com/KhazenLab/covid19-data
 
 ```
-cp ~/Development/gitlab.com/biominers/covid19-testing-data/l1b-altogether/multiple-aggregated_owid_wiki_worldometers_biominers-gitrepo.csv ~/Development/github.com/KhazenLab/covid19-data/covid19-testing-dataset.csv
-sed -i "s/biominers/lau/g" covid19-testing-dataset.csv
+# Update 2020-07-01: mirroring the postprocessed file instead of before postprocessing
+# cp ~/Development/gitlab.com/biominers/covid19-testing-data/l1b-altogether/multiple-aggregated_owid_wiki_worldometers_biominers-gitrepo.csv ~/Development/github.com/KhazenLab/covid19-data/covid19-testing-dataset.csv
+cp ~/Development/gitlab.com/biominers/covid19-testing-data/ArcGis/v2/covid19-testing-dataset-postprocessed.csv ~/Development/github.com/KhazenLab/covid19-data/covid19-testing-dataset-postprocessed.csv
 ```
 
 
